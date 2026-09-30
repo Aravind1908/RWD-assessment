@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git: Fork vs Clone — and the Fork → Clone → Branch → Commit → PR Workflow</title>
+  <meta name="description" content="Fork vs clone differentiated, the complete GitHub workflow (fork, clone, branch, commit, pull request) as commands, and a note on hosting a website with GitHub Pages.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="git fork, git clone, pull request, PR workflow, upstream, origin, GitHub Pages, contribute to open source">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Fork vs Clone — and the Pull Request Workflow</h1>
+    <p>Clone copies a repo you already have access to; a fork is your <em>own copy of someone else's</em> repo on GitHub. The full contribute-to-any-project workflow — fork → clone → branch → commit → pull request — plus a note on GitHub Pages.</p>
+    <span class="badge">Version Control · Git · GitHub Workflow</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    On a team repo, you <strong>clone</strong> it and push branches directly — everyone shares one repository. In open source (or any repo you don't own), you don't have write access, so GitHub gives you a <strong>fork</strong>: a personal copy of the project under <em>your</em> account. You clone <em>your fork</em>, work on it, and propose your changes back to the original with a <strong>pull request</strong>.
+  </p>
+  <table>
+    <tr><th></th><th>Clone</th><th>Fork</th></tr>
+    <tr><td>What it is</td><td>a full copy of a repo on <em>your machine</em></td><td>a full copy of the repo on <em>GitHub, under your account</em></td></tr>
+    <tr><td>Where it lives</td><td>your laptop</td><td>GitHub (<code>you/project</code> instead of <code>team/project</code>)</td></tr>
+    <tr><td>When you use it</td><td>every time you work on any repo</td><td>when you need your own writable copy of someone else's repo</td></tr>
+    <tr><td>How</td><td><code>git clone &lt;url&gt;</code></td><td>the <em>Fork</em> button (a GitHub feature — not a git command)</td></tr>
+  </table>
+  <pre><code><span class="comment"># the shape of a contribution</span>
+team/project ──Fork (GitHub button)──▶ you/project ──clone──▶ your laptop
+   ▲                                                        │
+   └────────────── Pull Request (branch + review + merge) ◀─┘</code></pre>
+  <p>
+    Once you have the two repos connected, your laptop knows both: <code>origin</code> = <em>your fork</em>, <code>upstream</code> = <em>the original</em>. Everything else is ordinary Git.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>The Complete Workflow, as Commands</h2>
+
+  <pre><code><span class="comment"># 1. Fork: click the "Fork" button on team/project (GitHub does the copying)</span>
+
+<span class="comment"># 2. Clone YOUR fork to your laptop</span>
+git clone https://github.com/you/project.git
+cd project
+
+<span class="comment"># 3. Connect the original, so you can keep up with it</span>
+git remote -v                  <span class="comment"># origin → your fork</span>
+git remote add upstream https://github.com/team/project.git
+
+<span class="comment"># 4. Branch and work (never commit to main of the project)</span>
+git switch -c feature/add-install
+<span class="comment">#    …edit files…</span>
+git add .
+git commit -m <span class="str">"docs: add install section"</span>
+git push -u origin feature/add-install   <span class="comment"># push to YOUR fork</span>
+
+<span class="comment"># 5. Pull Request: on GitHub, "Compare &amp; pull request"</span>
+<span class="comment">#    team/project ← you/project:feature/add-install</span>
+<span class="comment">#    → CI runs, maintainers review, you fix feedback (more commits on the
+</span>
+<span class="comment">#      same branch), and a maintainer clicks Merge.</span>
+
+<span class="comment"># 6. Keep your fork healthy (repeat while the project is alive)</span>
+git fetch upstream
+git switch main
+git merge upstream/main        <span class="comment"># bring the project's progress into your fork</span>
+git push</code></pre>
+
+  <p><strong>What a pull request actually is:</strong> a proposal — "here are N commits on a branch of your fork; please merge them into your repo" — plus the review conversation, CI results, and the merge button around it. It is the gate that keeps the original clean: <em>nothing enters the project without review.</em></p>
+
+  <div class="note">
+    <strong>Hosting a website with GitHub Pages:</strong> GitHub serves any repo as a static website — the same static-hosting model as the hosting guide. Put your site files (an <code>index.html</code> + assets) in your repo, then <strong>Settings → Pages → Deploy from a branch</strong> (choose <code>/main</code>, or a <code>docs/</code> folder). Minutes later the site is live at <code>https://you.github.io/repo-name</code>. No server, no billing, no config — it's the classic home for portfolios, project docs, and this series of guides.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+  <div class="card">
+    <h3>Fork or clone — which one?</h3>
+    <table>
+      <tr><th>Situation</th><th>Path</th></tr>
+      <tr><td>Your team's repo (you have write access)</td><td>clone it, push feature branches directly, open PRs between branches of the <em>same</em> repo</td></tr>
+      <tr><td>Open-source project you want to contribute to</td><td>fork → clone your fork → branch → PR to the original</td></tr>
+      <tr><td>Just reading/studying someone's code</td><td>clone it — no fork needed</td></tr>
+      <tr><td>Building your own project as a fork of a template</td><td>fork the template, then delete the upstream connection if you want a clean history</td></tr>
+    </table>
+  </div>
+  <div class="tip">
+    <strong>The two-remote habit:</strong> in a fork, <code>push</code> goes to <code>origin</code> (your fork — always safe), and progress from the project is <code>fetch</code>ed from <code>upstream</code>. Mixing those up is the single most common fork-workflow mistake — pushing to upstream is impossible anyway (you have no write access), which is the built-in safety.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Program</h2>
+  <p>One script simulates the entire workflow on a single machine: two bare repositories play "team/project" (upstream) and "you/project" (the fork), a third clone is your laptop. Built in a temp folder, cleans up after itself.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+root=$(mktemp -d) &amp;&amp; cd <span class="str">"$root"</span>
+
+<span class="comment"># team/project — the original ("upstream")</span>
+git init -q --bare --initial-branch=main team.git
+git clone -q team.git seed &amp;&amp; cd seed
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="136776727e53766b727e637f763d707c7e">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"Team"</span>
+<span class="kw">echo</span> <span class="str">"# project"</span> &gt; README.md
+git add README.md
+git commit -qm <span class="str">"v1"</span>
+git push -q origin main
+cd <span class="str">"$root"</span>
+
+<span class="comment"># you click "Fork": a copy of the repo appears under your account</span>
+git clone -q --bare team.git you.git
+
+<span class="comment"># you clone YOUR fork to your laptop</span>
+git clone -q you.git laptop &amp;&amp; cd laptop
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95ecfae0d5f0edf4f8e5f9f0bbf6faf8">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+git remote add upstream ../team.git   <span class="comment"># connect the original</span>
+
+<span class="comment"># branch, work, commit, push to your fork</span>
+git switch -c feature/add-install
+printf <span class="str">"\n## Install\nnpm install\n"</span> &gt;&gt; README.md
+git add README.md
+git commit -qm <span class="str">"docs: add install section"</span>
+git push -u origin feature/add-install
+
+<span class="comment"># the pull request = your branch vs the project's main</span>
+git fetch upstream
+git log --oneline upstream/main..feature/add-install   <span class="comment"># what the PR proposes</span>
+
+<span class="comment"># a maintainer merges the PR (their clone takes your branch)</span>
+cd <span class="str">"$root"</span>
+git clone -q team.git maintainer &amp;&amp; cd maintainer
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="235746424e63465b424e534f460d404c4e">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"Team"</span>
+git remote add you ../you.git
+git fetch you
+git merge --no-ff you/feature/add-install -m <span class="str">"Merge PR: add install section"</span>
+git push -q origin main
+git log --oneline --graph          <span class="comment"># the contribution, inside the project now</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation:</strong>
+    <ul>
+      <li><code>git clone --bare team.git you.git</code> stands in for clicking Fork: a complete copy of the project, owned by "you". The <code>laptop</code> clone then has <code>origin</code> = the fork and <code>upstream</code> = the original.</li>
+      <li>Your commit goes only to <code>origin</code> (the fork) — the original is untouched, exactly like GitHub's permission model.</li>
+      <li><code>git log upstream/main..feature/add-install</code> is the PR's content: the commits that are <em>proposed</em> for the project.</li>
+      <li>The final merge is what the maintainer's <em>Merge</em> button does: the project's <code>main</code> now carries your branch, and the <code>--graph</code> shows the fork's line joining the project's.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_fork_clone_pr.sh</code> and run <code>bash example1_fork_clone_pr.sh</code>. Only Git is needed; everything happens in a temp folder.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Contribute to anything:</strong> the fork model lets strangers improve any public project without the owners giving out write access.</li>
+    <li><strong>Safe by permission:</strong> you literally cannot break the original repo — your pushes go to your fork, and entry is only via reviewed PRs.</li>
+    <li><strong>Review + CI as a gate:</strong> every change gets tested and discussed before it lands; the project's <code>main</code> stays trustworthy.</li>
+    <li><strong>Your fork is a sandbox:</strong> experiments, half-finished ideas and learning branches live in your own space, with the project's progress one <code>git fetch upstream</code> away.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    <strong>Clone</strong> is a copy on your machine; <strong>fork</strong> is your own copy of someone else's repo on GitHub. The workflow: <em>Fork → clone your fork → add <code>upstream</code> → branch → commit → push to your fork → open a Pull Request → maintainers review and merge</em>. Your laptop's two remotes keep it honest: push to <code>origin</code>, update from <code>upstream</code>.
+  </p>
+  <p>
+    And the same platform hosts the result: put an <code>index.html</code> in a repo, enable <strong>Settings → Pages</strong>, and your static website is live at <code>you.github.io/repo</code> — no server required. <em>Fork to copy, PR to propose, Pages to publish.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Fork vs Clone &amp; the PR Workflow</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

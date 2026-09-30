@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS vs Bootstrap: Approach, Styling, Flexibility, Bundle Size &amp; Learning Curve</title>
+  <meta name="description" content="A detailed comparison of Tailwind CSS and Bootstrap — approach, styling, flexibility, bundle size, learning curve — with a code comparison of the same button and card in both.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind vs bootstrap, comparison, css framework, bundle size, learning curve, utility-first, components">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS vs Bootstrap</h1>
+    <p>Two frameworks, one goal — fast, consistent UIs — with opposite philosophies. Compared on approach, styling, flexibility, bundle size and learning curve, with the same button and card coded in both.</p>
+    <span class="badge">CSS Frameworks · Tailwind vs Bootstrap</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>Bootstrap</strong> (2011; v5.x is current) and <strong>Tailwind CSS</strong> (2018; v4.x is current) solve the same problem — building UIs faster than hand-writing CSS — but they take <strong>opposite sides of the same argument</strong>:
+  </p>
+  <ul>
+    <li><strong>Bootstrap is a component library.</strong> You write semantic markup (<code>class="card"</code>, <code>class="btn btn-primary"</code>) and it ships you <em>pre-styled, pre-behaving components</em> — buttons, navbars, modals, forms — with an established look out of the box.</li>
+    <li><strong>Tailwind is a utility framework.</strong> It ships <em>no components at all</em> — only small, single-purpose classes (<code>bg-blue-600</code>, <code>rounded-lg</code>, <code>flex</code>) that you compose yourself in the markup, pixel by pixel.</li>
+  </ul>
+  <p>
+    The one-line difference: <strong>Bootstrap gives you components; Tailwind gives you the atoms to build any component.</strong> Everything below compares how that difference plays out in practice.
+  </p>
+  <pre><code><span class="comment">&lt;!-- Same button, both frameworks --&gt;</span>
+<span class="comment">&lt;!-- Bootstrap: one semantic component class --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"btn btn-primary"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/button&gt;</span>
+
+<span class="comment">&lt;!-- Tailwind: the same look, composed from utilities --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 text-white font-semibold
+            px-6 py-3 rounded-lg transition"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/button&gt;</span></code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Two different ways of reading a class list</h3>
+  <p>In Bootstrap, a class is a <strong>component or a role</strong> — <code>card</code>, <code>card-body</code>, <code>nav</code>, <code>table</code>. You rarely see a color or a pixel value in the class name. In Tailwind, every class is a <strong>declaration</strong> — the name <em>is</em> the CSS (<code>px-6</code> = 1.5rem horizontal padding). One expresses <em>what something is</em>, the other <em>what it looks like</em>.</p>
+  <table>
+    <tr><th></th><th>Bootstrap</th><th>Tailwind</th></tr>
+    <tr><td>A button</td><td><code>btn btn-primary</code> (+ <code>btn-lg</code>, <code>disabled</code>)</td><td><code>bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg</code></td></tr>
+    <tr><td>A card</td><td><code>card &gt; card-body</code>, <code>card-title</code>, <code>card-text</code></td><td><code>bg-white rounded-2xl border border-gray-200 shadow-sm p-6</code> + type utilities</td></tr>
+    <tr><td>Layout</td><td>Grid system: <code>container &gt; row &gt; col-6</code></td><td><code>flex</code>/<code>grid</code> + spacing: <code>flex md:flex-row gap-4</code></td></tr>
+    <tr><td>Responsive</td><td>Breakpoint classes: <code>col-md-6</code>, <code>d-none d-md-block</code></td><td>Prefixed utilities: <code>md:flex-row</code>, <code>hidden md:block</code></td></tr>
+  </table>
+
+  <h3>The same card, both ways</h3>
+  <pre><code><span class="comment">&lt;!-- ── Bootstrap ─ --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span> <span class="attr">style</span>=<span class="val">"max-width: 340px"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card-body"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h5</span> <span class="attr">class</span>=<span class="val">"card-title"</span><span class="tag">&gt;</span>Card title<span class="tag">&lt;/h5&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"card-text"</span><span class="tag">&gt;</span>Some quick example text.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"btn btn-primary"</span><span class="tag">&gt;</span>Go somewhere<span class="tag">&lt;/a&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="comment">&lt;!-- ── Tailwind (identical design, composed) ── --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-sm bg-white rounded-2xl border border-gray-200
+            shadow-sm p-6"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"text-lg font-bold text-gray-900"</span><span class="tag">&gt;</span>Card title<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600"</span><span class="tag">&gt;</span>Some quick example text.<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm
+              font-semibold px-4 py-2 rounded-lg"</span><span class="tag">&gt;</span>Go somewhere<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+  <p>Notice the trade in plain sight: the Bootstrap version is <em>shorter</em>, but its look is Bootstrap's — to make it look like <em>your</em> brand you'd override component CSS. The Tailwind version is <em>longer</em>, but every visual decision is explicit in the markup, and nothing is "Bootstrap-y" by default.</p>
+
+  <h3>How you customize each</h3>
+  <pre><code><span class="comment">/* Bootstrap 5: themes via CSS custom properties (SCSS source for deeper cuts) */</span>
+<span class="tag">:root</span> {
+  <span class="kw">--bs-primary</span>: <span class="str">#2563eb</span>;          <span class="comment">/* re-skins .btn-primary, alerts, … */</span>
+  <span class="kw">--bs-border-radius</span>: <span class="num">0.75rem</span>;
+}
+
+<span class="comment">/* Tailwind v4: extend the scale in CSS, then use it in markup */</span>
+<span class="kw">@theme</span> {
+  <span class="kw">--color-brand</span>: <span class="str">#2563eb</span>;        <span class="comment">/* enables bg-brand, text-brand, … */</span>
+}</code></pre>
+  <p>Both can be themed; the difference is what you're fighting against. Bootstrap customization means <em>overriding its component defaults</em> (sometimes with <code>!important</code>), while Tailwind customization means <em>choosing different utilities</em> — there are no component defaults to override.</p>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>The head-to-head</h3>
+    <table>
+      <tr><th>Dimension</th><th>Bootstrap</th><th>Tailwind</th></tr>
+      <tr><td><strong>Approach</strong></td><td>Component library — semantic classes on pre-built components (btn, card, navbar, modal…)</td><td>Utility-first — compose single-purpose classes; no pre-built components</td></tr>
+      <tr><td><strong>Styling / defaults</strong></td><td>Strong opinions: an established look out of the box; JS plugins for interactions (popovers, toasts)</td><td>No opinion: you compose every detail; pair with Headless UI for accessible behavior</td></tr>
+      <tr><td><strong>Customization</strong></td><td>CSS variables / SCSS themes; off-system looks need override effort (specificity battles, <code>!important</code>)</td><td>Change utilities or extend the scale (<code>@theme</code>); nothing to override</td></tr>
+      <tr><td><strong>Flexibility</strong></td><td>Excellent <em>within</em> the system; unusual designs mean fighting the defaults</td><td>Any design expressible directly — at the cost of longer class lists ("class soup")</td></tr>
+      <tr><td><strong>Bundle size</strong></td><td>Full <code>bootstrap.min.css</code> ≈ 230 KB (≈ 35 KB gzipped); a pruned SCSS subset can land around 20–50 KB</td><td>Only used utilities ship — a typical page's final CSS is on the order of 5–15 KB minified</td></tr>
+      <tr><td><strong>Learning curve</strong></td><td>Gentle — a handful of semantic classes; productive in an hour, even with light CSS knowledge</td><td>Steeper ramp — learn the scale and utility names; then it's muscle memory, and you absorb real CSS along the way</td></tr>
+      <tr><td><strong>Ecosystem</strong></td><td>Massive legacy: AdminLTE, SB Admin, React-Bootstrap, BootstrapVue, countless themes</td><td>daisyUI, shadcn-style patterns, Headless UI, @tailwindcss/typography, Tailwind UI</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Fast conventional admin dashboards &amp; marketing pages, internal tools, legacy projects, teams wanting a consistent default look</td><td>Custom branded products, design systems, teams that want to own every pixel and ship tiny CSS</td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — the Tailwind card, live (needs internet)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">The Bootstrap twin can't be loaded on this page without its stylesheet (its resets would restyle the guide itself) — so the Bootstrap half lives in the code blocks above and in Example 2, where both CDNs run together.</p>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="max-w-sm bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-4">
+      <h3 class="text-lg font-bold text-gray-900 m-0">Card title</h3>
+      <p class="mt-2 text-sm text-gray-600 m-0">Some quick example text — the same card Bootstrap builds with <code>card &gt; card-body</code>.</p>
+      <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">Go somewhere</button>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Bundle size, honestly:</strong> "Tailwind is smaller" is true <em>in production builds</em> — its purger ships only the utilities you use. Bootstrap's ~230 KB is the full component library whether you need 3 components or 30. A small Bootstrap page (pruned SCSS) and a large Tailwind app can end up similar; the gap is biggest where pages are simple (Tailwind wins) or where Bootstrap components go unused (Bootstrap pays for what it doesn't show).
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — The same button, both frameworks, side by side</h3>
+  <p>One page loads <em>both</em> CDNs: the left panel is styled by Bootstrap, the right by Tailwind. Save as <code>index.html</code> (needs internet for both CDNs).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Same Button: Bootstrap vs Tailwind<span class="tag">&lt;/title&gt;</span>
+  <span class="comment">&lt;!-- both frameworks on one page (demo only — pick one in real projects) --&gt;</span>
+  <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="val">"https://cdn.jsdelivr.net/npm/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="66040909121512140716265348554855">[email&#160;protected]</a>/dist/css/bootstrap.min.css"</span>
+        <span class="attr">rel</span>=<span class="val">"stylesheet"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* host layout only — not part of either framework's lesson */</span>
+    <span class="kw">body</span> { <span class="kw">display</span>: <span class="kw">flex</span>; <span class="kw">justify-content</span>: <span class="kw">center</span>;
+      <span class="kw">align-items</span>: <span class="kw">center</span>; <span class="kw">min-height</span>: <span class="num">100vh</span>; <span class="kw">gap</span>: <span class="num">24px</span>; }
+    <span class="kw">.panel</span> { <span class="kw">text-align</span>: <span class="kw">center</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="comment">&lt;!-- Bootstrap's button --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"panel card p-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"fw-bold mb-2"</span><span class="tag">&gt;</span>Bootstrap — <code>btn btn-primary</code><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"btn btn-primary"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- Tailwind's button --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"panel"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"font-bold mb-4"</span><span class="tag">&gt;</span>Tailwind — composed utilities<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 text-white font-semibold
+                px-6 py-3 rounded-lg transition"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>Same visible result, two philosophies: <code>btn btn-primary</code> says "give me <em>your</em> primary button" (Bootstrap blue <code>#0d6efd</code>), while the utility list says "give me <em>this</em> blue, <em>these</em> paddings, <em>this</em> radius" (Tailwind blue-600 <code>#2563eb</code>) — which is why the two buttons are subtly different blues.</li>
+      <li>Bootstrap's hover and focus behavior come from the component; Tailwind's come from <code>hover:bg-blue-700</code> + <code>transition</code> — visible right in the markup.</li>
+      <li>The small <code>&lt;style&gt;</code> block only centers the two demo panels — everything the buttons themselves look like comes from the two frameworks.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Hover both buttons: Bootstrap animates its own way, Tailwind's <code>transition</code> eases the color. Open DevTools and compare: one generated component class vs a long list of single-purpose classes.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — The same card, both frameworks, side by side</h3>
+  <p>The card comparison from Section 2, made runnable — Bootstrap's <code>card</code> on the left, the utility-composed card on the right, same content.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Same Card: Bootstrap vs Tailwind<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="val">"https://cdn.jsdelivr.net/npm/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51333e3e25222523302111647f627f62">[email&#160;protected]</a>/dist/css/bootstrap.min.css"</span>
+        <span class="attr">rel</span>=<span class="val">"stylesheet"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-light min-vh-100 d-flex align-items-center
+            justify-content-center flex-wrap gap-4 m-0 p-3"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- ── Bootstrap card ── --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card-body"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h5</span> <span class="attr">class</span>=<span class="val">"card-title"</span><span class="tag">&gt;</span>Bootstrap card<span class="tag">&lt;/h5&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"card-text"</span><span class="tag">&gt;</span>
+        Pre-styled title, text and button from the framework.
+      <span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"btn btn-primary btn-sm"</span><span class="tag">&gt;</span>Go somewhere<span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- ── Tailwind card (same design, composed) ── --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-2xl border border-gray-200
+              shadow-sm p-6 w-80"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"text-lg font-bold text-gray-900"</span><span class="tag">&gt;</span>Tailwind card<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600"</span><span class="tag">&gt;</span>
+      Same card — every visual decision is an explicit utility.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-3 bg-blue-600 hover:bg-blue-700 text-white
+                text-sm font-semibold px-4 py-2 rounded-lg"</span><span class="tag">&gt;</span>Go somewhere<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>Bootstrap's card needs three class names total; its padding, radius, shadow, title size and muted text are all framework defaults. Change the card's brand look and you'd override <code>.card</code>/<code>.card-title</code> CSS.</li>
+      <li>The Tailwind card names everything — <code>rounded-2xl</code>, <code>border-gray-200</code>, <code>shadow-sm</code>, <code>text-sm text-gray-600</code> — so the design is fully visible in the markup and trivially changeable per instance.</li>
+      <li>The body's Bootstrap flex classes (<code>d-flex</code>, <code>gap-4</code>) only host the two cards side by side — in a real project each framework would own the whole page.</li>
+      <li>Compare the two <code>&lt;div&gt;</code> class lists and you can see the whole argument: <strong>short &amp; opaque (components) vs long &amp; explicit (utilities)</strong>.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet (both CDNs). Resize to see the two cards wrap onto separate lines. Try changing the Tailwind card's <code>rounded-2xl</code> to <code>rounded-none</code> — an instant re-skin with zero CSS.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages (and when to pick which)</h2>
+
+  <h3>Bootstrap's advantages</h3>
+  <ul>
+    <li><strong>Fastest possible start:</strong> a handful of semantic classes produce a complete, consistent, accessible-by-default UI — productive within an hour, even for junior developers.</li>
+    <li><strong>Zero design decisions up front:</strong> the framework's defaults are sane and familiar, so teams without a designer ship respectable UIs immediately.</li>
+    <li><strong>Built-in JS behaviors:</strong> modals, dropdowns, tooltips, toasts ship as plugins — no extra state/JS work for common interactions.</li>
+    <li><strong>Huge legacy ecosystem:</strong> the largest stock of themes, admin templates (AdminLTE, SB Admin) and framework ports (React-Bootstrap, etc.) — great for conventional admin/internal tooling.</li>
+  </ul>
+
+  <h3>Tailwind's advantages</h3>
+  <ul>
+    <li><strong>Full design freedom:</strong> no component defaults to fight — any brand, any layout, expressible directly in markup.</li>
+    <li><strong>Tiny production CSS:</strong> the purger ships only used utilities (typically 5–15 KB), versus a full Bootstrap sheet or a carefully pruned one.</li>
+    <li><strong>Colocation &amp; deletability:</strong> styles live next to the markup; delete the element, the styles go too — no orphaned component overrides.</li>
+    <li><strong>Consistency by scale:</strong> spacing/type/color tokens keep teams aligned without a style guide, and responsive/state behavior are one-class additions (<code>md:</code>, <code>hover:</code>).</li>
+    <li><strong>You learn CSS on the way:</strong> the utility vocabulary <em>is</em> CSS property names — a side effect Bootstrap users often never get.</li>
+  </ul>
+
+  <div class="tip">
+    <strong>Verdict:</strong> they're tools for different jobs, not rivals for a throne. <strong>Bootstrap</strong> when you need a conventional, consistent UI <em>fast</em> (internal tools, admin dashboards, quick prototypes, teams with light CSS experience). <strong>Tailwind</strong> when the design is the product — custom branding, a design system to own, or a performance budget that makes every shipped byte count. (And yes, many teams do both: Bootstrap in the legacy app, Tailwind in the new one.)
+  </div>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Tailwind and Bootstrap both answer "how do I build UI faster?" — Bootstrap by <strong>giving you components</strong> (semantic classes, pre-styled, with JS behaviors, a gentle learning curve, but an opinionated look and a ~230 KB default sheet), and Tailwind by <strong>giving you utilities</strong> (explicit, composable classes, full design freedom, tiny purged CSS, but a steeper vocabulary to learn and longer class lists).
+  </p>
+  <p>
+    The same button is <code>btn btn-primary</code> in one and six utilities in the other; the same card is <code>card &gt; card-body</code> versus a dozen explicit classes. <em>Pick Bootstrap to move fast with defaults; pick Tailwind to own every pixel — and in both cases, the fastest path is picking one and committing to it.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS vs Bootstrap</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3bd238c8b4e17cf',t:'MTc4OTUzMzA1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

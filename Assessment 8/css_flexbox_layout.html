@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to CSS Flexbox — container properties (flex-direction, justify-content, align-items, gap, flex-wrap) and item properties (flex-grow, shrink, basis, order) with a navbar/card example.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="CSS Flexbox, flex-direction, justify-content, align-items, gap, flex-wrap, flex-grow, flex-shrink, flex-basis, order, navbar, card">
+  <title>CSS Flexbox Layout</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#0d9488; --accent-soft:#e4f6f3; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#0d9488,#0f766e); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:#0f766e; border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:#0f766e; padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:#0f766e; }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+    /* Live flex demos */
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    .flex-box { display:flex; gap:8px; padding:8px; border:1px dashed #0d9488; background:#fff; }
+    .flex-box > div { background:#0d9488; color:#fff; padding:14px; border-radius:4px; }
+    .demo-nav { display:flex; justify-content:space-between; align-items:center; background:#0f766e; padding:12px 16px; border-radius:8px; color:#fff; }
+    .demo-nav .links { display:flex; gap:16px; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>CSS Flexbox Layout</h1>
+    <p>Container and item properties — flex-direction, justify-content, align-items, gap, flex-wrap, grow, shrink, basis, order — with a navbar/card example.</p>
+    <span class="badge">CSS · Layout · Flexbox</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>Flexbox</strong> (Flexible Box) is a one-dimensional CSS layout system. "One-dimensional" means it lays out items along a <em>single axis at a time</em> — either a horizontal row or a vertical column. This is perfect for arranging a set of items in a line: navigation bars, rows of cards, toolbars, or centering content.
+  </p>
+  <p>
+    To use Flexbox, you make an element a <strong>flex container</strong> by giving it <code>display: flex</code>. Its direct children automatically become <strong>flex items</strong>. Then you control the layout using two groups of properties:
+  </p>
+  <ul>
+    <li><strong>Container properties</strong> — set on the parent flex container: <code>flex-direction</code>, <code>justify-content</code>, <code>align-items</code>, <code>gap</code>, <code>flex-wrap</code>.</li>
+    <li><strong>Item properties</strong> — set on the individual flex items: <code>flex-grow</code>, <code>flex-shrink</code>, <code>flex-basis</code>, <code>order</code>.</li>
+  </ul>
+  <p>
+    Flexbox is brilliant at distribution and alignment along one axis, which is why it's the go-to for horizontal navbars, button rows, and centering. (The newer CSS Grid handles two-dimensional layouts — we'll compare them in the next guide.)
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Making a flex container</h3>
+  <pre><code><span class="kw">.container</span> {
+  <span class="kw">display</span>: <span class="kw">flex</span>;
+  <span class="comment">/* ... container properties ... */</span>
+}</code></pre>
+
+  <h3>The two axes (main &amp; cross)</h3>
+  <p>Flexbox has a <strong>main axis</strong> (the direction items flow) and a <strong>cross axis</strong> (perpendicular to it).</p>
+  <table>
+    <tr><th>Axis</th><th>Direction</th><th>Controlled by</th></tr>
+    <tr><td>Main axis</td><td>Where items go (row default)</td><td><code>flex-direction</code> (row/column)</td></tr>
+    <tr><td>Cross axis</td><td>Perpendicular to main</td><td><code>align-items</code></td></tr>
+  </table>
+
+  <h3>Container properties</h3>
+  <table>
+    <tr><th>Property</th><th>What it does</th><th>Values</th></tr>
+    <tr><td><code>flex-direction</code></td><td>Sets the main axis / direction items flow.</td><td><code>row</code>, <code>row-reverse</code>, <code>column</code>, <code>column-reverse</code></td></tr>
+    <tr><td><code>justify-content</code></td><td>Aligns items along the <em>main axis</em>; distributes space.</td><td><code>flex-start</code>, <code>center</code>, <code>flex-end</code>, <code>space-between</code>, <code>space-around</code>, <code>space-evenly</code></td></tr>
+    <tr><td><code>align-items</code></td><td>Aligns items along the <em>cross axis</em>.</td><td><code>stretch</code>, <code>flex-start</code>, <code>center</code>, <code>flex-end</code>, <code>baseline</code></td></tr>
+    <tr><td><code>gap</code></td><td>Adds space between items (row-gap / column-gap).</td><td>A length (e.g. <code>16px</code>)</td></tr>
+    <tr><td><code>flex-wrap</code></td><td>Whether items wrap onto multiple lines when they overflow.</td><td><code>nowrap</code>, <code>wrap</code>, <code>wrap-reverse</code></td></tr>
+  </table>
+
+  <h3>Item properties</h3>
+  <table>
+    <tr><th>Property</th><th>What it does</th><th>Example</th></tr>
+    <tr><td><code>flex-grow</code></td><td>How much an item <em>grows</em> to fill free space.</td><td><code>flex-grow: 1</code></td></tr>
+    <tr><td><code>flex-shrink</code></td><td>How much an item <em>shrinks</em> when there's not enough space.</td><td><code>flex-shrink: 0</code> (never shrink)</td></tr>
+    <tr><td><code>flex-basis</code></td><td>The starting size of the item before grow/shrink.</td><td><code>flex-basis: 200px</code></td></tr>
+    <tr><td><code>order</code></td><td>Reorders items visually without changing HTML.</td><td><code>order: 2</code></td></tr>
+  </table>
+
+  <div class="note">
+    <strong>Key rule:</strong> Container properties go on the parent (<code>display: flex</code>) and affect <em>all</em> its children. Item properties go on each child and affect only that one item. Remember: <code>justify-content</code> works on the <strong>main</strong> axis, <code>align-items</code> on the <strong>cross</strong> axis.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. flex-direction — choose the flow direction</h3>
+    <p>Sets whether items go left-to-right (row, default) or top-to-bottom (column).</p>
+    <pre><code><span class="kw">.container</span> { <span class="kw">display</span>: <span class="kw">flex</span>; <span class="kw">flex-direction</span>: <span class="kw">column</span>; }
+<span class="kw">.container</span> { <span class="kw">flex-direction</span>: <span class="kw">row</span>; }   <span class="comment">// default (horizontal)</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. justify-content — distribute along the main axis</h3>
+    <p>Controls where items sit and how leftover space is shared. Common patterns: <code>center</code>, <code>space-between</code>, <code>space-around</code>.</p>
+    <pre><code><span class="kw">.row</span> { <span class="kw">justify-content</span>: <span class="kw">center</span>; }   <span class="comment">// items grouped in center</span>
+<span class="kw">.nav</span>  { <span class="kw">justify-content</span>: <span class="kw">space-between</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. align-items — align along the cross axis</h3>
+    <p>Vertically aligns items when row is the main direction. <code>center</code> is very common for vertically centering content.</p>
+    <pre><code><span class="kw">.navbar</span> { <span class="kw">display</span>: <span class="kw">flex</span>; <span class="kw">align-items</span>: <span class="kw">center</span>; }
+<span class="kw">.container</span> { <span class="kw">align-items</span>: <span class="kw">stretch</span>; }   <span class="comment">// default — fills height</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. gap — space between items</h3>
+    <p>An easy way to add consistent spacing between flex items (and also works with Grid).</p>
+    <pre><code><span class="kw">.cards</span> { <span class="kw">display</span>: <span class="kw">flex</span>; <span class="kw">gap</span>: <span class="num">16px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. flex-wrap — allow items to wrap</h3>
+    <p>By default items squeeze onto one line. <code>wrap</code> lets them drop to the next line when there isn't room.</p>
+    <pre><code><span class="kw">.container</span> { <span class="kw">flex-wrap</span>: <span class="kw">wrap</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>6. flex-grow / shrink / basis — sizing the items</h3>
+    <p>These control how each item grows, shrinks, and what its starting size is.</p>
+    <pre><code><span class="kw">.item</span> { <span class="kw">flex-grow</span>: <span class="num">1</span>; }    <span class="comment">// grows to fill extra space</span>
+<span class="kw">.item</span> { <span class="kw">flex-shrink</span>: <span class="num">0</span>; }  <span class="comment">// never shrinks</span>
+<span class="kw">.item</span> { <span class="kw">flex-basis</span>: <span class="num">200px</span>; } <span class="comment">// start at 200px</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>7. order — reorder without touching HTML</h3>
+    <p>Changes the visual order of items. Lower numbers come first.</p>
+    <pre><code><span class="kw">.item</span> { <span class="kw">order</span>: <span class="num">1</span>; }    <span class="comment">// appears later</span>
+<span class="kw">.item</span> { <span class="kw">order</span>: <span class="num">-1</span>; }   <span class="comment">// appears first</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>Live demo: a flex row</h3>
+    <div class="flex-box"><div>1</div><div>2</div><div>3</div></div>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> The most common one-liner for perfectly centering something — both horizontally and vertically — is simply <code>display: flex; justify-content: center; align-items: center;</code>.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — A responsive navbar</h3>
+  <p>This example builds a navbar using Flexbox. It uses <code>justify-content: space-between</code> to push the logo to the left and the links to the right, and <code>align-items: center</code> to keep everything vertically aligned.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* The flex container */</span>
+    <span class="kw">.navbar</span> {
+      <span class="kw">display</span>: <span class="kw">flex</span>;
+      <span class="kw">justify-content</span>: <span class="kw">space-between</span>;  <span class="comment">// logo left, links right</span>
+      <span class="kw">align-items</span>: <span class="kw">center</span>;                 <span class="comment">// vertically centered</span>
+      <span class="kw">background</span>: <span class="str">#0f766e</span>; <span class="kw">color</span>: <span class="str">white</span>; <span class="kw">padding</span>: <span class="num">16px</span>;
+    }
+
+    <span class="comment">/* The links group is ALSO a flex container */</span>
+    <span class="kw">.links</span> {
+      <span class="kw">display</span>: <span class="kw">flex</span>;
+      <span class="kw">gap</span>: <span class="num">20px</span>;                       <span class="comment">// space between links</span>
+      <span class="kw">align-items</span>: <span class="kw">center</span>;
+    }
+    <span class="kw">.links a</span> { <span class="kw">color</span>: <span class="str">white</span>; <span class="kw">text-decoration</span>: <span class="kw">none</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;nav</span> <span class="attr">class</span>=<span class="val">"navbar"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"logo"</span><span class="tag">&gt;</span>MySite<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"links"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span><span class="tag">&gt;</span>Home<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span><span class="tag">&gt;</span>About<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span><span class="tag">&gt;</span>Contact<span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li><code>.navbar</code> is the flex container with <code>display: flex</code>.</li>
+      <li><code>justify-content: space-between</code> spreads the logo (left) and the links (right).</li>
+      <li><code>align-items: center</code> vertically aligns the logo and the links group.</li>
+      <li>The inner <code>.links</code> is <em>also</em> a flex container, using <code>gap</code> to space the links evenly.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A row of flex-grow cards</h3>
+  <p>This example lays out three cards side by side. The middle card uses <code>flex-grow: 2</code> so it takes up twice the free space, while the others grow equally. This shows how <code>flex-grow</code> and <code>gap</code> control a card row.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* The container — a responsive card row */</span>
+    <span class="kw">.cards</span> {
+      <span class="kw">display</span>: <span class="kw">flex</span>;
+      <span class="kw">gap</span>: <span class="num">16px</span>;               <span class="comment">// space between cards</span>
+      <span class="kw">flex-wrap</span>: <span class="kw">wrap</span>;         <span class="comment">// wrap on small screens</span>
+    }
+
+    <span class="kw">.card</span> {
+      <span class="kw">flex-grow</span>: <span class="num">1</span>;              <span class="comment">// each card grows equally</span>
+      <span class="kw">background</span>: <span class="str">#e4f6f3</span>; <span class="kw">padding</span>: <span class="num">20px</span>;
+      <span class="kw">border-radius</span>: <span class="num">8px</span>;
+    }
+
+    <span class="comment">/* The middle card grows TWICE as much */</span>
+    <span class="kw">.card.featured</span> { <span class="kw">flex-grow</span>: <span class="num">2</span>; <span class="kw">background</span>: <span class="str">#0d9488</span>; <span class="kw">color</span>: <span class="str">white</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"cards"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>Card 1<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card featured"</span><span class="tag">&gt;</span>Featured (grow 2)<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>Card 3<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>.cards</code> uses <code>display: flex</code>, <code>gap: 16px</code>, and <code>flex-wrap: wrap</code> so cards wrap on narrow screens.</li>
+      <li>Each card has <code>flex-grow: 1</code>, so they share free space equally.</li>
+      <li>The <em>featured</em> card has <code>flex-grow: 2</code>, so it takes up twice as much of the leftover space.</li>
+      <li><code>flex-wrap</code> ensures that on small screens, the cards stack rather than overflow.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. Resize the window to see the navbar and cards respond. Try changing <code>flex-direction</code>, <code>justify-content</code>, or <code>flex-grow</code> values to observe the effects.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Easy alignment &amp; distribution:</strong> Center, space-out, or group items with a single property.</li>
+    <li><strong>Responsive by nature:</strong> Items flex, wrap, and resize to fit the container width.</li>
+    <li><strong>Great for navbars &amp; rows:</strong> Perfect one-dimensional layouts like menus, toolbars, and button groups.</li>
+    <li><strong>Order without HTML changes:</strong> <code>order</code> lets you reorder visually while keeping markup readable.</li>
+    <li><strong>Simple centering:</strong> A two-line flex rule vertically and horizontally centers anything.</li>
+    <li><strong>Clean, minimal markup:</strong> No need for floats or tricky margin hacks — flexbox handles it.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Flexbox is the modern way to arrange items along one axis. As a <strong>container</strong>, you control the flow direction (<code>flex-direction</code>), distribution along the main axis (<code>justify-content</code>), alignment on the cross axis (<code>align-items</code>), spacing (<code>gap</code>), and wrapping (<code>flex-wrap</code>). As <strong>items</strong>, you control growth (<code>flex-grow</code>), shrinking (<code>flex-shrink</code>), the starting size (<code>flex-basis</code>), and visual order (<code>order</code>).
+  </p>
+  <p>
+    In summary: <strong>make the parent <code>display: flex</code>, then set container properties on the parent and item properties on the children.</strong> Flexbox shines for one-dimensional rows and columns, making navbars, card rows, and centering almost effortless. As the saying goes: <em>"Flexbox makes the one-dimensional trivial."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · CSS Flexbox Layout</footer>
+</div>
+</body>
+</html>

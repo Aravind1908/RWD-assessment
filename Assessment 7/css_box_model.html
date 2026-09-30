@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to the CSS Box Model — content, padding, border, margin — with a diagram and content-box vs. border-box.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="CSS Box Model, content, padding, border, margin, content-box, border-box, box-sizing">
+  <title>The CSS Box Model</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-soft:#e7effc; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:#1d4ed8; border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:#1d4ed8; padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:#1d4ed8; }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+    /* Box model diagram */
+    .dia { font-family:Consolas,Menlo,monospace; font-size:12px; white-space:pre; line-height:1.2; margin:18px auto; width:max-content; text-align:center; }
+    .diag { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 16px; margin:20px 0; overflow-x:auto; }
+    .d-margin { color:#94a3b8; }
+    .d-border { color:#f59e0b; font-weight:bold; }
+    .d-padding { color:#2563eb; }
+    .d-content { color:#16a34a; font-weight:bold; }
+
+    /* Demo boxes to compare content-box and border-box */
+    .demo-grid { display:flex; gap:20px; flex-wrap:wrap; }
+    .demo-box { width:200px; background:#e7effc; border:10px solid #1d4ed8; padding:20px; text-align:center; }
+    .cb { box-sizing:content-box; }
+    .bb { box-sizing:border-box; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>The CSS Box Model</h1>
+    <p>Understanding content, padding, border, and margin — with a diagram and content-box vs. border-box.</p>
+    <span class="badge">CSS · Layout · Box Model</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Every element on a web page is rendered as a <strong>rectangular box</strong>. This box is called the <strong>CSS Box Model</strong>. Understanding it is essential for controlling spacing, sizing, and layout — because almost every layout tweak involves the box model.
+  </p>
+  <p>
+    From the inside out, every element's box is made of four layers:
+  </p>
+  <ul>
+    <li><strong>Content</strong> — the actual content (text, image, etc.). It's the innermost part.</li>
+    <li><strong>Padding</strong> — the space <em>inside</em> the border, between the content and the border.</li>
+    <li><strong>Border</strong> — the line that outlines the element, separating padding from margin.</li>
+    <li><strong>Margin</strong> — the space <em>outside</em> the border, between this element and its neighbours.</li>
+  </ul>
+  <p>
+    You can visualize it as a frame around a photo: the photo is the content, the picture frame's backing is the padding, the frame itself is the border, and the wall space around the frame is the margin.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+  <p>The four parts are controlled by separate properties (each can also be set in a shorthand):</p>
+  <pre><code><span class="comment">/* Content — sized by width &amp; height */</span>
+<span class="kw">width</span>: <span class="num">200px</span>;
+<span class="kw">height</span>: <span class="num">100px</span>;
+
+<span class="comment">/* Padding — inside the border */</span>
+<span class="kw">padding</span>: <span class="num">20px</span>;              <span class="comment">// all sides</span>
+<span class="kw">padding-top/right/bottom/left</span>;   <span class="comment">// or individually</span>
+
+<span class="comment">/* Border — the outline */</span>
+<span class="kw">border</span>: <span class="num">2px</span> <span class="kw">solid</span> <span class="str">#333</span>;
+
+<span class="comment">/* Margin — outside the border */</span>
+<span class="kw">margin</span>: <span class="num">10px</span>;               <span class="comment">// all sides</span>
+<span class="kw">margin: 10px 20px</span>;        <span class="comment">// top/bottom, right/left</span></code></pre>
+
+  <h3>Shorthand orders (TLBR)</h3>
+  <pre><code><span class="kw">padding</span>: <span class="num">10px</span> <span class="num">20px</span> <span class="num">30px</span> <span class="num">40px</span>;  <span class="comment">// top right bottom left</span></code></pre>
+
+  <div class="note">
+    <strong>Key rule:</strong> Padding and margin look similar but are different. <strong>Padding</strong> pushes content away from the border (it's <em>inside</em> the box, so it adds to the box's background area). <strong>Margin</strong> pushes the whole box away from neighbours (<em>outside</em>, so it's transparent and sits beyond the border).
+  </div>
+
+  <!-- DIAGRAM -->
+  <h3>Diagram of the box model</h3>
+  <div class="diag">
+    <div class="dia"><span class="d-margin">+--------------------------------------------------+</span>
+<span class="d-margin">|                       MARGIN                      |</span>
+<span class="d-margin">|           +----------------------------------+       |</span>
+<span class="d-margin">|           |              BORDER             |       |</span>
+<span class="d-margin">|           |   +----------------------+       |       |</span>
+<span class="d-margin">|           |   |      PADDING        |       |       |</span>
+<span class="d-margin">|           |   |   +--------------+   |       |       |</span>
+<span class="d-margin">|           |   |   |   CONTENT    |   |       |       |</span>
+<span class="d-margin">|           |   |   |              |   |       |       |</span>
+<span class="d-margin">|           |   |   +--------------+   |       |       |</span>
+<span class="d-margin">|           |   +----------------------+       |       |</span>
+<span class="d-margin">|           +----------------------------------+       |</span>
+<span class="d-margin">+--------------------------------------------------+</span></div>
+    <p style="text-align:center;color:var(--muted);margin:8px 0 0;font-size:0.9rem;">
+      <span class="d-content">Content</span> → <span class="d-padding">Padding</span> → <span class="d-border">Border</span> → <span class="d-margin">Margin</span> (outermost)
+    </p>
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. Content — the size of the material</h3>
+    <p>The actual content. Its size is set by <code>width</code> and <code>height</code> (or by default, by the content itself).</p>
+    <pre><code><span class="kw">.hero</span> { <span class="kw">width</span>: <span class="num">400px</span>; <span class="kw">height</span>: <span class="num">200px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. Padding — breathing room inside</h3>
+    <p>Adds space between the content and the border. It <strong>does</strong> contribute to the element's total size and background area.</p>
+    <pre><code><span class="kw">.card</span> { <span class="kw">background</span>: <span class="str">#e7effc</span>; <span class="kw">padding</span>: <span class="num">20px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. Border — the visible outline</h3>
+    <p>The boundary of the box. It can be a solid line, dashed, dotted, or even a specific width/color. Like padding, it adds to the box's total width.</p>
+    <pre><code><span class="kw">.btn</span> { <span class="kw">border</span>: <span class="num">2px</span> <span class="kw">solid</span> <span class="str">#2563eb</span>; <span class="kw">border-radius</span>: <span class="num">6px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. Margin — space between elements</h3>
+    <p>Space <em>outside</em> the border that pushes the box away from its neighbours. Margins can be collapsed (top &amp; bottom margins between adjacent elements combine into the larger one).</p>
+    <pre><code><span class="kw">.box</span> { <span class="kw">margin</span>: <span class="num">20px</span> auto; }  <span class="comment">// vertical 20px, horizontal auto (centers)</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. content-box vs. border-box — what does width mean?</h3>
+    <p>This is one of the most confusing — and important — differences. The <code>box-sizing</code> property decides whether <code>width</code> and <code>height</code> <em>include</em> padding and border or not.</p>
+    <pre><code><span class="comment">/* content-box (default): width = content only. Padding &amp; border are ADDED on top. */</span>
+<span class="kw">box-sizing</span>: <span class="kw">content-box</span>;
+
+<span class="comment">/* border-box: width INCLUDES padding and border. Total stays what you set. */</span>
+<span class="kw">box-sizing</span>: <span class="kw">border-box</span>;</code></pre>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> Almost every modern CSS reset sets <code>* { box-sizing: border-box; }</code>. This makes sizing much easier to reason about, because a <code>width: 200px</code> element stays 200px wide even when you add padding and a border.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Building and measuring a segment of the box model</h3>
+  <p>This example creates a box with content, padding, a border, and a margin, and explains how each contributes to the total width.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="kw">.box</span> {
+      <span class="comment">/* Content */</span>
+      <span class="kw">width</span>: <span class="num">200px</span>;
+      <span class="kw">height</span>: <span class="num">100px</span>;
+      <span class="comment">/* Padding inside the border */</span>
+      <span class="kw">padding</span>: <span class="num">20px</span>;
+      <span class="comment">/* Border */</span>
+      <span class="kw">border</span>: <span class="num">10px</span> <span class="kw">solid</span> <span class="str">#1d4ed8</span>;
+      <span class="comment">/* Margin outside */</span>
+      <span class="kw">margin</span>: <span class="num">30px</span>;
+      <span class="kw">background</span>: <span class="str">#e7effc</span>;
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"box"</span><span class="tag">&gt;</span>Box content<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong> With <code>box-sizing: content-box</code> (the default), the total width is calculated as:
+    <pre><code>content (200px) + padding (20px+20px) + border (10px+10px) = 260px</code></pre>
+    <ul>
+      <li><strong>Width of content:</strong> 200px (as set).</li>
+      <li><strong>Padding:</strong> 20px on each side, added to the width.</li>
+      <li><strong>Border:</strong> 10px on each side, also added.</li>
+      <li><strong>Total box width:</strong> 200 + 40 (padding) + 20 (border) = <strong>260px</strong>.</li>
+      <li>The <strong>margin</strong> of 30px is outside the box and doesn't change its width — it only adds a gap to the neighbours.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — content-box vs. border-box side by side</h3>
+  <p>Two identical-looking boxes (same width, padding, and border) end up different total sizes. The left uses <code>content-box</code> (default), and the right uses <code>border-box</code>. Open it in a browser to see the difference in total width.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="kw">.box</span> {
+      <span class="kw">width</span>: <span class="num">200px</span>;
+      <span class="kw">padding</span>: <span class="num">20px</span>;
+      <span class="kw">border</span>: <span class="num">10px</span> <span class="kw">solid</span> <span class="str">#1d4ed8</span>;
+      <span class="kw">background</span>: <span class="str">#e7effc</span>;
+      <span class="kw">display</span>: <span class="kw">inline-block</span>;   <span class="comment">// so boxes sit side by side</span>
+    }
+    <span class="kw">.cb</span> { <span class="kw">box-sizing</span>: <span class="kw">content-box</span>; }   <span class="comment">// default (bigger total)</span>
+    <span class="kw">.bb</span> { <span class="kw">box-sizing</span>: <span class="kw">border-box</span>; }    <span class="comment">// width includes padding+border</span>
+    <span class="kw">.label</span> { <span class="kw">font-weight</span>: <span class="kw">bold</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="kw">content-box</span>: width 200 does <strong>not</strong> include padding+border → ~260px wide.<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"box cb"</span><span class="tag">&gt;</span>Content-box<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;br&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="kw">border-box</span>: width 200 <strong>does</strong> include padding+border → stays 200px wide.<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"box bb"</span><span class="tag">&gt;</span>Border-box<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><strong>content-box</strong> — the <code>width: 200px</code> refers only to the <em>content</em>. Padding and border are <em>added</em>, so this box is really <em>260px</em> wide.</li>
+      <li><strong>border-box</strong> — the <code>width: 200px</code> refers to the <em>entire box</em> including content + padding + border. The final box stays exactly 200px.</li>
+      <li>This is why <code>border-box</code> is preferred in modern CSS: a "200px" box stays 200px no matter how much padding/border you add.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. In Example 2, use DevTools (F12 → Elements) to hover the boxes and read their measured width — the content-box is wider because padding and border are added on; the border-box stays 200px.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Predictable sizing:</strong> Understanding the box model lets you control exact element dimensions.</li>
+    <li><strong>Clear spacing control:</strong> Padding for inside-space, margin for outside-space, and border for the outline.</li>
+    <li><strong>Easier layout math:</strong> With <code>border-box</code>, you can avoid annoying off-by-padding errors.</li>
+    <li><strong>Reusable components:</strong> Consistent box-model usage makes buttons, cards, and forms look uniform.</li>
+    <li><strong>Better responsive design:</strong> Knowing how the box grows helps you build layouts that adapt to screen width.</li>
+    <li><strong>Debugging made easy:</strong> DevTools shows the box model visually, so you can see content/padding/border/margin at a glance.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    The CSS Box Model is the foundation of all layout. Every element is a box made of four layers — <strong>content</strong>, <strong>padding</strong>, <strong>border</strong>, and <strong>margin</strong> — stacking from the inside out. The <code>box-sizing</code> property decides whether <code>width</code>/<code>height</code> measure the content (<em>content-box</em>) or the whole box (<em>border-box</em>).
+  </p>
+  <p>
+    In summary: <strong>content holds the material, padding adds space inside the border, border outlines the element, and margin creates space outside.</strong> Use <code>border-box</code> for predictable sizing, and inspect any element in DevTools to see its box model clearly. As the saying goes: <em>"Master the box model, and you master CSS layout."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · The CSS Box Model</footer>
+</div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37b61220bc6b297',t:'MTc4ODg0MzUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

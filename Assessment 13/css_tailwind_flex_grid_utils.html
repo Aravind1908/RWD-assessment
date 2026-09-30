@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: Flexbox &amp; Grid Utilities</title>
+  <meta name="description" content="Tailwind's Flexbox and Grid utilities — flex, items-center, justify-between, grid, grid-cols-3, col-span- — explained with mapping tables and two layout examples.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind, flexbox, grid, utilities, items-center, justify-between, grid-cols, col-span, layout">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: Flexbox &amp; Grid Utilities</h1>
+    <p>Every Flexbox and Grid property mapped to its Tailwind class — <code>flex</code>, <code>items-center</code>, <code>justify-between</code>, <code>grid</code>, <code>grid-cols-3</code>, <code>col-span-*</code> — with two complete layout examples.</p>
+    <span class="badge">CSS Framework · Tailwind · Layout Utilities</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Flexbox and Grid are CSS's two layout systems, and Tailwind gives both a <strong>1:1 utility vocabulary</strong>: every layout property you'd write in a stylesheet has a class name, usually a shortening of the property. <code>display: flex</code> becomes <code>flex</code>, <code>align-items: center</code> becomes <code>items-center</code>, <code>grid-template-columns: repeat(3, 1fr)</code> becomes <code>grid-cols-3</code>.
+  </p>
+  <p>
+    The division of labor (from the CSS guides in this series) carries over directly: <strong>Flexbox for one-dimensional flow</strong> — a navbar, a row of buttons, centering one thing — and <strong>Grid for two-dimensional structure</strong> — page frames, dashboards, card mosaics with tiles that span columns.
+  </p>
+  <pre><code><span class="comment">&lt;!-- the two systems in their most common form --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex items-center justify-between"</span><span class="tag">&gt;</span>
+  <span class="comment">&lt;!-- logo ←→ actions, perfectly centered on the cross axis --&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"grid grid-cols-3 gap-4"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"col-span-2"</span><span class="tag">&gt;</span>wide tile<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;div&gt;</span>tile<span class="tag">&lt;/div&gt;&lt;div&gt;</span>tile<span class="tag">&lt;/div&gt;&lt;div&gt;</span>tile<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Flexbox utilities — the property → class map</h3>
+  <table>
+    <tr><th>CSS property</th><th>Tailwind class</th><th>Notes</th></tr>
+    <tr><td><code>display: flex</code></td><td><code>flex</code></td><td>make the container a flex container</td></tr>
+    <tr><td><code>display: inline-flex</code></td><td><code>inline-flex</code></td><td>inline-level flex (icon + label pairs)</td></tr>
+    <tr><td><code>flex-direction: column</code></td><td><code>flex-col</code></td><td>stack instead of row</td></tr>
+    <tr><td><code>flex-wrap: wrap</code></td><td><code>flex-wrap</code></td><td>let items flow to new lines</td></tr>
+    <tr><td><code>justify-content: …</code> (main axis)</td><td><code>justify-start / center / end / between / around / evenly</code></td><td><code>justify-between</code> = <code>space-between</code></td></tr>
+    <tr><td><code>align-items: …</code> (cross axis)</td><td><code>items-start / center / end / stretch / baseline</code></td><td><code>stretch</code> is the default</td></tr>
+    <tr><td><code>gap: 1rem</code></td><td><code>gap-4</code> (or <code>gap-x-6 gap-y-2</code>)</td><td>spacing between items</td></tr>
+    <tr><td><code>align-self: start</code> (per item)</td><td><code>self-start / self-center / self-end</code></td><td>one item opts out</td></tr>
+    <tr><td><code>order: 1</code> (per item)</td><td><code>order-1</code> … <code>order-last</code></td><td>reorder without touching HTML</td></tr>
+    <tr><td><code>flex: 1</code> (per item)</td><td><code>flex-1</code></td><td>grow to fill remaining space</td></tr>
+    <tr><td><code>flex: none</code> (per item)</td><td><code>flex-none</code></td><td>never shrink/grow (logos, icons)</td></tr>
+  </table>
+  <p>The two workhorses: <strong><code>justify-</code> positions along the main axis</strong> (row: left→right; column: top→bottom) and <strong><code>items-</code> positions across it</strong>. <code>flex items-center justify-between</code> is the most-typed layout line in the Tailwind ecosystem — a bar with its ends pushed apart, everything optically centered.</p>
+
+  <h3>Grid utilities — the property → class map</h3>
+  <table>
+    <tr><th>CSS property</th><th>Tailwind class</th><th>Notes</th></tr>
+    <tr><td><code>display: grid</code></td><td><code>grid</code></td><td>make the container a grid</td></tr>
+    <tr><td><code>grid-template-columns: repeat(3, 1fr)</code></td><td><code>grid-cols-3</code></td><td>works for 1–12 equal columns</td></tr>
+    <tr><td><code>grid-template-columns: 2fr 1fr</code></td><td><code>grid-cols-[2fr_1fr]</code></td><td>arbitrary values for custom tracks</td></tr>
+    <tr><td><code>grid-template-rows: repeat(2, 1fr)</code></td><td><code>grid-rows-2</code></td><td>explicit rows</td></tr>
+    <tr><td><code>grid-column: span 2</code> (per item)</td><td><code>col-span-2</code></td><td>tile spans 2 columns</td></tr>
+    <tr><td><code>grid-column: 1 / -1</code></td><td><code>col-span-full</code></td><td>tile spans every column</td></tr>
+    <tr><td><code>grid-row: span 2</code> (per item)</td><td><code>row-span-2</code></td><td>tile spans 2 rows</td></tr>
+    <tr><td><code>gap: 1rem</code></td><td><code>gap-4</code> (or <code>gap-x-*</code>/<code>gap-y-*</code>)</td><td>same spacing scale as flex</td></tr>
+    <tr><td><code>grid-auto-flow: dense</code></td><td><code>grid-flow-dense</code></td><td>backfill holes from spans</td></tr>
+  </table>
+  <p>For the advanced auto-fit pattern from the CSS Grid guide, Tailwind uses an arbitrary value: <code>grid-cols-[repeat(auto-fit,minmax(200px,1fr))]</code> — columns that appear and disappear with the width, no media queries.</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> Container classes (<code>flex</code>, <code>grid</code>, <code>grid-cols-*</code>, <code>gap-*</code>, <code>justify-*</code>, <code>items-*</code>) go on the <em>parent</em>; item classes (<code>flex-1</code>, <code>col-span-*</code>, <code>row-span-*</code>, <code>self-*</code>, <code>order-*</code>) go on the <em>children</em>. Same rules as the CSS itself — Tailwind just renamed the properties.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Canonical patterns, memorize these</h3>
+    <table>
+      <tr><th>Pattern</th><th>Classes</th></tr>
+      <tr><td>Top bar (logo left, actions right)</td><td><code>flex items-center justify-between</code></td></tr>
+      <tr><td>Center anything</td><td><code>flex items-center justify-center</code></td></tr>
+      <tr><td>Equal-width row</td><td><code>flex md:flex-row gap-4</code> + <code>flex-1</code> on children</td></tr>
+      <tr><td>Pills / tags that wrap</td><td><code>flex flex-wrap gap-2</code></td></tr>
+      <tr><td>Card grid, responsive</td><td><code>grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4</code></td></tr>
+      <tr><td>Dashboard mosaic</td><td><code>grid grid-cols-3 gap-4</code> + <code>col-span-2</code> / <code>row-span-2</code> tiles</td></tr>
+      <tr><td>Sidebar + content frame</td><td><code>grid grid-cols-[16rem_1fr] gap-6</code></td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 1 — justify- and items- (needs internet)</h3>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="mt-4 space-y-3">
+      <div class="bg-blue-50 rounded-lg p-3 flex justify-between"><span class="badge-chip bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">A</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">B</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">C</span></div>
+      <div class="bg-blue-50 rounded-lg p-3 flex justify-center gap-3"><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">A</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">B</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">C</span></div>
+      <div class="bg-blue-50 rounded-lg p-3 flex justify-evenly items-center h-16"><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">A</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">B</span><span class="bg-blue-600 text-white text-xs font-mono px-2 py-1 rounded">C</span></div>
+    </div>
+    <p class="text-xs text-gray-500 mt-3"><code>justify-between</code> · <code>justify-center gap-3</code> · <code>justify-evenly items-center</code> (last row: note the vertical centering).</p>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 2 — grid-cols-3 with col-span-2 (needs internet)</h3>
+    <div class="grid grid-cols-3 gap-3 mt-4">
+      <div class="col-span-2 bg-blue-600 text-white rounded-lg p-4 text-sm font-semibold">col-span-2</div>
+      <div class="bg-blue-300 rounded-lg p-4 text-sm font-semibold">tile</div>
+      <div class="bg-blue-400 rounded-lg p-4 text-sm font-semibold">tile</div>
+      <div class="bg-blue-500 rounded-lg p-4 text-sm font-semibold">tile</div>
+      <div class="bg-blue-700 text-white rounded-lg p-4 text-sm font-semibold">tile</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Rule of thumb:</strong> one row of things? <code>flex</code>. A layout where rows <em>and</em> columns matter, or where a tile must span across its neighbors? <code>grid</code>. And when in doubt between the two, Flexbox is the safer default — Grid's superpower is the span, so reach for it when you need one.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — A flexbox dashboard header + stat row</h3>
+  <p>A compact dashboard top: a flex top bar (<code>items-center justify-between</code>) and an equal-thirds stat row where each card grows with <code>flex-1</code>. Save as <code>index.html</code> (needs internet for the CDN).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Flexbox Layout<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-6 text-gray-900"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-4xl mx-auto space-y-6"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- top bar: logo left, actions right --&gt;</span>
+  <span class="tag">&lt;header</span> <span class="attr">class</span>=<span class="val">"flex items-center justify-between bg-white
+              border border-gray-200 rounded-xl px-5 py-3"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"font-bold text-blue-600"</span><span class="tag">&gt;</span>acme.<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex items-center gap-3"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-semibold
+                  flex items-center justify-center text-sm"</span><span class="tag">&gt;</span>A<span class="tag">&lt;/span&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 text-white text-sm
+                  font-semibold px-4 py-2 rounded-lg"</span><span class="tag">&gt;</span>New<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/header&gt;</span>
+
+  <span class="comment">&lt;!-- equal thirds: flex-1 cards, stacked on phones --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex flex-col md:flex-row gap-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex-1 bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs text-gray-400"</span><span class="tag">&gt;</span>Users<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>1,248<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex-1 bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs text-gray-400"</span><span class="tag">&gt;</span>Revenue<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>$9,300<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex-1 bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs text-gray-400"</span><span class="tag">&gt;</span>Uptime<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>99.9%<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The top bar is <code>flex items-center justify-between</code>: logo and actions are pushed to opposite ends (<code>justify-between</code>) and vertically centered against each other (<code>items-center</code>) — the workhorse pattern.</li>
+      <li>The right-hand cluster is its own little flex row (<code>flex items-center gap-3</code>) — flex nests freely, the way divs nest.</li>
+      <li>The stat row is <code>flex flex-col md:flex-row</code> (stacked on phones) and each card is <code>flex-1</code> — grow equally to fill the line, so the thirds stay perfect at any width. No percentages.</li>
+      <li><code>space-y-6</code> on the outer wrapper adds vertical rhythm between the two blocks without margins on each child.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize below 768px: the stat row stacks. Try changing a stat card to <code>flex-none</code> and watch it stop growing — the other two absorb the space.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A grid dashboard with spanning tiles</h3>
+  <p>A 3-column grid with a <code>col-span-2</code> hero tile and a <code>col-span-full</code> banner tile — the two span patterns that make grid a dashboard tool.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Grid Layout<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-6 text-gray-900"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-4xl mx-auto"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>Grid layout<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>
+    grid-cols-3 with a col-span-2 tile and a full-width banner
+  <span class="tag">&lt;/p&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- wide tile: spans 2 columns --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"sm:col-span-2 bg-blue-600 text-white rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>col-span-2<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-blue-200 mt-1"</span><span class="tag">&gt;</span>Spans two columns.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Single<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>One column.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Single<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>One column.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-xl p-5"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Single<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>One column.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="comment">&lt;!-- full-width banner: spans every column --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-100 text-blue-800 rounded-xl p-5 col-span-full"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>col-span-full<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm mt-1"</span><span class="tag">&gt;</span>Spans all columns.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>grid-cols-1 sm:grid-cols-3</code> is responsive for free: one column on phones, three from <code>sm:</code>.</li>
+      <li><code>sm:col-span-2</code> makes the hero tile cover two tracks on tablets+ (and prefixing it means it behaves as a single column on phones, where spans of 2 would overflow the 1-column grid).</li>
+      <li><code>col-span-full</code> on the banner stretches it across <em>every</em> column, whatever the current column count — the Tailwind form of <code>grid-column: 1 / -1</code>.</li>
+      <li>Want a tall panel or a sidebar frame? The Section 2 table covers <code>row-span-*</code> and the <code>grid-cols-[16rem_1fr]</code> arbitrary-track pattern.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize across 640px: the mosaic collapses to one column. Try adding <code>row-span-2</code> to a tile, or changing the grid to <code>grid-cols-2</code>.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Layout in the markup:</strong> the entire layout is readable in the class list — <code>flex items-center justify-between</code> needs no stylesheet to understand.</li>
+    <li><strong>A short, predictable vocabulary:</strong> ~15 flex classes and ~10 grid classes cover 95% of layouts; the names mirror the CSS properties, so CSS knowledge transfers 1:1.</li>
+    <li><strong>Responsive layout for free:</strong> every layout utility accepts prefixes — <code>flex-col md:flex-row</code>, <code>grid-cols-1 lg:grid-cols-3</code> — without writing a media query.</li>
+    <li><strong>Item-level control without selectors:</strong> <code>flex-1</code>, <code>col-span-2</code>, <code>self-center</code>, <code>order-last</code> target single items directly — no nth-child tricks.</li>
+    <li><strong>Composes with everything:</strong> layout utilities pair with the spacing scale (<code>gap-4</code>), sizing (<code>w-full</code>), and state variants in one class list.</li>
+    <li><strong>Nesting is natural:</strong> a flex row of flex columns, a grid of flex cards — the systems nest exactly as the CSS does, with no wrapper divs added for layout.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Tailwind's layout utilities are a faithful, compact rename of the CSS layout systems: <strong>Flexbox</strong> via <code>flex</code>, <code>flex-col</code>, <code>justify-*</code> (main axis), <code>items-*</code> (cross axis), <code>gap-*</code>, and per-item <code>flex-1</code>/<code>self-*</code>/<code>order-*</code>; <strong>Grid</strong> via <code>grid</code>, <code>grid-cols-*</code> (equal or arbitrary tracks), <code>gap-*</code>, and per-item <code>col-span-*</code>/<code>row-span-*</code>. Container classes on the parent, item classes on the children — same rules as the CSS, shorter names.
+  </p>
+  <p>
+    The working pairings to memorize: <code>flex items-center justify-between</code> for bars, <code>flex items-center justify-center</code> for centering, <code>flex-1</code> for equal splits, and <code>grid grid-cols-3 gap-4</code> + spans for mosaics. <em>Flex for a line, Grid for a plane — and in both cases, the class list is the stylesheet.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: Flexbox &amp; Grid Utilities</footer>
+</div>
+</body>
+</html>

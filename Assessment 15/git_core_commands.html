@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git: Core Commands &amp; the Three States of a File</title>
+  <meta name="description" content="The core Git commands — init, add, commit, status, log, diff — explained through the three areas every file moves through: working directory → staging area → repository.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="git init, git add, git commit, git status, git log, git diff, staging area, working directory, index, three states">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Git: Core Commands &amp; the Three States</h1>
+    <p><code>init</code>, <code>add</code>, <code>commit</code>, <code>status</code>, <code>log</code>, <code>diff</code> — and the working directory → staging area → repository model that makes all six make sense. Two runnable terminal demos.</p>
+    <span class="badge">Version Control · Git · Fundamentals</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Every Git file exists in one of <strong>three places at a time</strong>: the <strong>working directory</strong> (the files you actually edit), the <strong>staging area</strong> (a holding pen for "what the next commit will contain"), and the <strong>repository</strong> (the saved snapshots). The six core commands are just verbs that move a file through those places:
+  </p>
+  <pre><code>working directory ──git add──&gt; staging area ──git commit──&gt; repository
+        ↑                             │
+        └────── git restore / reset ──┘   <span class="comment">(backwards also exists)</span></code></pre>
+  <table>
+    <tr><th>Command</th><th>In one line</th></tr>
+    <tr><td><code>git init</code></td><td>start tracking this folder (create the repository)</td></tr>
+    <tr><td><code>git status</code></td><td>where is everything right now?</td></tr>
+    <tr><td><code>git add</code></td><td>put this change into the staging area</td></tr>
+    <tr><td><code>git commit</code></td><td>save the staged snapshot into the repository</td></tr>
+    <tr><td><code>git log</code></td><td>what has been saved, in order</td></tr>
+    <tr><td><code>git diff</code></td><td>what changed — between which two places</td></tr>
+  </table>
+  <p>
+    Learn the model and the commands stop being memorized: <em>status tells you which area you're looking at, add and commit move files between areas, and diff shows the gap between any two.</em>
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>git init — start a repository</h3>
+  <pre><code>git init            <span class="comment"># in an existing folder</span>
+git init my-project <span class="comment"># create the folder too</span></code></pre>
+  <p>Creates a hidden <code>.git</code> directory holding the whole repository (objects, refs, config). After the first commit, the repo has a history; before it, it's an empty repository. Running <code>init</code> in an already-initialized folder is harmless — it just resets nothing and says so.</p>
+
+  <h3>git status — the first command to type</h3>
+  <pre><code>git status          <span class="comment"># human format</span>
+git status --short  <span class="comment"># two-letter codes, one line per file</span></code></pre>
+  <p>Reports three zones at once: <strong>staged</strong> (what will be committed), <strong>modified-but-unstaged</strong> (edits not yet staged), and <strong>untracked</strong> (files Git has never seen). If you only build one Git habit, make it <em>status before add, diff before commit</em>.</p>
+
+  <h3>git add — move changes into the staging area</h3>
+  <pre><code>git add file.txt    <span class="comment"># one file</span>
+git add .           <span class="comment"># everything in this folder (and below)</span>
+git add -A          <span class="comment"># everything, including deletions, from here up</span></code></pre>
+  <p><code>add</code> copies the file's <em>current contents</em> into the index (the staging area). You can <code>add</code> the same file twice — the second call just replaces the staged copy with the newer one. This is also how you stage <em>part</em> of a file: <code>git add -p</code> walks hunk by hunk.</p>
+
+  <h3>git commit — save the staged snapshot</h3>
+  <pre><code>git commit -m <span class="str">"add retry logic to payment flow"</span>
+git commit -am  <span class="str">"fix typo"</span>   <span class="comment"># -a stages tracked-file edits first, then commits</span></code></pre>
+  <p>A commit takes <strong>exactly what is staged</strong> and saves it as a new snapshot with a message, an author, a timestamp and a pointer to its parent commit. Nothing unstaged goes in — that's a feature (you can commit half your work) and the classic source of surprises (you committed nothing). The message is the commit's documentation: write it in the present tense, for future you.</p>
+
+  <h3>git log — read the history</h3>
+  <pre><code>git log                 <span class="comment"># full history, oldest last</span>
+git log --oneline       <span class="comment"># one line per commit</span>
+git log --stat --oneline
+git log -5              <span class="comment"># last 5 commits</span>
+git log --author=Dev    <span class="comment"># by a person</span></code></pre>
+  <p>The repository as a timeline. Each entry shows the hash (the address), the message and the author — and every hash is a bookmark you can restore, inspect or branch from.</p>
+
+  <h3>git diff — what changed where (the subtle one)</h3>
+  <pre><code>git diff             <span class="comment"># working directory  vs  staging area</span>
+git diff --cached     <span class="comment"># staging area      vs  last commit  (what WILL be committed)</span>
+git diff HEAD         <span class="comment"># working directory vs  last commit  (everything combined)</span>
+git diff abc123 def456 <span class="comment"># two commits against each other</span></code></pre>
+  <p><code>diff</code> always answers "how do <em>X</em> and <em>Y</em> differ?" — and the pairs depend on where you stand. Bare <code>diff</code> compares your files against what's staged; <code>--cached</code> compares the staging area against the last commit. Memorize those two and the rest are variations.
+
+  <div class="card">
+    <h3>Which diff for which question</h3>
+    <table>
+      <tr><th>Question</th><th>Command</th></tr>
+      <tr><td>What have I edited that I <em>haven't</em> staged yet?</td><td><code>git diff</code></td></tr>
+      <tr><td>What exactly will the next commit contain?</td><td><code>git diff --cached</code></td></tr>
+      <tr><td>How does my whole tree differ from the last commit?</td><td><code>git diff HEAD</code></td></tr>
+      <tr><td>What did commit A change compared to B?</td><td><code>git diff A B</code></td></tr>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>Going backwards (the modern split):</strong> <code>git restore file.txt</code> throws away edits in the working directory (back to the staged state); <code>git restore --staged file.txt</code> un-stages (back to the unstaged state). Older guides call both <code>git reset</code> — which still works for un-staging.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>The three states, in one file's life</h3>
+    <ol>
+      <li><strong>Working directory.</strong> You edit <code>notes.txt</code>. Git sees it as <em>untracked</em> (never added), then <em>modified</em> (changed since the last commit). It exists only on your disk — one crash or one wrong save away from gone.</li>
+      <li><strong>Staging area (the index).</strong> <code>git add</code> copies the file's current contents into the index. This is Git's "pre-flight check": a deliberate, reviewable declaration of what the next commit will be — and the only place you can stage <em>part</em> of a file.</li>
+      <li><strong>Repository.</strong> <code>git commit</code> snapshots the index into an immutable, hash-addressed commit. From here the change is part of history: listable in <code>git log</code>, restorable anytime, shareable via <code>push</code>.</li>
+    </ol>
+    <pre><code><span class="comment"># git status — all three zones in one look</span>
+Changes to be committed:            <span class="comment">┌ staging area (will be committed)</span>
+  modified:   src/auth.js           <span>│</span>
+                                      <span>└</span>
+Changes not staged for commit:      <span class="comment">┌ working directory (edited, not staged)</span>
+  modified:   src/util.js           <span>└</span>
+
+Untracked files:
+  scratch/                          <span class="comment">(git has never seen it)</span></code></pre>
+  </div>
+
+  <div class="demo">
+    <h3>Why the staging area exists</h3>
+    <p style="font-size:0.9rem;color:var(--muted);margin-top:0">
+      A commit is a <em>story</em>: "this change does one thing." The staging area is where you build that story — half your edits in, the other half left out, a partial file staged hunk by hunk (<code>git add -p</code>). Teams that skip it end up with commits like "misc"; teams that use it produce history they can actually read.
+    </p>
+  </div>
+
+  <div class="tip">
+    <strong>The daily loop, six verbs:</strong> <code>status</code> → <code>diff</code> → <code>add</code> → <code>diff --cached</code> → <code>commit</code> → <code>log</code>. That's 95% of a Git day.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+  <p>Both are terminal scripts that build a throwaway repo in a temp folder and print each step as it happens. Git is the only requirement.</p>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — The three states in one session</h3>
+  <p>One file makes the full journey: untracked → modified → staged → committed. <code>status</code> narrates every stop.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+demo=$(mktemp -d)/three-states &amp;&amp; mkdir -p <span class="str">"$demo"</span> &amp;&amp; cd <span class="str">"$demo"</span>
+
+git init -q
+git config user.email <span class="str">"you@example.com"</span>
+git config user.name  <span class="str">"You"</span>
+
+<span class="kw">echo</span> <span class="str">"== 1) working directory: an untracked file appears =="</span>
+<span class="kw">echo</span> <span class="str">"hello v1"</span> &gt; notes.txt
+git status --short                    <span class="comment"># ?? notes.txt</span>
+
+<span class="kw">echo</span> <span class="str">"== 2) stage it, then edit it again =="</span>
+git add notes.txt
+git status --short                    <span class="comment"># A  notes.txt  (staged)</span>
+<span class="kw">echo</span> <span class="str">"extra line"</span> &gt;&gt; notes.txt
+git status --short                    <span class="comment"># AM notes.txt  (staged + new unstaged edit)</span>
+git diff --cached                     <span class="comment"># what the next commit WILL contain</span>
+git diff                              <span class="comment"># the edit made after staging</span>
+
+<span class="kw">echo</span> <span class="str">"== 3) commit: the snapshot enters the repository =="</span>
+git add notes.txt
+git commit -qm <span class="str">"first snapshot"</span>
+git status --short                    <span class="comment"># (nothing — clean)</span>
+
+<span class="kw">echo</span> <span class="str">"== 4) history: what the repository remembers =="</span>
+git log --oneline --stat
+<span class="kw">echo</span> <span class="str">"done — working dir -&gt; staging -&gt; repository"</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li><code>?? notes.txt</code> — untracked: the file exists only in the working directory, in no other area.</li>
+      <li><code>A notes.txt</code> — added: its contents now sit in the staging area, waiting to be committed.</li>
+      <li><code>AM notes.txt</code> — the interesting state: <em>A</em>dded/staged, then <em>M</em>odified again. Two <code>diff</code> commands show the two halves side by side — exactly what the staging area is for.</li>
+      <li>After <code>commit</code>, <code>status</code> is empty and <code>log</code> shows the snapshot: the file has completed the journey.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_git_three_states.sh</code> and run <code>bash example1_git_three_states.sh</code>. Read the status codes as they scroll by — that's the entire vocabulary.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — diff: what changed, where</h3>
+  <p>The same file edited twice, staged once. Watch the three <code>diff</code> flavors answer three different questions about the same moment.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+demo=$(mktemp -d)/diff-demo &amp;&amp; mkdir -p <span class="str">"$demo"</span> &amp;&amp; cd <span class="str">"$demo"</span>
+git init -q
+git config user.email <span class="str">"you@example.com"</span>
+git config user.name  <span class="str">"You"</span>
+<span class="kw">echo</span> <span class="str">"line one"</span>  &gt; file.txt
+<span class="kw">echo</span> <span class="str">"line two"</span> &gt;&gt; file.txt
+git add file.txt
+git commit -qm <span class="str">"baseline"</span>
+
+<span class="kw">echo</span> <span class="str">"== edit 1, unstaged =="</span>
+<span class="kw">echo</span> <span class="str">"line three"</span> &gt;&gt; file.txt
+<span class="kw">echo</span> <span class="str">"--- git diff (working tree vs staging) ---"</span>
+git diff
+
+<span class="kw">echo</span> <span class="str">"== stage edit 1, then make edit 2 =="</span>
+git add file.txt
+<span class="kw">echo</span> <span class="str">"line four"</span> &gt;&gt; file.txt
+<span class="kw">echo</span> <span class="str">"--- git diff --cached (what WILL be committed) ---"</span>
+git diff --cached
+<span class="kw">echo</span> <span class="str">"--- git diff (only the new unstaged edit) ---"</span>
+git diff
+<span class="kw">echo</span> <span class="str">"--- git diff HEAD (everything vs the last commit) ---"</span>
+git diff HEAD
+
+git commit -qam <span class="str">"edits one and two"</span>
+git log --oneline</code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>After the first edit, bare <code>git diff</code> shows <em>line three</em> — the gap between your file and the staging area.</li>
+      <li>After staging, the same command is silent and <code>git diff --cached</code> takes over: it shows the staged edit (line three) as "what will be committed" — review this before <code>commit</code>.</li>
+      <li>The second edit makes <em>both</em> diffs useful again: <code>--cached</code> shows the old staged half, bare <code>diff</code> the new unstaged half, and <code>diff HEAD</code> stitches them together — your whole distance from the last commit.</li>
+      <li><code>commit -a</code> at the end sweeps in the unstaged edit and saves everything in one snapshot; <code>log</code> closes the loop.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example2_git_diff_states.sh</code> and run <code>bash example2_git_diff_states.sh</code>. The four diff outputs in sequence are the lesson — same moment, three questions.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Six commands cover 95% of a Git day</strong> — the model is small enough to actually hold in your head.</li>
+    <li><strong>Nothing is a mystery:</strong> <code>status</code> shows all three areas at once; <code>diff</code> answers any "what's different?" before you commit.</li>
+    <li><strong>The staging area is a review step</strong> — you decide what a commit contains, and you can stage half a file (<code>add -p</code>), so commits stay focused and history stays readable.</li>
+    <li><strong>Commit boundaries are honest:</strong> a commit is exactly the index — no more, no less — which is what makes "commit half the work" safe.</li>
+    <li><strong>History is addressable:</strong> every <code>log</code> entry is a hash you can restore, inspect, compare or branch from.</li>
+    <li><strong>The model transfers everywhere:</strong> the same three areas and six verbs power GitHub's UI, IDE integrations and every GUI tool — learn the model once.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Git's entire core workflow is one diagram: the <strong>working directory</strong> is where you work, the <strong>staging area</strong> is where you decide what the next snapshot will contain, and the <strong>repository</strong> is the snapshot you decided on. <code>init</code> opens the door, <code>status</code> tells you where you are, <code>add</code> and <code>commit</code> move files forward, and <code>log</code>/<code>diff</code> let you read and compare any two points on the way.
+  </p>
+  <pre><code>git init           start tracking
+git status         where am I?
+git diff           what changed (not yet staged)?
+git add            stage it
+git diff --cached  what will be committed?
+git commit -m      save the snapshot
+git log            the history
+<span class="comment"># if you forget everything: status, add, commit, diff</span></code></pre>
+  <p>
+    <em>Learn the three areas and the six verbs are just directions on a map you already understand.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Git: Core Commands &amp; the Three States</footer>
+</div>
+</body>
+</html>

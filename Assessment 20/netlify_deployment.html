@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netlify Deployment — Drag-and-Drop &amp; Git-Based Continuous Deployment</title>
+  <meta name="description" content="Deploying on Netlify in two ways — drag-and-drop (Netlify Drop) and Git-based continuous deployment — with exact steps.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="netlify, netlify drop, continuous deployment, git integration, build command, publish directory">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#00ad9f; --accent-dark:#007a70; --accent-soft:#d7f4f1; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#00ad9f,#007a70); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Deploying on Netlify</h1>
+    <p>Two ways: <strong>drag-and-drop</strong> (live in under a minute, no repo needed) and <strong>Git-based continuous deployment</strong> (every push redeploys automatically).</p>
+    <span class="badge">Hosting · Netlify · Deployment</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Netlify is a static-first host: give it files (or a repo it can build into files) and it serves them from a global CDN with HTTPS included. Two doors in — <strong>Drop</strong> for a folder of finished files (prototypes, one-shots), <strong>Git integration</strong> for anything you'll keep updating. Both end at a live <code>https://&lt;site&gt;.netlify.app</code>.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>The Two Methods, Step by Step</h2>
+
+  <h3>Method 1 — Drag-and-drop (Netlify Drop)</h3>
+  <ol>
+    <li>Prepare a folder with <code>index.html</code> at its root. Frameworks: run <code>npm run build</code> first and drag the output folder (<code>dist/</code>), not the source.</li>
+    <li>Open <strong><code>app.netlify.com/drop</code></strong> (sign in takes 30 seconds).</li>
+    <li><strong>Drag the folder in</strong> and let it upload.</li>
+    <li>It's live at <code>https://random-name.netlify.app</code>. Optionally rename it under <strong>Site settings → Change site name</strong>.</li>
+  </ol>
+  <p>Updating = drag again (or use the CLI). Each upload is a new, saved deploy.</p>
+
+  <h3>Method 2 — Git-based continuous deployment</h3>
+  <ol>
+    <li>Push your source to GitHub/GitLab.</li>
+    <li>Netlify: <strong>Add new site → Import an existing project</strong> → pick the repo.</li>
+    <li>Set <strong>build command</strong> (<code>npm run build</code>; empty for plain static) and <strong>publish directory</strong> (<code>dist</code>/<code>build</code>/<code>.</code>) — auto-suggested for known frameworks.</li>
+    <li>Add environment variables if the build needs them, then <strong>Deploy</strong>.</li>
+  </ol>
+  <p>
+    Now it's continuous: every push to the default branch → auto build → production deploy; every other branch/PR → its own preview URL; every deploy stays saved, so a bad push is a one-click <strong>rollback</strong> on the Deploys page.
+  </p>
+
+  <div class="tip">
+    <strong>Rule of thumb:</strong> drag-and-drop to <em>try</em>, Git integration to <em>ship</em> — once the repo is connected, deploying just happens. Terminal alternative: <code>npx netlify-cli deploy --prod --dir=demo_site</code> (after <code>npx netlify-cli login</code>).
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+  <table>
+    <tr><th>Comes with the deploy</th><th>Note</th></tr>
+    <tr><td>CDN + HTTPS + rollbacks</td><td>every deploy served globally, saved, one-click revert</td></tr>
+    <tr><td>Branch deploys / previews</td><td>non-main branches and PRs get unique preview URLs</td></tr>
+    <tr><td>Forms</td><td><code>data-netlify="true"</code> on a <code>&lt;form&gt;</code> — submissions in the dashboard, no backend</td></tr>
+    <tr><td>Functions &amp; redirects</td><td>serverless functions in <code>netlify/functions</code>; redirects via <code>netlify.toml</code></td></tr>
+  </table>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example</h2>
+  <p>The <code>demo_site/</code> folder in this workspace is a complete static site (one <code>index.html</code>). Deploy it either way:</p>
+  <ul>
+    <li><strong>Drop:</strong> open <code>app.netlify.com/drop</code>, drag <code>demo_site</code> in → live URL in ~30 seconds (the page says "It's live! 🎉").</li>
+    <li><strong>Git:</strong> put <code>demo_site</code> in a GitHub repo → Add new site → pick it → <strong>build command: empty, publish directory: <code>.</code></strong> → Deploy → push another commit and watch the second deploy appear on its own.</li>
+  </ul>
+  <div class="run-box">
+    <div class="label">Requirements</div>
+    A free Netlify account and internet. No Node, no build step — the folder <em>is</em> the site.
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Shortest path to a URL anywhere</strong> — files in, live site out, no config, no repo, no CLI.</li>
+    <li><strong>Deployment stops being a task</strong> — with Git connected, every push is a deploy, with previews and rollbacks built in.</li>
+    <li><strong>Zero server ops</strong> — CDN, HTTPS, scaling and patching are the platform's job; you only manage files.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Netlify has two doors: <strong>Drop</strong> (drag a folder of finished files → live in under a minute) and <strong>Git integration</strong> (connect a repo, set build command + publish directory → every push auto-deploys, with branch previews and one-click rollback). The pattern: <em>drop to try, Git to ship.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Netlify Deployment</footer>
+</div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ffcbebaf817f50',t:'MTc5MDIzMjAxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

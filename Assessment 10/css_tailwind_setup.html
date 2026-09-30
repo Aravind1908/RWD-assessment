@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The three Tailwind CSS setup methods — Play CDN, CLI, and PostCSS — with step-by-step instructions, code, a comparison table, and when each one is appropriate.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind css, play cdn, cli, postcss, setup, install, vite, build">
+  <title>Tailwind CSS: The Three Setup Methods — CDN, CLI &amp; PostCSS</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: The Three Setup Methods</h1>
+    <p>Play CDN, CLI, and PostCSS — how each one works, step by step, side by side, and exactly when each method is the appropriate choice.</p>
+    <span class="badge">CSS Framework · Tailwind · Setup Methods</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Tailwind doesn't work like a normal stylesheet you copy from a website — the CSS is <strong>generated for your project</strong>, keeping only the utility classes you actually use. That "generation" needs a mechanism, and Tailwind offers <strong>three standard setup methods</strong>, each aimed at a different situation:
+  </p>
+  <ul>
+    <li><strong>Play CDN</strong> — one <code>&lt;script&gt;</code> tag; Tailwind compiles in the browser at runtime. No build, no install.</li>
+    <li><strong>CLI</strong> — one watched command that compiles a small input file into a purged <code>output.css</code>. Light build, no bundler.</li>
+    <li><strong>PostCSS</strong> — Tailwind plugs into your existing build tool (Vite, webpack) as a PostCSS plugin. The full production pipeline.</li>
+  </ul>
+  <p>
+    All three let you write the <em>same</em> utility-class HTML. The difference is <strong>where and when the CSS is compiled</strong> — and therefore which one is appropriate for your project. (The philosophy behind those utility classes is covered in the companion document, <em>css_tailwind_utility_first.html</em>.)
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The pipeline all three methods share</h3>
+  <pre><code>your HTML/templates  ──
+                       ├──▶  Tailwind scanner  ──▶  CSS containing
+your input.css  ───────┘        (purging)            ONLY the utilities
+                                                        you actually use</code></pre>
+  <p>
+    Two inputs matter everywhere: your <strong>HTML</strong> (so the scanner knows which utility classes appear) and a tiny <strong>CSS entry file</strong>. Methods differ only in who runs the scanner and when:
+  </p>
+  <table>
+    <tr><th></th><th>Play CDN</th><th>CLI</th><th>PostCSS</th></tr>
+    <tr><td><strong>Who runs the scanner</strong></td><td>a script in the user's browser</td><td>a command on <em>your</em> machine</td><td>your build tool (Vite/webpack)</td></tr>
+    <tr><td><strong>When it runs</strong></td><td>runtime, on every page load</td><td>on save, while you work</td><td>on save (dev) + at build time</td></tr>
+    <tr><td><strong>What ships to users</strong></td><td>HTML + the CDN script (full CSS, compiled in-browser)</td><td>HTML + a static <code>output.css</code></td><td>HTML + built, purged CSS</td></tr>
+  </table>
+
+  <h3>The one CSS entry file (Tailwind v4)</h3>
+  <pre><code><span class="comment">/* input.css — used by BOTH the CLI and PostCSS methods */</span>
+<span class="kw">@import</span> <span class="str">"tailwindcss"</span>;</code></pre>
+  <p>In v4 this single line is the entire "config" — design tokens and customization live in CSS via <code>@theme</code> instead of a JavaScript file. (If you're using Tailwind v3, the entry file uses three directives — <code>@tailwind base; @tailwind components; @tailwind utilities;</code> — and a <code>tailwind.config.js</code> with a <code>content</code> glob tells the scanner where your templates live.)</p>
+
+  <h3>Quick syntax reference for each method</h3>
+  <pre><code><span class="comment">&lt;!-- Play CDN: the entire setup --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="comment"># CLI (v4): compile + watch</span>
+npx @tailwindcss/cli -i ./input.css -o ./dist/output.css --watch
+
+<span class="comment"># PostCSS (v4): plugin config, then your build tool does the rest</span>
+<span class="comment">// postcss.config.js</span>
+<span class="kw">export</span> <span class="kw">default</span> { plugins: { <span class="str">'@tailwindcss/postcss'</span>: {}, <span class="str">'autoprefixer'</span>: {} } }</code></pre>
+
+  <div class="note">
+    <strong>Key rule:</strong> the CDN gives you the <em>fastest start</em> but ships the <em>most CSS</em> (nothing is purged, compilation happens in the visitor's browser). The CLI and PostCSS both give you the <em>same purged production CSS</em> — pick between them by whether your project already has a build tool.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Method 1 — Play CDN (no build at all)</h3>
+    <p>One script tag, added to <code>&lt;head&gt;</code>. The script watches the DOM and compiles utility CSS in the browser as you edit. You can even configure it inline:</p>
+    <pre><code><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+  <span class="comment">// optional: extend the theme without any build</span>
+  tailwind.config = {
+    theme: { extend: { colors: { brand: <span class="str">"#2563eb"</span> } } }
+  }
+<span class="tag">&lt;/script&gt;</span></code></pre>
+    <ul>
+      <li><strong>Appropriate when:</strong> learning Tailwind, quick prototypes, demos/talks, CodePen/JSFiddle experiments, emails, throwaway pages.</li>
+      <li><strong>Not appropriate when:</strong> any production site — it ships the entire utility CSS (no purging), compiles at runtime in each visitor's browser, and prints a console warning that says exactly this.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Method 2 — CLI (one command, no bundler)</h3>
+    <p>The Tailwind CLI compiles your input CSS into a <strong>purged, production-ready stylesheet</strong> and can watch for changes. No PostCSS, no webpack — ideal for static sites and simple multi-page sites.</p>
+    <pre><code><span class="comment"># 1. write input.css →  @import "tailwindcss";</span>
+
+<span class="comment"># 2. install the CLI</span>
+npm install -D tailwindcss @tailwindcss/cli
+
+<span class="comment"># 3. compile + watch (v4)  — v3 used: npx tailwindcss</span>
+npx @tailwindcss/cli -i ./input.css -o ./dist/output.css --watch</code></pre>
+    <pre><code><span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"dist/output.css"</span><span class="tag">&gt;</span></code></pre>
+    <ul>
+      <li><strong>Appropriate when:</strong> static sites, personal pages, small marketing sites, or whenever you want real purged CSS with the least possible machinery.</li>
+      <li><strong>Not appropriate when:</strong> you're already inside a Vite/webpack project — don't run a second build alongside it; let the existing pipeline handle Tailwind via the PostCSS route.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Method 3 — PostCSS (the full production pipeline)</h3>
+    <p>Tailwind plugs into your existing build as a PostCSS plugin. Your CSS entry is a normal source file processed at build time — the standard route for real applications.</p>
+    <pre><code><span class="comment"># install the plugin (v4)</span>
+npm install -D tailwindcss @tailwindcss/postcss autoprefixer
+
+<span class="comment"># postcss.config.js</span>
+<span class="kw">export</span> <span class="kw">default</span> {
+  plugins: { <span class="str">'@tailwindcss/postcss'</span>: {}, <span class="str">'autoprefixer'</span>: {} }
+}
+
+<span class="comment"># src/input.css</span>
+<span class="kw">@import</span> <span class="str">"tailwindcss"</span>;</code></pre>
+    <ul>
+      <li><strong>Appropriate when:</strong> production apps, SPAs, React/Vue/Svelte projects, anything already built with Vite, webpack, or esbuild. (In Vite you'll usually add the <code>@tailwindcss/vite</code> plugin instead — same idea, tighter integration, still "the PostCSS-family route".)</li>
+      <li><strong>Not appropriate when:</strong> a single throwaway HTML page — that's overkill; the Play CDN is the right tool there.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Which setup should I choose?</h3>
+    <table>
+      <tr><th></th><th>Play CDN</th><th>CLI</th><th>PostCSS</th></tr>
+      <tr><td><strong>Mechanism</strong></td><td>&lt;script&gt; tag, compiles in the browser</td><td>one watched command, HTML → output.css</td><td>PostCSS plugin inside your build (Vite/webpack)</td></tr>
+      <tr><td><strong>Build step</strong></td><td>none</td><td>light (one command)</td><td>full (your project's pipeline)</td></tr>
+      <tr><td><strong>Purged, small CSS?</strong></td><td>no — full CSS, runtime compile</td><td>yes</td><td>yes</td></tr>
+      <tr><td><strong>Hot reload</strong></td><td>live in-browser (that's the point)</td><td>recompile on save</td><td>full hot reload via your dev server</td></tr>
+      <tr><td><strong>Best for</strong></td><td>learning, prototypes, demos, one-off pages</td><td>static sites, simple multi-page sites</td><td>production apps, framework projects</td></tr>
+      <tr><td><strong>Rule of thumb</strong></td><td>prototyping</td><td>static</td><td>production</td></tr>
+    </table>
+    <p>The three methods form a natural <strong>upward path</strong>: learn and prototype on the CDN → move a real static site to the CLI → move a growing app to PostCSS. The HTML you write never changes along the way — only the build gets more serious.</p>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — Play CDN in action (needs internet)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">This box uses Method 1: one CDN script tag, then pure utility classes. The button's color comes from a custom <code>brand</code> color defined in an inline <code>tailwind.config</code> — proof you can customize even without a build.</p>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { brand: "#2563eb" } } } }
+    </script>
+    <div class="flex flex-col sm:flex-row items-center gap-6 mt-4">
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 w-full max-w-xs text-center">
+        <h3 class="text-lg font-bold text-gray-900 m-0">Setup in one line</h3>
+        <p class="text-gray-500 text-sm m-0 mt-1"><code>bg-brand</code> is a custom color — extended via an inline <code>tailwind.config</code>, no build step.</p>
+        <button class="mt-4 bg-brand hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition">Hover me</button>
+      </div>
+      <p class="text-sm text-gray-500 m-0 flex-1">Same file opened in CodePen or a local editor behaves identically — that instant, build-free feedback loop is exactly what makes the Play CDN the best way to <em>learn</em>.</p>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> The Play CDN's console warning is honest about its limits: it's a JIT compiler running in the visitor's browser, so first paint includes a compile step and the shipped CSS isn't purged. For learning that's a feature (you see everything instantly); for production it's the reason the CLI and PostCSS methods exist.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Starter page with the Play CDN (Method 1)</h3>
+  <p>The fastest possible start: a single HTML file with the CDN script, an inline theme extension, and a small page built purely from utilities. Save as <code>index.html</code> and open in a browser with internet access.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Tailwind Starter — Play CDN<span class="tag">&lt;/title&gt;</span>
+  <span class="comment">&lt;!-- Method 1: the entire setup is this one tag --&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="comment">&lt;!-- optional inline config: add a "brand" color --&gt;</span>
+  <span class="tag">&lt;script&gt;</span>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: <span class="str">"#2563eb"</span> } } }
+    }
+  <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 min-h-screen flex flex-col"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;nav</span> <span class="attr">class</span>=<span class="val">"max-w-4xl w-full mx-auto flex items-center
+            justify-between px-6 py-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"font-bold text-brand"</span><span class="tag">&gt;</span>acme.<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"bg-brand hover:bg-blue-700 text-white text-sm
+        font-semibold px-4 py-2 rounded-lg transition"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/a&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+
+  <span class="tag">&lt;main</span> <span class="attr">class</span>=<span class="val">"flex-1 flex items-center justify-center px-6 pb-16"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-2xl shadow p-10 max-w-md w-full text-center"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-3xl font-bold"</span><span class="tag">&gt;</span>Hello from Tailwind<span class="tag">&lt;/h1&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-3 text-gray-600"</span><span class="tag">&gt;</span>
+        This page uses <strong>zero</strong> hand-written CSS — every style is a
+        utility class. <code>text-brand</code> is a custom color from the
+        inline config above.
+      <span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-8 flex flex-col sm:flex-row justify-center gap-3"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-brand hover:bg-blue-700 text-white font-semibold
+                    py-3 px-6 rounded-xl transition"</span><span class="tag">&gt;</span>Primary<span class="tag">&lt;/button&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"border border-gray-300 hover:border-blue-600
+                    hover:text-blue-600 font-semibold py-3 px-6
+                    rounded-xl transition"</span><span class="tag">&gt;</span>Secondary<span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The CDN script is the <em>only</em> setup — no <code>npm</code>, no CSS file, no config file.</li>
+      <li>The inline <code>tailwind.config</code> adds a <code>brand</code> color, showing that even the CDN route is customizable: <code>text-brand</code>, <code>bg-brand</code>, and <code>hover:bg-blue-700</code> all work immediately.</li>
+      <li><code>sm:flex-row</code> on the button row demonstrates responsive modifiers with no media queries written.</li>
+      <li>Because compilation happens in the browser, you can open this in CodePen and watch styles update as you type — the ideal learning loop.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser <em>with internet</em> (the CDN downloads Tailwind). Resize below 640px to see the buttons stack. Note the console warning from the CDN script — it's the framework telling you "great for prototyping, use a real build for production", which is exactly when you'd move to Method 2 or 3.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Production setup with PostCSS + Vite (Method 3)</h3>
+  <p>A real, minimal project — four files. Vite runs PostCSS → <code>@tailwindcss/postcss</code> → Tailwind: hot reload while developing, and a purged, minified stylesheet at build time. (Method 2, the CLI, would replace Vite with the single <code>npx @tailwindcss/cli</code> command and the same <code>input.css</code>.)</p>
+
+  <pre><code><span class="comment"># ── project structure ─────────────────────────────</span>
+my-app/
+├── package.json
+├── postcss.config.js
+└── src/
+    ├── input.css
+    └── index.html
+
+<span class="comment"># ── 1. package.json ───────────────────────────────</span>
+{
+  <span class="attr">"name"</span>: <span class="str">"my-tailwind-app"</span>,
+  <span class="attr">"private"</span>: <span class="num">true</span>,
+  <span class="attr">"type"</span>: <span class="str">"module"</span>,
+  <span class="attr">"scripts"</span>: {
+    <span class="attr">"dev"</span>: <span class="str">"vite"</span>,
+    <span class="attr">"build"</span>: <span class="str">"vite build"</span>
+  },
+  <span class="attr">"devDependencies"</span>: {
+    <span class="attr">"tailwindcss"</span>: <span class="str">"^4.0.0"</span>,
+    <span class="attr">"@tailwindcss/postcss"</span>: <span class="str">"^4.0.0"</span>,
+    <span class="attr">"autoprefixer"</span>: <span class="str">"^10.4.20"</span>,
+    <span class="attr">"postcss"</span>: <span class="str">"^8.4.49"</span>,
+    <span class="attr">"vite"</span>: <span class="str">"^6.0.0"</span>
+  }
+}
+
+<span class="comment"># ── 2. postcss.config.js ──────────────────────────</span>
+<span class="kw">export</span> <span class="kw">default</span> {
+  plugins: {
+    <span class="str">'@tailwindcss/postcss'</span>: {},
+    <span class="str">'autoprefixer'</span>: {}
+  }
+}
+
+<span class="comment"># ── 3. src/input.css (the whole "config") ─────────</span>
+<span class="kw">@import</span> <span class="str">"tailwindcss"</span>;</code></pre>
+
+  <pre><code><span class="comment">&lt;!-- ── 4. src/index.html ────────────────────────── --&gt;</span>
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Tailwind via PostCSS<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"/src/input.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-100 p-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-3xl font-bold text-blue-700"</span><span class="tag">&gt;</span>Tailwind via PostCSS<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-gray-600"</span><span class="tag">&gt;</span>
+    Built by a real PostCSS pipeline — purged, small CSS for production.
+  <span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- two pricing cards: stacked on mobile, side-by-side from md --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 flex flex-col md:flex-row gap-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white p-6 rounded-xl shadow w-full md:w-56"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold text-lg"</span><span class="tag">&gt;</span>Plan A<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>Starter utilities<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm
+                  font-medium py-2 px-4 rounded-lg"</span><span class="tag">&gt;</span>Choose<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white p-6 rounded-xl shadow w-full md:w-56"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold text-lg"</span><span class="tag">&gt;</span>Plan B<span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>More utilities<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-gray-800 hover:bg-gray-900 text-white text-sm
+                  font-medium py-2 px-4 rounded-lg"</span><span class="tag">&gt;</span>Choose<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>@import "tailwindcss";</code> in <code>src/input.css</code> is all the CSS source you need — v4 keeps its configuration in CSS (<code>@theme</code>), so there's no <code>tailwind.config.js</code> to maintain.</li>
+      <li>Vite processes <code>input.css</code> through PostCSS → <code>@tailwindcss/postcss</code> → Tailwind, which scans <code>index.html</code> and keeps only the utilities that appear.</li>
+      <li><code>flex-col md:flex-row</code> stacks the cards on phones and lays them out side by side from <code>md</code> — the same responsive pattern as Example 1, now compiled at build time.</li>
+      <li><code>npm run build</code> outputs <code>dist/</code> with a purged, minified stylesheet — often only a few KB for a whole page. That's the production advantage the CDN can't offer.</li>
+      <li>Tailwind v3 note: same project shape, but <code>input.css</code> uses the three directives <code>@tailwind base; @tailwind components; @tailwind utilities;</code> and a <code>tailwind.config.js</code> holds the <code>content</code> glob.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Create the four files exactly as shown, then run: <code>npm install</code> → <code>npm run dev</code> (hot-reload dev server) → <code>npm run build</code> (production build into <code>dist/</code>). No CDN and no internet needed after the initial <code>npm install</code>. A ready-made version of this project is in the workspace folder <code>tailwind_postcss_starter/</code>.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>The right tool for every stage:</strong> the three methods match the lifecycle of a project — zero-setup learning (CDN) → real static sites (CLI) → full applications (PostCSS) — without ever changing the HTML you write.</li>
+    <li><strong>Fastest possible feedback loop:</strong> the Play CDN compiles in the browser, so learning and prototyping have no setup friction at all — open a file, type a class, see it.</li>
+    <li><strong>Production CSS without a bundler:</strong> the CLI gives you the same purged output as a full build pipeline for sites that don't need one — less tooling to learn and maintain.</li>
+    <li><strong>Native framework integration:</strong> via PostCSS (or the <code>@tailwindcss/vite</code> plugin), Tailwind becomes just another part of the build you already have — hot reload, tree-shaken output, cache-busting, all for free.</li>
+    <li><strong>Small, lean output everywhere it matters:</strong> both real-build methods output only used utilities, keeping production CSS tiny (often 5–15&nbsp;KB) and page loads fast.</li>
+    <li><strong>No dead end:</strong> migrating "up" (CDN → CLI → PostCSS) is a build-config change, not a rewrite — your utility-class markup carries over untouched.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    All three setup methods compile the <em>same</em> utility-class HTML — they differ only in <strong>who runs the scanner and when</strong>: the Play CDN runs it in the visitor's browser (fastest start, no purging), the CLI runs it on your machine with one watched command (purged CSS, no bundler), and PostCSS runs it inside your existing Vite/webpack build (purged CSS plus full hot reload and framework integration).
+  </p>
+  <p>
+    In summary: <strong>learn and prototype with the Play CDN, ship static sites with the CLI, and ship applications with PostCSS.</em> Prototype with the CDN, ship with a build — and remember your HTML never changes as you move between them. For <em>why</em> utility classes work the way they do, see the companion document <strong>css_tailwind_utility_first.html</strong>.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: The Three Setup Methods</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deploying on Vercel — GitHub Import, Preview Deployments, Custom Domains &amp; Netlify Comparison</title>
+  <meta name="description" content="Deploying on Vercel — GitHub import, preview deployments, custom domains — a Netlify vs Vercel comparison, and DNS/SSL notes for custom domains.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="vercel, vercel deployment, github import, preview deployments, custom domain, DNS, SSL, netlify vs vercel">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#111827; --accent-dark:#111827; --accent-soft:#e5e7eb; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#111827,#374151); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Deploying on Vercel</h1>
+    <p>GitHub import in a few clicks, a <strong>preview URL for every pull request</strong>, and custom domains with automatic HTTPS — plus a short Netlify comparison.</p>
+    <span class="badge">Hosting · Vercel · Deployment</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Vercel is the platform from the Next.js team: Git-driven deploys served from a global edge network, with automatic framework detection. Its signature feature: <strong>every branch and pull request gets its own live preview URL</strong>. Static sites deploy with zero config; server-side code (serverless/edge functions) deploys right next to them.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Deployment, Step by Step</h2>
+
+  <h3>GitHub import</h3>
+  <ol>
+    <li>Sign in at <strong>vercel.com</strong> with GitHub → <strong>Add New… → Project</strong> → pick the repo.</li>
+    <li>Review the auto-detected <strong>framework preset</strong> (Next.js, Vite, React, static…) — for a plain HTML folder it's "no build, publish as-is".</li>
+    <li>Add environment variables if needed → <strong>Deploy</strong>. Live at <code>https://&lt;project&gt;-&lt;you&gt;.vercel.app</code>; every future push redeploys automatically.</li>
+  </ol>
+  <p>CLI equivalent: <code>npx vercel</code> (preview) and <code>npx vercel --prod</code> (production) — for folders or non-GitHub remotes.</p>
+
+  <h3>Preview deployments</h3>
+  <p>
+    Every push to a non-main branch — and every PR — builds a <strong>unique, shareable URL</strong>: a fully working copy of that exact commit, isolated from production. Vercel <strong>auto-comments the URL on the GitHub PR</strong>, so reviewers test the real artifact. After merge, production updates; previews can be discarded. <em>The link in the PR is the deploy.</em>
+  </p>
+
+  <h3>Custom domains</h3>
+  <ol>
+    <li><strong>Project → Settings → Domains → Add</strong> → type <code>yourdomain.com</code>.</li>
+    <li>Create the <strong>exact DNS records</strong> Vercel shows (below) at your registrar.</li>
+    <li>Vercel verifies (usually minutes) and <strong>issues the HTTPS certificate automatically, free</strong>.</li>
+  </ol>
+
+  <div class="note">
+    <strong>DNS + SSL, the short version.</strong>
+    <ul style="margin-bottom:0">
+      <li><strong>Records</strong> (the dashboard always shows exact values): <strong>root domain → A record</strong> — on Vercel, <code>@ → 76.76.21.21</code>; <strong>www/subdomains → CNAME</strong> — on Vercel, <code>www → cname.vercel-dns.com</code>. Netlify's shape is the same idea: CNAME root and www to <code>&lt;site&gt;.netlify.app</code>.</li>
+      <li><strong>Verification:</strong> the platform polls public DNS after you save; propagation is usually seconds-to-minutes (48h is the theoretical max, never seen in practice).</li>
+      <li><strong>HTTPS/SSL:</strong> both platforms <strong>provision and renew TLS certificates automatically</strong> once DNS is correct — no cert files, no renewal dates. You only toggle <em>redirect HTTP → HTTPS</em> (on) / <em>force SSL</em>.</li>
+    </ul>
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses — Netlify vs Vercel</h2>
+  <table>
+    <tr><th></th><th>Netlify</th><th>Vercel</th></tr>
+    <tr><td>Fastest deploy</td><td><strong>drag-and-drop</strong> (no repo needed)</td><td>GitHub import (repo required; CLI for folders)</td></tr>
+    <tr><td>Previews</td><td>branch deploys + PR comments</td><td>branch/PR deploys — <strong>auto PR comment is the signature UX</strong></td></tr>
+    <tr><td>Framework sweet spot</td><td>any static site</td><td><strong>Next.js native</strong>; also Vite/React/Astro</td></tr>
+    <tr><td>Forms</td><td><strong>built-in</strong> (zero backend)</td><td>via API routes/functions</td></tr>
+    <tr><td>Serverless</td><td>Netlify Functions</td><td>Serverless + <strong>Edge</strong> Functions</td></tr>
+    <tr><td>CDN / HTTPS / rollbacks / free tier</td><td>yes / auto / yes / generous</td><td>yes / auto / yes / generous</td></tr>
+  </table>
+  <div class="tip">
+    <strong>Choosing in one line:</strong> static/quick publish → either (drop vs import); <strong>Next.js</strong> → Vercel; <strong>no-backend forms</strong> → Netlify.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example</h2>
+  <p>Deploy the <code>demo_site/</code> folder (one-file static site, shared with the Netlify guide) via CLI — the same flow the UI import runs for you:</p>
+  <pre><code><span class="comment"># inside demo_site/ (free Vercel account required)</span>
+npx vercel login            <span class="comment"># browser sign-in, one time</span>
+npx vercel                  <span class="comment"># detects static site → preview URL (*.vercel.app)</span>
+npx vercel --prod           <span class="comment"># promote to the production URL</span>
+npx vercel domains add yourdomain.com   <span class="comment"># after creating the DNS records</span></code></pre>
+  <div class="run-box">
+    <div class="label">Requirements</div>
+    Free Vercel account, Node for the CLI, internet. Through the UI instead (Add New → Project → repo), every future push redeploys and each PR gets its preview URL + GitHub comment.
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Import-to-live in clicks</strong> — framework auto-detection means zero build config; the URL arrives while you're reading the confirmation.</li>
+    <li><strong>Previews change review culture</strong> — every PR has a working link; "works on my machine" stops being an argument.</li>
+    <li><strong>Domains are frictionless</strong> — paste the suggested records, wait minutes, HTTPS appears and renews on its own.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Vercel's flow: <em>sign in with GitHub → import the repo → framework auto-detected → Deploy</em> — production follows the default branch, every PR gets a live preview URL commented on automatically, and a custom domain is two DNS records away with HTTPS free. Versus Netlify: near-tie for static sites; Vercel wins for Next.js, Netlify for quick publishes and built-in forms. The domain rule is the same everywhere: <em>root → A record, www → CNAME, then the certificate takes care of itself.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Deploying on Vercel</footer>
+</div>
+</body>
+</html>

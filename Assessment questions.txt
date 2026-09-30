@@ -1,0 +1,82 @@
+Assessment 1 :
+Explain semantic elements.
+2. Explain about <meta> tag in detail.
+
+Assessment 2 :
+Explain the overview of web technologies — client-side vs. server-side- and the roles of HTML, CSS, and JavaScript.
+2. Describe the structure of an HTML5 document with a sample skeleton (doctype, head, meta charset, viewport, body).
+
+Assessment 3 :
+Explain hyperlinks and navigation in HTML5 — internal, external, email, anchor links, and the target attribute.
+2. Explain the structure of an HTML5 table with thead, tbody, tfoot, caption, colspan, and rowspan.
+
+Assessment 4 :
+Explain HTML5 forms in detail — important input types (email, password, number, date, range, color, file, radio, checkbox), select, datalist, and textarea with an example registration form.
+2. What is form validation? Explain the built-in validation attributes — required, pattern, min, max, minlength, maxlength, placeholder — with examples.
+
+Assessment 5 :
+Write short notes on Browser DevTools (Elements, Console, Network, device emulation) and Emmet abbreviations with examples.
+2. Explain the types of CSS selectors — element, class, id, attribute, combinators (descendant, child, sibling), universal — with syntax and examples.
+
+Assessment 6 :----------------------------Done
+Explain color notations (named, hex, rgb, hsl), background properties, and linear & radial gradients with examples.
+2. Explain typography in CSS — font-family, font-size, font-weight, line-height, text-align — and the use of web fonts.
+3. Differentiate pseudo-classes (:hover, :focus, :nth-child(), :not()) from pseudo-elements (::before, ::after, ::first-line) with examples.
+4. Explain the types of positioning — static, relative, absolute, fixed, sticky — with syntax.
+
+Assessment 7 :
+What are specificity, cascade, and inheritance? Explain with examples how the browser resolves conflicting CSS rules.
+2. Explain the CSS Box Model (content, padding, border, margin) with a diagram and differentiate content-box vs. border-box.
+
+Assessment 8 :
+Explain Flexbox layout — container properties (flex-direction, justify-content, align-items, gap, flex-wrap) and item properties (flex-grow, shrink,   basis, order) with a navbar/card example.
+2. Explain CSS Grid layout — grid-template-columns/rows, fr unit, repeat(), gap, line placement — and differentiate Grid vs. Flexbox.
+
+Assessment 9 :
+What is responsive design? Explain mobile-first media queries, breakpoints, and container queries, and compare container queries with media queries.
+2. Explain transitions, @keyframes animations, and scroll-driven animations with syntax; add a note on modern CSS — variables, calc(), clamp(), nesting, and  @layer.
+
+Assessment 10 :
+What is Tailwind CSS? Explain the utility-first philosophy with its advantages and limitations.
+2. Explain the three setup methods — Play CDN, CLI, and PostCSS — and when each is appropriate
+
+Assessment 11 :
+Explain the core utilities — spacing (p-, m-, gap-), sizing (w-, h-, max-w-) — with examples of the default spacing scale.
+2. Explain color utilities (text-, bg-, border-) and typography utilities (text-lg, font-bold, leading-, tracking-) with examples.
+
+Assessment 12 :
+Explain responsive prefixes sm:, md:, lg:, xl:, 2xl: with a mobile-first card-grid example.
+Explain state variants — hover:, focus:, active:, group-hover:, dark: — with examples. Add a short note on the @tailwindcss/typography plugin and Headless UI.
+
+Assessment 13 :
+Compare Tailwind CSS and Bootstrap (approach, styling, flexibility, bundle size, learning curve) with a code comparison of the same button/card in both.
+2. Explain Flexbox and Grid utilities in Tailwind (flex, items-center, justify-between, grid, grid-cols-3, col-span-) with two layout examples.
+
+Assessment 14 :
+1. Explain the structure of tailwind.config.js — content paths (purging unused styles), theme.extend for custom colors/fonts/spacing, and plugins.
+2. What is the @apply directive? Explain how it is used to create reusable component classes, with its advantages and when to avoid it.
+3. Explain dark mode in Tailwind — media strategy vs. class strategy — with implementation steps and the use of the dark: variant.
+
+Assessment 15 :
+What is version control? Explain why Git is used and how distributed VCS differs from centralized VCS.
+2. Explain the core Git commands — init, add, commit, status, log, diff — and the three states of a file (working directory → staging → repository).
+
+Assessment 16 :
+Explain remote repository commands — clone, remote, push, pull, fetch — and differentiate git pull vs. git fetch.
+2. What is .gitignore? Explain its importance with examples of files that should be ignored
+
+Assessment 17 :
+Explain Markdown syntax — headings, emphasis, ordered/unordered lists, inline and fenced code blocks, tables, links, and images — with examples.
+2. Differentiate static web hosting from cloud hosting platforms, with examples.
+
+Assessment 18 :
+What are branches? Explain branching, git switch/checkout, merging (fast-forward vs. three-way), and the feature-branch workflow.
+2. What is a merge conflict? Explain the steps to resolve a merge conflict with an example.
+
+Assessment 19 :
+Differentiate fork vs. clone, and explain the complete fork → clone → branch → commit → pull request workflow on GitHub. Add a note on hosting a website with GitHub Pages.
+What is GitHub Flavored Markdown? Explain task lists, collapsible sections, and the structure of a professional README.md (badges, screenshots, installation, contributing guide, license).
+
+Assessment 20 :
+Explain Netlify deployment — drag-and-drop method and Git-based continuous deployment — with steps.
+Explain Vercel deployment — GitHub import, preview deployments, and custom domains — and compare Netlify vs. Vercel features. Add a note on custom domain setup with DNS configuration and HTTPS/SSL certificates.

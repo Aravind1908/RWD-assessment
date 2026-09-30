@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: Dark Mode — Media vs Class Strategy</title>
+  <meta name="description" content="Dark mode in Tailwind CSS — the dark: variant, the media strategy (OS preference) vs the class strategy (toggle), with full implementation steps and two runnable examples.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind dark mode, dark: variant, prefers-color-scheme, class strategy, media strategy, theme toggle">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: Dark Mode</h1>
+    <p>One variant — <code>dark:</code> — and two triggers. The <strong>media</strong> strategy follows the user's operating system; the <strong>class</strong> strategy hands you the toggle. Both, with full implementation steps.</p>
+    <span class="badge">CSS Framework · Tailwind · Dark Mode</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Dark mode in Tailwind is a single variant, <code>dark:</code>, that re-declares any utility for dark contexts: <code>bg-gray-50 dark:bg-slate-950</code>, <code>text-gray-900 dark:text-white</code>. The real decision is <strong>when "dark" is true</strong> — and Tailwind offers two strategies:
+  </p>
+  <ul>
+    <li><strong>media</strong> (the default) — dark mode follows the user's operating-system preference. Zero JavaScript, zero configuration.</li>
+    <li><strong>class</strong> — dark mode is triggered by a <code>.dark</code> class you toggle on <code>&lt;html&gt;</code>. You own the switch, the persistence and the initial state.</li>
+  </ul>
+  <p>
+    Same markup, same <code>dark:</code> utilities — only the trigger differs. Everything below covers both.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The dark: variant</h3>
+  <pre><code><span class="comment">&lt;!-- paired on the same element: light value, then its dark twin --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"border-gray-200 dark:border-slate-800"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+  <p>
+    It works on <em>any</em> utility — backgrounds, text, borders, shadows, rings, gradient stops — and it composes with every other variant: <code>hover:dark:bg-slate-800</code>, <code>md:dark:px-8</code>. The habit that keeps it readable: keep each pair together on the same element, light value first.
+  </p>
+
+  <h3>The two strategies compared</h3>
+  <table>
+    <tr><th></th><th>media</th><th>class</th></tr>
+    <tr><td>Dark is true when</td><td>the OS says <code>prefers-color-scheme: dark</code></td><td><code>&lt;html&gt;</code> carries <code>class="dark"</code></td></tr>
+    <tr><td>JavaScript needed</td><td>none</td><td>a small toggle (~15 lines)</td></tr>
+    <tr><td>User can force it per-site</td><td>no — the OS wins</td><td>yes — your UI decides</td></tr>
+    <tr><td>Compiles to</td><td><code>@media (prefers-color-scheme: dark)</code></td><td>a <code>.dark</code> ancestor selector</td></tr>
+    <tr><td>Best for</td><td>content sites, "respect the OS" apps</td><td>products with a theme switcher</td></tr>
+  </table>
+
+  <h3>Declaring the strategy</h3>
+  <pre><code><span class="comment">// tailwind.config.js (v3) — 'media' is the default</span>
+<span class="kw">export</span> <span class="kw">default</span> {
+  <span class="tag">darkMode</span>: <span class="str">'media'</span>,   <span class="comment">// follow the OS</span>
+  <span class="comment">// darkMode: 'class',</span>
+  <span class="comment">// darkMode: ['class', '[data-theme="dark"]'],  // custom selector</span>
+}</code></pre>
+  <pre><code><span class="comment">/* v4 — CSS. media is the default; opt into class strategy with: */</span>
+<span class="kw">@import</span> <span class="str">"tailwindcss"</span>;
+<span class="kw">@custom-variant</span> <span class="tag">dark</span> (<span class="kw">&amp;</span><span class="kw">:where</span>(<span class="tag">.dark</span>, <span class="tag">.dark</span> *));</code></pre>
+  <p>
+    The v4 selector reads: "dark means this element, or any descendant of <code>.dark</code>" — and the <code>:where()</code> keeps its specificity at zero, so your own rules still win.
+  </p>
+
+  <h3>Implementation — media strategy</h3>
+  <ol>
+    <li>Do nothing in the config — <code>media</code> is the default in v3 and v4.</li>
+    <li>Design light-first; add <code>dark:</code> twins only where the light value breaks (surfaces, text, borders, shadows).</li>
+    <li>Preview it: DevTools → More tools → Render → <em>Emulate CSS prefers-color-scheme</em> — or simply switch your OS theme.</li>
+  </ol>
+  <p>That's the entire implementation. The trade-off: you can't offer a per-site override.</p>
+
+  <h3>Implementation — class strategy</h3>
+  <ol>
+    <li>Set the strategy: <code>darkMode: 'class'</code> (v3) or the <code>@custom-variant</code> line (v4).</li>
+    <li>Add <code>&lt;meta name="color-scheme" content="light dark"&gt;</code> — native form controls and scrollbars follow the theme, and it prevents a white flash.</li>
+    <li>Seed the initial state on load: stored choice first; if none, fall back to <code>matchMedia('(prefers-color-scheme: dark)')</code>.</li>
+    <li>Wire the toggle: <code>document.documentElement.classList.toggle('dark')</code> + persist to <code>localStorage</code>.</li>
+    <li>Pair light/dark values together on the same element <em>as you write</em> — don't hunt for darks later.</li>
+  </ol>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Where dark: actually goes</h3>
+    <table>
+      <tr><th>Layer</th><th>Typical pairing</th></tr>
+      <tr><td>Surfaces</td><td><code>bg-white dark:bg-slate-900</code> · <code>bg-gray-50 dark:bg-slate-950</code></td></tr>
+      <tr><td>Text</td><td><code>text-gray-900 dark:text-slate-100</code> · <code>text-gray-500 dark:text-slate-400</code></td></tr>
+      <tr><td>Borders / dividers</td><td><code>border-gray-200 dark:border-slate-800</code></td></tr>
+      <tr><td>Shadows</td><td>soft in light, near-gone or glow in dark: <code>shadow-sm dark:shadow-none</code></td></tr>
+      <tr><td>Focus rings</td><td><code>ring-blue-500 dark:ring-blue-400</code> (slightly brighter in dark)</td></tr>
+      <tr><td>Gradients</td><td><code>from-blue-600 dark:from-blue-500</code> — stops accept the variant too</td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — class strategy with a toggle (needs internet)</h3>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <div class="mt-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800
+                rounded-xl p-4 flex items-center justify-between">
+      <p class="text-sm m-0 text-gray-700 dark:text-slate-300">
+        Click — then reload this guide (the choice persists).
+      </p>
+      <button id="dm-toggle"
+              class="rounded-lg border border-gray-300 dark:border-slate-700
+                     px-3 py-1.5 text-sm font-medium
+                     hover:bg-gray-100 dark:hover:bg-slate-800">
+        Toggle
+      </button>
+    </div>
+    <script>
+      const root = document.documentElement
+      const stored = localStorage.getItem('theme')
+      if (stored === 'dark' || (!stored && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        root.classList.add('dark')
+      }
+      document.getElementById('dm-toggle').addEventListener('click', () => {
+        root.classList.toggle('dark')
+        localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light')
+      })
+    </script>
+  </div>
+
+  <div class="tip">
+    <strong>Don't manually invert everything.</strong> Pick a neutral family that's already dark-friendly (slate, zinc, gray) and add <code>dark:</code> only where the light value breaks. Brand accents usually stay put; what flips is surfaces, text and borders. Images often just need <code>dark:brightness-75</code> or a separate asset.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Media strategy (runnable, no JavaScript)</h3>
+  <p>The entire feature is a pair of utilities per element. Save as <code>index.html</code> (needs internet) and watch it react to your operating system.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"color-scheme"</span> <span class="attr">content</span>=<span class="val">"light dark"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Dark mode — media strategy<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 dark:bg-slate-950 text-gray-900
+            dark:text-slate-100 p-6"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto mt-8 bg-white dark:bg-slate-900
+              border border-gray-200 dark:border-slate-800
+              rounded-2xl p-6 shadow-sm"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-xl font-bold"</span><span class="tag">&gt;</span>Media strategy<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600 dark:text-slate-400"</span><span class="tag">&gt;</span>
+      Zero config, zero JavaScript. The <code class="text-xs">dark:</code> variant
+      compiles to <code class="text-xs">@media (prefers-color-scheme: dark)</code> —
+      your operating system decides.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;ul</span> <span class="attr">class</span>=<span class="val">"mt-4 space-y-2 text-sm text-gray-700 dark:text-slate-300"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;li</span> <span class="attr">class</span>=<span class="val">"bg-gray-100 dark:bg-slate-800 rounded-lg px-3 py-2"</span><span class="tag">&gt;</span>Surfaces: gray-50 → slate-950<span class="tag">&lt;/li&gt;</span>
+      <span class="tag">&lt;li</span> <span class="attr">class</span>=<span class="val">"bg-gray-100 dark:bg-slate-800 rounded-lg px-3 py-2"</span><span class="tag">&gt;</span>Text: gray-900 → slate-100<span class="tag">&lt;/li&gt;</span>
+      <span class="tag">&lt;li</span> <span class="attr">class</span>=<span class="val">"bg-gray-100 dark:bg-slate-800 rounded-lg px-3 py-2"</span><span class="tag">&gt;</span>Borders: gray-200 → slate-800<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-center mt-6 text-xs text-gray-400 dark:text-slate-500"</span><span class="tag">&gt;</span>
+    Switch your OS theme, or DevTools → Render →
+    "Emulate CSS prefers-color-scheme".
+  <span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>No config, no script: <code>dark:</code> utilities compile to <code>@media (prefers-color-scheme: dark)</code>, and the OS decides.</li>
+      <li>The <code>color-scheme</code> meta makes scrollbars and form controls follow along for free.</li>
+      <li>Every element keeps its light/dark pair together — surface, then its text, then its border — which is why a dark theme stays readable without a second stylesheet.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Toggle your OS between light and dark, or in DevTools: More tools → Render → Emulate CSS prefers-color-scheme. Nothing on the page knows JavaScript exists.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Class strategy: toggle + persistence</h3>
+  <p>The product version: a user-controlled switch, remembered between visits, seeded from the system preference on first visit. Save as <code>index.html</code> (needs internet).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"color-scheme"</span> <span class="attr">content</span>=<span class="val">"light dark"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Dark mode — class strategy<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;script&gt;</span>
+    <span class="tag">tailwind.config</span> = { <span class="tag">darkMode</span>: <span class="str">'class'</span> }
+  <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 dark:bg-slate-950 text-gray-900
+            dark:text-slate-100 p-6"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto mt-8 bg-white dark:bg-slate-900
+              border border-gray-200 dark:border-slate-800
+              rounded-2xl p-6 shadow-sm"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex items-center justify-between"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-xl font-bold"</span><span class="tag">&gt;</span>Class strategy<span class="tag">&lt;/h1&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="val">"toggle"</span>
+              <span class="attr">class</span>=<span class="val">"rounded-lg border border-gray-300 dark:border-slate-700
+                     px-3 py-1.5 text-sm font-medium
+                     hover:bg-gray-100 dark:hover:bg-slate-800"</span><span class="tag">&gt;</span>
+        Toggle
+      <span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600 dark:text-slate-400"</span><span class="tag">&gt;</span>
+      The <code class="text-xs">dark:</code> variant now keys off a
+      <code class="text-xs">.dark</code> class on <code class="text-xs">&lt;html&gt;</code> — you decide
+      when it is true.
+    <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;script&gt;</span>
+    <span class="kw">const</span> root = <span class="tag">document</span>.<span class="tag">documentElement</span>
+    <span class="kw">const</span> stored = <span class="tag">localStorage</span>.<span class="tag">getItem</span>(<span class="str">'theme'</span>)
+    <span class="kw">if</span> (stored === <span class="str">'dark'</span> ||
+        (!stored &amp;&amp; <span class="tag">matchMedia</span>(<span class="str">'(prefers-color-scheme: dark)'</span>).<span class="tag">matches</span>)) {
+      root.<span class="tag">classList</span>.<span class="tag">add</span>(<span class="str">'dark'</span>)
+    }
+    <span class="tag">document</span>.<span class="tag">getElementById</span>(<span class="str">'toggle'</span>).<span class="tag">addEventListener</span>(<span class="str">'click'</span>, () =&gt; {
+      root.<span class="tag">classList</span>.<span class="tag">toggle</span>(<span class="str">'dark'</span>)
+      <span class="tag">localStorage</span>.<span class="tag">setItem</span>(<span class="str">'theme'</span>,
+        root.<span class="tag">classList</span>.<span class="tag">contains</span>(<span class="str">'dark'</span>) ? <span class="str">'dark'</span> : <span class="str">'light'</span>)
+    })
+  <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>tailwind.config = { darkMode: 'class' }</code> flips the variant from a media query to a <code>.dark</code> ancestor — the markup doesn't change at all.</li>
+      <li>The seed block runs on load: a stored choice wins; otherwise the system preference sets the first paint. In a real app this snippet goes in <code>&lt;head&gt;</code>, before the body renders, to avoid a flash.</li>
+      <li>The toggle is two lines: <code>classList.toggle('dark')</code> + <code>localStorage.setItem</code>. Fifteen lines of JavaScript is the entire dark-mode feature.</li>
+      <li>Because the variant is an ancestor selector, one class on <code>&lt;html&gt;</code> themes the whole document — no per-element JavaScript.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Click Toggle, then reload: the choice survives. Clear site data and reload: it falls back to your OS preference.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>One variant, total coverage:</strong> <code>dark:</code> works on every utility and composes with <code>hover:</code>, <code>md:</code>, <code>group-</code> — a full theme is just pairs of classes.</li>
+    <li><strong>No second stylesheet:</strong> there's no <code>dark.css</code> to keep in sync — the twins live next to the values they replace.</li>
+    <li><strong>media strategy is free accessibility:</strong> respecting the user's OS preference is the default behavior, zero JavaScript.</li>
+    <li><strong>class strategy is ~15 lines of JS</strong> for a toggle with persistence — cheaper than most third-party theme libraries.</li>
+    <li><strong>Both survive v4:</strong> media stays the default; the class strategy is one <code>@custom-variant</code> line.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Dark mode in Tailwind is a variant, not a framework: <code>dark:</code> re-declares any utility, and the strategy decides the trigger. <strong>media</strong> compiles to a <code>prefers-color-scheme</code> media query — zero code, follows the OS. <strong>class</strong> keys off <code>.dark</code> on <code>&lt;html&gt;</code> — a toggle, <code>localStorage</code>, and a system-preference seed, fifteen lines total.
+  </p>
+  <p>
+    Choose media when the site should simply respect the user; choose class when the product needs its own switch — and in either case, write the pairs together: <em>light value, dark twin, same element, every time.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: Dark Mode</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: The @apply Directive — Reusable Component Classes</title>
+  <meta name="description" content="The @apply directive in Tailwind — how it inlines utilities into reusable component classes, its advantages, and the situations where you should avoid it.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind @apply, component classes, reusable css, layer components, when to avoid @apply">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: The @apply Directive</h1>
+    <p>When the same dozen utilities repeat on forty buttons, <code>@apply</code> inlines them into one class — what it is, how to use it for reusable component classes, and where it quietly stops being a good idea.</p>
+    <span class="badge">CSS Framework · Tailwind · @apply</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Tailwind's rule is to write utilities in your markup. The exception is when the <em>exact same combination</em> repeats — a button you've written forty times. The <code>@apply</code> directive takes a list of utilities and <strong>inlines their CSS into your own class</strong>, so the definition lives once in a stylesheet and the markup just says <code>class="btn"</code>.
+  </p>
+  <pre><code><span class="comment">/* components.css — the whole definition */</span>
+<span class="tag">.btn</span> {
+  <span class="kw">@apply</span> bg-blue-600 hover:bg-blue-700 text-white
+         font-semibold px-4 py-2 rounded-lg transition;
+}</code></pre>
+  <p>
+    One important qualification up front: <code>@apply</code> is a <strong>build-time</strong> directive. Your PostCSS build compiles it; a plain <code>&lt;style&gt;</code> tag does nothing with it. The Play CDN supports it only inside a <code>&lt;style type="text/tailwindcss"&gt;</code> block — which both examples in Section 4 use, so they still run by opening a file.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The basic form</h3>
+  <p><code>.selector { @apply utility utility …; }</code> — the output is the utilities' declarations, inlined into that selector.</p>
+  <pre><code><span class="comment">/* what the build emits (simplified) */</span>
+<span class="tag">.btn</span> {
+  background-color: <span class="num">#2563eb</span>;
+  color: <span class="num">#fff</span>;
+  font-weight: <span class="num">600</span>;
+  padding: <span class="num">.5rem</span> <span class="num">1rem</span>;
+  border-radius: <span class="num">.5rem</span>;
+  transition-property: color, background-color, border-color,
+                       box-shadow, transform;
+}
+<span class="tag">.btn</span><span class="kw">:hover</span> { background-color: <span class="num">#1d4ed8</span>; }</code></pre>
+  <p>Read the <code>:hover</code> line: <strong>variants listed in the <code>@apply</code> become real selectors in the output</strong>.</p>
+
+  <h3>Variants and responsive prefixes work inside</h3>
+  <pre><code><span class="comment">/* a variant → a nested selector */</span>
+<span class="tag">.nav-link</span> { <span class="kw">@apply</span> text-sm text-gray-600 hover:text-blue-600; }
+
+<span class="comment">/* a responsive prefix → a media query */</span>
+<span class="tag">.shell</span> { <span class="kw">@apply</span> max-w-7xl mx-auto px-4 md:px-6; }</code></pre>
+  <p>One class can therefore hold a component's entire lifecycle — base look, hover, focus ring, and mobile vs desktop padding — while the markup stays two words.</p>
+
+  <h3>Put it in @layer components</h3>
+  <pre><code><span class="kw">@layer</span> <span class="tag">components</span> {
+  <span class="tag">.btn</span> { <span class="kw">@apply</span> …; }
+}</code></pre>
+  <p>
+    Layers set the order: <code>base</code> → <code>components</code> → <code>utilities</code>. Placing the class in <code>components</code> means a utility on the same element <em>still wins</em> — <code>class="btn bg-red-600"</code> re-skins the button without touching any CSS. That layering is what keeps <code>@apply</code> from becoming a trap: there is always an escape hatch in the markup.
+  </p>
+
+  <h3>The Play CDN form</h3>
+  <pre><code><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;style</span> <span class="attr">type</span>=<span class="val">"text/tailwindcss"</span><span class="tag">&gt;</span>
+  <span class="tag">.btn</span> { <span class="kw">@apply</span> bg-blue-600 text-white px-4 py-2 rounded-lg; }
+<span class="tag">&lt;/style&gt;</span></code></pre>
+  <p>The <code>type="text/tailwindcss"</code> tag tells the CDN to run its in-browser compiler on the block — the only way to use <code>@apply</code> without a local build.</p>
+
+  <div class="note">
+    <strong>Tailwind v4:</strong> <code>@apply</code> still works with the same syntax. The new recommendation is to define reusable things with <code>@utility</code> — e.g. <code>@utility btn { @apply …; }</code> — because @utility-registered names are first-class: they accept variants and can themselves be <code>@apply</code>ed. Plain <code>.class</code> + <code>@apply</code> remains fine for internal component styles.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Where @apply earns its keep</h3>
+    <table>
+      <tr><th>Situation</th><th>Verdict</th></tr>
+      <tr><td>Repeated components (button, input, card) — the same classes in many places</td><td><code>@apply</code> — change it once, it updates everywhere</td></tr>
+      <tr><td>Accessibility wrappers (<code>.skip-link</code>, <code>.sr-only</code> helpers)</td><td><code>@apply</code> — behavior-level, used often, rarely read</td></tr>
+      <tr><td>Base-layer element styling (body font, heading rhythm)</td><td><code>@apply</code> or plain CSS in <code>@layer base</code></td></tr>
+      <tr><td>Porting an existing design's component CSS into a Tailwind project</td><td><code>@apply</code> — translates old class names to the token scale</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>When to avoid it</h3>
+    <ul>
+      <li><strong>One-off styles.</strong> If the combination appears once, write it in the markup — <code>@apply</code> buys indirection with zero reuse.</li>
+      <li><strong>Runtime variation.</strong> <code>@apply</code> bakes values in at build time. Per-instance colors or sizes belong in CSS custom properties + arbitrary values (<code>bg-[var(--c)]</code>), not in a family of <code>@apply</code>ed classes.</li>
+      <li><strong>Over-abstraction.</strong> A <code>.card</code> that encodes layout + color + state + spacing is a second component framework, now fighting Tailwind instead of using it. Component classes should be <em>small</em>.</li>
+      <li><strong>Deep chains.</strong> A class that <code>@apply</code>s another custom class that <code>@apply</code>s a third is a maze the moment something breaks. Keep it one level deep.</li>
+      <li><strong>Things that must stay greppable.</strong> If the team needs to find every place a focus ring is applied, utilities in markup are searchable; <code>@apply</code>ed ones are not.</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    <strong>Rule of thumb:</strong> utilities in markup by default. Reach for <code>@apply</code> when the <em>exact same classes repeat 3+ times</em>, or when the class is a <em>behavior</em> (skip link, sr-only wrapper) rather than a look. When in doubt — utilities.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Component classes with @apply</h3>
+  <p>A sign-in form whose buttons and inputs are <code>@apply</code>ed component classes. The <code>&lt;style type="text/tailwindcss"&gt;</code> block is the entire stylesheet. Save as <code>index.html</code> (needs internet).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>@apply — component classes<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;style</span> <span class="attr">type</span>=<span class="val">"text/tailwindcss"</span><span class="tag">&gt;</span>
+    <span class="kw">@layer</span> <span class="tag">components</span> {
+      <span class="tag">.btn</span> {
+        <span class="kw">@apply</span> inline-flex items-center gap-2 rounded-lg px-4 py-2
+               text-sm font-semibold transition;
+      }
+      <span class="tag">.btn-primary</span> { <span class="kw">@apply</span> bg-blue-600 text-white hover:bg-blue-700; }
+      <span class="tag">.btn-ghost</span>   { <span class="kw">@apply</span> bg-transparent text-gray-700 hover:bg-gray-100; }
+      <span class="tag">.input</span> {
+        <span class="kw">@apply</span> w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+               focus:outline-none focus:ring-2 focus:ring-blue-500;
+      }
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-6 text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;form</span> <span class="attr">class</span>=<span class="val">"max-w-sm mx-auto mt-8 bg-white border border-gray-200
+               rounded-2xl p-6 shadow-sm"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-lg font-bold"</span><span class="tag">&gt;</span>Sign in<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">class</span>=<span class="val">"mt-4 block text-sm font-medium"</span><span class="tag">&gt;</span>Email<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">class</span>=<span class="val">"input mt-1"</span> <span class="attr">type</span>=<span class="val">"email"</span> <span class="attr">placeholder</span>=<span class="val">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="245d4b5164415c45495448410a474b49">[email&#160;protected]</a>"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">class</span>=<span class="val">"mt-4 block text-sm font-medium"</span><span class="tag">&gt;</span>Password<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">class</span>=<span class="val">"input mt-1"</span> <span class="attr">type</span>=<span class="val">"password"</span> <span class="attr">placeholder</span>=<span class="val">"••••••••"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 flex gap-3"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"btn btn-primary"</span><span class="tag">&gt;</span>Sign in<span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"btn btn-ghost"</span><span class="tag">&gt;</span>Cancel<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/form&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The <code>type="text/tailwindcss"</code> block is compiled by the CDN — this is the browser-only form of <code>@apply</code>.</li>
+      <li><code>.btn-primary { @apply bg-blue-600 hover:bg-blue-700; }</code> compiles to a real <code>.btn-primary:hover</code> rule — variants included.</li>
+      <li>Both buttons share the <code>.btn</code> base and add only their colors — component classes compose in the markup the way utilities do.</li>
+      <li><code>.input</code>'s <code>focus:ring-2</code> shows the payoff: the accessibility focus state is one token away, using the same ring scale the rest of the app uses.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Change <code>.btn-primary</code>'s <code>bg-blue-600</code> to <code>bg-emerald-600</code> and refresh: every primary button in the app re-skins from one line.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Responsive @apply, and the anti-pattern</h3>
+  <p>A shell and a card that are worth abstracting (used on every page), next to a hero class that isn't — the same page shows both sides of the rule.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>@apply — responsive + limits<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;style</span> <span class="attr">type</span>=<span class="val">"text/tailwindcss"</span><span class="tag">&gt;</span>
+    <span class="comment">/* good: a layout shell — the same responsive classes on 6+ pages */</span>
+    <span class="tag">.shell</span> { <span class="kw">@apply</span> max-w-7xl mx-auto px-4 md:px-6 lg:px-8; }
+    <span class="comment">/* good: a card base used everywhere */</span>
+    <span class="tag">.card</span> { <span class="kw">@apply</span> bg-white border border-gray-200 rounded-2xl shadow-sm p-6; }
+    <span class="comment">/* AVOID: layout + color + state baked into one class is a second
+       component framework. The page below does the hero in utilities. */</span>
+    <span class="tag">.hero-marketing</span> {
+      <span class="kw">@apply</span> bg-gradient-to-r from-blue-600 to-indigo-600 text-white
+             rounded-3xl p-10 md:p-16 flex flex-col items-center text-center;
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"shell py-8"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- the anti-pattern class exists above, but this page does the right thing --&gt;</span>
+    <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="val">"bg-gradient-to-r from-blue-600 to-indigo-600 text-white
+                    rounded-3xl p-10 md:p-16 flex flex-col items-center
+                    text-center"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-3xl md:text-4xl font-bold"</span><span class="tag">&gt;</span>Hero, in utilities<span class="tag">&lt;/h1&gt;</span>
+      <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-3 text-blue-100 max-w-md text-sm"</span><span class="tag">&gt;</span>
+        One-off design? Keep it in the markup — no indirection,
+        fully greppable.
+      <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 grid gap-4 md:grid-cols-3"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span><span class="tag">&lt;h3</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Card 1<span class="tag">&lt;/h3&gt;</span><span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>.card from @apply.<span class="tag">&lt;/p&gt;</span><span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span><span class="tag">&lt;h3</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Card 2<span class="tag">&lt;/h3&gt;</span><span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>Change it once, updates everywhere.<span class="tag">&lt;/p&gt;</span><span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span><span class="tag">&lt;h3</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Card 3<span class="tag">&lt;/h3&gt;</span><span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>A utility in markup still wins over .card.<span class="tag">&lt;/p&gt;</span><span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>.shell { @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8; }</code> — responsive prefixes compile to media queries inside the class, so the layout rhythm lives in one place.</li>
+      <li><code>.card</code> is a legitimate <code>@apply</code> target: the same six utilities on every card in the app.</li>
+      <li><code>.hero-marketing</code> is defined but <em>not used</em> — the hero is written in utilities in the markup instead. Layout + color + state in one class means every variation forks the class; one-off design belongs in the markup, where it's greppable.</li>
+      <li>Because the <code>@apply</code>ed classes sit in <code>@layer components</code>, <code>class="card bg-red-50"</code> would override its background — the utilities layer still wins.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize below 768px and watch <code>.shell</code>'s padding step from <code>px-4</code> to <code>md:px-6</code>. Then delete the unused <code>.hero-marketing</code> block — nothing changes, which is the point.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages (and the honest costs)</h2>
+  <ul>
+    <li><strong>DRY where it's real:</strong> change <code>.btn</code> once and forty buttons update; the definition is a single greppable line.</li>
+    <li><strong>Token-based by construction:</strong> <code>@apply</code>ed values come from the scale, so brand changes stay centralized — no hex codes drifting into CSS.</li>
+    <li><strong>Variants and responsiveness work:</strong> <code>hover:</code>, <code>focus:</code>, <code>md:</code> all compile correctly into the component class.</li>
+    <li><strong>Markup stays calm:</strong> a form of five <code>@apply</code>ed controls reads like semantics, not class soup.</li>
+    <li><strong>Override-safe by layering:</strong> in <code>@layer components</code>, a markup utility still wins — the escape hatch is always one class away.</li>
+    <li><strong>The costs, honestly:</strong> indirection (markup no longer says what things look like), a build requirement, and the temptation to over-abstract. Those are discipline costs, not technical ones.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    <code>@apply</code> is the bridge between Tailwind's utility-first core and ordinary component CSS: it inlines utilities into your own classes at build time, with variants, responsive prefixes and layering all working. It shines on the things that truly repeat — buttons, inputs, shells, accessibility wrappers — and it goes stale the moment a style is one-off, varies at runtime, or swallows a whole design.
+  </p>
+  <p>
+    The working rule: <em>utilities in markup by default; @apply when the same classes repeat 3+ times; and component classes stay small enough that you could still read them at a glance.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: The @apply Directive</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3c53cf0fee00d93',t:'MTc4OTYxNzk4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

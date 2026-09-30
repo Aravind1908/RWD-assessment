@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Branches — Branching, switch, Merging, Feature-Branch Workflow</title>
+  <meta name="description" content="What Git branches are — pointers, not copies — how git switch works, fast-forward vs three-way merging, and the feature-branch workflow, with one simple runnable demo.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="git branch, git switch, git merge, fast-forward, three-way merge, feature branch workflow">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Git Branches</h1>
+    <p>Branches are pointers, not copies — which is why they're nearly free. Creating and switching between them, merging in its two forms, and the feature-branch workflow. One simple demo.</p>
+    <span class="badge">Version Control · Git · Branching &amp; Merging</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    A <strong>branch</strong> is a movable pointer to a commit — a tiny file containing one hash. Creating a branch writes that file; switching branches re-points your working directory at the branch's commit. Nothing is copied, so branching is nearly free — which is why the healthy habit is <em>a branch per task</em>, each with its own timeline.
+  </p>
+  <pre><code><span class="comment"># what a branch actually is</span>
+.git/refs/heads/main     →  a1b2c3d
+.git/refs/heads/feature  →  a1b2c3d   <span class="comment">← two pointers, same commit: free</span></code></pre>
+  <p>Three verbs cover almost everything: <strong>create</strong> (<code>git switch -c</code>), <strong>move between</strong> (<code>git switch</code>), and <strong>combine</strong> (<code>git merge</code>).</p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Creating and switching</h3>
+  <pre><code>git switch -c feature/login   <span class="comment"># create the branch AND switch to it</span>
+git switch main               <span class="comment"># back to main</span>
+git switch -                  <span class="comment"># jump to the previous branch</span>
+git branch                    <span class="comment"># list branches (* = current)</span>
+git branch -d feature/login   <span class="comment"># delete a fully-merged branch</span></code></pre>
+  <p>The old <code>checkout</code> still does all of this (<code>git checkout -b</code> = <code>git switch -c</code>). Modern Git just split the jobs: <code>switch</code> moves branches, <code>git restore file</code> discards file edits.</p>
+
+  <h3>Merging — two forms</h3>
+  <pre><code><span class="comment"># 1) FAST-FORWARD — your branch didn't move; the pointer slides ahead</span>
+main ─A─B
+      └─C─D    (feature; main sat still)
+git merge feature  →  main ─A─B─C─D        <span class="comment"># no new commit, linear</span>
+
+<span class="comment"># 2) THREE-WAY — both sides moved, so Git joins the timelines</span>
+          B
+         / \
+    M───/   \──C        (M on main, C on feature)
+    A
+git merge feature  →  M──X     <span class="comment"># X = merge commit with TWO parents</span></code></pre>
+  <p>
+    In a three-way merge Git finds the <strong>common ancestor</strong>, compares each side's changes, and combines them. Different parts of the file → combined automatically. The <em>same</em> lines → Git can't choose for you: that's a <strong>merge conflict</strong> (next guide).
+  </p>
+
+  <h3>The feature-branch workflow</h3>
+  <pre><code>git switch main &amp;&amp; git pull           <span class="comment"># 1. start from fresh main</span>
+git switch -c feature/login-fix       <span class="comment"># 2. branch</span>
+<span class="comment"># 3. edit, commit in small steps</span>
+git fetch &amp;&amp; git merge origin/main    <span class="comment"># 4. sync with main while working (repeat!)</span>
+git push -u origin feature/login-fix  <span class="comment"># 5. share it → open a PR</span>
+<span class="comment"># 6. review → merge into main</span>
+git switch main &amp;&amp; git pull
+git branch -d feature/login-fix       <span class="comment"># 7. done — delete the branch</span></code></pre>
+  <p>
+    The discipline in one line: <strong>main is always shippable; every branch is a draft.</strong> Step 4 — syncing with main while the feature is alive — is what keeps the final merge small.
+  </p>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+  <div class="card">
+    <h3>Why branch instead of copying a folder</h3>
+    <table>
+      <tr><th>Folder copies (<code>app_v2</code>)</th><th>Git branches</th></tr>
+      <tr><td>Duplicate every file; drift silently</td><td>Zero duplication</td></tr>
+      <tr><td>Recombining = manual copy-paste</td><td><code>git merge</code> combines per line, automatically</td></tr>
+      <tr><td>Cost grows with the project</td><td>Constant, tiny cost — branch per task</td></tr>
+    </table>
+  </div>
+  <div class="tip">
+    <strong>Name branches by job:</strong> <code>feature/billing-retry</code>, <code>fix/login-timeout</code>, <code>hotfix/crash</code> — the branch list should read like a to-do board.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Program</h2>
+  <p>One script: branch off, work on <em>both</em> sides, merge, and watch the history. Built in a temp folder, cleans up after itself.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+demo=$(mktemp -d)/branches &amp;&amp; mkdir -p <span class="str">"$demo"</span> &amp;&amp; cd <span class="str">"$demo"</span>
+git init -q --initial-branch=main
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="037a6c7643667b626e736f662d606c6e">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+printf <span class="str">"line one\nline two\nline three\nline four\nline five\nline six\nline seven\nline eight\n"</span> &gt; notes.txt
+git add notes.txt
+git commit -qm <span class="str">"base"</span>
+
+<span class="comment"># 1) branch off and work on it</span>
+git switch -c feature
+sed -i <span class="str">'s/line seven/FEATURE: line seven/'</span> notes.txt
+git commit -qam <span class="str">"feature: edit line seven"</span>
+
+<span class="comment"># 2) meanwhile, main moves too</span>
+git switch main
+sed -i <span class="str">'s/line two/LINE TWO (main)/'</span> notes.txt
+git commit -qam <span class="str">"main: edit line two"</span>
+
+<span class="comment"># 3) merge — both sides moved, so a merge commit joins them</span>
+git merge feature
+git log --oneline --graph --all
+cat notes.txt                        <span class="comment"># both edits, present together</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation:</strong>
+    <ul>
+      <li><code>git switch -c feature</code> created the pointer and moved the working tree — from then on, commits land on <em>feature</em>, not main.</li>
+      <li>Switching back to <code>main</code> makes the feature's edit vanish from disk — it's safe on the branch; the working tree is always "whatever the current branch points at".</li>
+      <li>Both sides now have commits, so the merge is <strong>three-way</strong>: the <code>--graph</code> log shows the fork and the X-shaped join (a merge commit with two parents).</li>
+      <li>If main had sat still, the same merge would have been a <strong>fast-forward</strong> — the pointer slides, no new commit, one straight line.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_git_branches.sh</code> and run <code>bash example1_git_branches.sh</code>. The <code>--graph</code> output at the end is the whole story: fork, join, both changes in.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Nearly free</strong> — a pointer plus new commits. That cost profile is why you branch per task instead of fearing the shared branch.</li>
+    <li><strong>Switch is a time machine</strong> — files belonging to other branches reappear when you switch back; nothing is lost by moving.</li>
+    <li><strong>Honest history</strong> — fast-forward stays linear when it can; the merge commit records where work happened when it can't. <code>git log --graph</code> always tells the true story.</li>
+    <li><strong>Local and parallel</strong> — branch, switch, merge need no network; several people (or one person, two tasks) move at full speed while main only receives finished work.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    A branch is a <strong>movable pointer to a commit</strong>. <code>git switch -c</code> makes one and moves you to it; <code>git merge</code> combines two histories — a <strong>fast-forward</strong> (pointer slides, no new commit) when your branch sat still, or a <strong>three-way merge</strong> (a merge commit joins the two tips) when both moved.
+  </p>
+  <p>
+    The daily rhythm: <em>fresh main → branch → small commits → sync often → push and review → merge → delete the branch.</em> Main is the promise that the project always works; every branch is a draft on its way there.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Git Branches</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3f69cf8a943c043',t:'MTc5MDEzNTcxOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

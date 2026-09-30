@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to CSS specificity, cascade, and inheritance — and how the browser resolves conflicting CSS rules, with examples.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="CSS specificity, cascade, inheritance, conflict resolution, !important, CSS rules">
+  <title>CSS Specificity, Cascade &amp; Inheritance</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#d97706; --accent-soft:#fcefdf; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#d97706,#b45309); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:#b45309; border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:#b45309; padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .sel { color:#7dd3fc; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:#b45309; }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .spec { font-family:"SF Mono",Consolas,monospace; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>CSS Specificity, Cascade &amp; Inheritance</h1>
+    <p>Understanding how the browser decides which CSS rule wins when there's a conflict — with examples.</p>
+    <span class="badge">CSS · Resolution · Conflict</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    When you write CSS, it's very common for more than one rule to try to style the <em>same</em> element. For example, a paragraph might be styled by <code>p</code>, by a class like <code>.note</code>, and by a specific id. So how does the browser know which one to use? This is the job of the <strong>cascade</strong>.
+  </p>
+  <p>
+    Three key ideas work together to settle any conflict:
+  </p>
+  <ul>
+    <li><strong>Cascade</strong> — the process by which the browser combines all the (possibly conflicting) declarations that apply to an element, and decides the final value. It's the "waterfall" of rules.</li>
+    <li><strong>Specificity</strong> — a way of assigning a "weight" to each selector. The more specific a selector is, the more it wins. Generally, <code>id</code> &gt; <code>class/attribute</code> &gt; <code>element</code>.</li>
+    <li><strong>Inheritance</strong> — some CSS properties (like <code>color</code> and <code>font-family</code>) are passed down from a parent element to its children, so you don't have to repeat them.</li>
+  </ul>
+  <p>
+    In short: <strong>inheritance</strong> helps values flow <em>down</em> the tree, <strong>specificity</strong> helps pick a winner <em>among</em> competing rules, and the <strong>cascade</strong> is the overall decision process that combines them.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>How specificity is calculated</h3>
+  <p>Specificity is usually expressed as three numbers: <code>(a, b, c)</code>. You can think of it like a score where:</p>
+  <table>
+    <tr><th>Level</th><th>Counts as</th><th>Examples</th></tr>
+    <tr><td>ID</td><td>1 point in the <code>id</code> column</td><td><code>#header</code></td></tr>
+    <tr><td>Class / Attribute / Pseudo-class</td><td>1 point in the <code>class</code> column</td><td><code>.box</code>, <code>[type="email"]</code>, <code>:hover</code></td></tr>
+    <tr><td>Element / Pseudo-element</td><td>1 point in the <code>element</code> column</td><td><code>p</code>, <code>div</code>, <code>::before</code></td></tr>
+  </table>
+  <pre><code><span class="sel">p</span>            <span class="comment">// specificity (0,0,1)</span>
+<span class="sel">.note</span>         <span class="comment">// specificity (0,1,0)</span>
+<span class="sel">#main</span>         <span class="comment">// specificity (1,0,0)</span>
+<span class="sel">p.note</span>        <span class="comment">// specificity (0,1,1)</span>
+<span class="sel">#main p.note</span>  <span class="comment">// specificity (1,1,1) — the highest here</span></code></pre>
+
+  <h3>Inheritance</h3>
+  <p>Text-related properties (color, font, line-height, text-align) are <em>inherited</em> by children. Box properties (margin, padding, border, width) are <em>not</em> inherited by default.</p>
+  <pre><code><span class="comment">/* The p inherits color from its parent (e.g. a div) */</span>
+<span class="kw">div</span> { <span class="kw">color</span>: <span class="str">red</span>; }
+<span class="kw">div p</span> { <span class="comment">/* p still red unless you override it */</span> }</code></pre>
+
+  <div class="note">
+    <strong>Key rule:</strong> To resolve a conflict, the browser compares <strong>specificity first</strong>. If specificities are <em>equal</em>, the rule that comes <strong>later in the stylesheet</strong> (or the one with <code>!important</code>) wins. Inheritance only provides the "default" when there's no direct rule at all.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. Specificity — who wins a direct conflict</h3>
+    <p>A more specific selector overrides a less specific one. This is why an <code>inline style</code> and <code>!important</code> are so powerful — and why they're generally avoided.</p>
+    <pre><code><span class="kw">p</span>    { <span class="kw">color</span>: <span class="str">gray</span>; }     <span class="comment">// (0,0,1) loses</span>
+<span class="kw">.note</span> { <span class="kw">color</span>: <span class="str">red</span>; }      <span class="comment">// (0,1,0) wins</span>
+<span class="kw">#main</span> { <span class="kw">color</span>: <span class="str">blue</span>; }     <span class="comment">// (1,0,0) wins over both</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. Order matters — when specificity is equal</h3>
+    <p>If two rules have the same specificity, the one that appears <strong>later</strong> in the CSS file wins. This is why the order of your rules can change the result.</p>
+    <pre><code><span class="kw">p</span>  { <span class="kw">color</span>: <span class="str">blue</span>; }   <span class="comment">// first</span>
+<span class="kw">p</span>  { <span class="kw">color</span>: <span class="str">red</span>; }    <span class="comment">// later — wins</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. !important — the trump card (used carefully)</h3>
+    <p>A declaration with <code>!important</code> overrides normal declarations, regardless of specificity. Use it sparingly, as it makes the cascade hard to reason about.</p>
+    <pre><code><span class="kw">#main p</span> { <span class="kw">color</span>: <span class="str">blue</span> <span class="kw">!important</span>; }
+<span class="kw">p.note</span> { <span class="kw">color</span>: <span class="str">red</span>; }   <span class="comment">// loses to !important above</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. Inheritance — property values flow down</h3>
+    <p>Setting a property like <code>color</code> on a parent automatically applies to all its children and grandchildren. This is what makes big style blocks possible.</p>
+    <pre><code><span class="kw">body</span> { <span class="kw">color</span>: <span class="str">#333</span>; }   <span class="comment">// everything inherits this</span>
+<span class="kw">h1</span>   { <span class="kw">font-family</span>: <span class="str">Arial</span>; }  <span class="comment">// h1 and its children get Arial</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. Inherited vs. non-inherited properties</h3>
+    <pre><code><span class="comment">// Inherited by default:</span>
+<span class="kw">color</span>, <span class="kw">font-family</span>, <span class="kw">font-size</span>, <span class="kw">line-height</span>, <span class="kw">text-align</span>
+
+<span class="comment">// NOT inherited by default:</span>
+<span class="kw">margin</span>, <span class="kw">padding</span>, <span class="kw">border</span>, <span class="kw">width</span>, <span class="kw">height</span></code></pre>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> A good habit is to keep selectors <em>low-specificity</em> (prefer classes over ids), write rules in a sensible order, and only reach for <code>!important</code> as a last resort. This keeps your CSS predictable and easy to override later.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — How the browser resolves conflicting rules</h3>
+  <p>This example lays out several conflicting rules for the same element and shows which one wins by specificity and by order. Change the rules to see the browser behave differently.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* 1. Element selector — low specificity (0,0,1) */</span>
+    <span class="kw">p</span> { <span class="kw">color</span>: <span class="str">gray</span>; }
+
+    <span class="comment">/* 2. Class selector — higher (0,1,0), so it beats the p */</span>
+    <span class="kw">.note</span> { <span class="kw">color</span>: <span class="str">red</span>; }
+
+    <span class="comment">/* 3. ID selector — highest (1,0,0), beats both */</span>
+    <span class="kw">#special</span> { <span class="kw">color</span>: <span class="str">blue</span>; }
+
+    <span class="comment">/* 4. Same specificity as 1, but LATER: this wins the tie */</span>
+    <span class="kw">body p</span> { <span class="kw">color</span>: <span class="str">green</span>; }  <span class="comment">// (0,0,2) — beats plain p</span>
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"note"</span> <span class="attr">id</span>=<span class="val">"special"</span><span class="tag">&gt;</span>
+    Which color wins? The ID selector (#special) has the highest
+    specificity, so this text should be <span class="kw">blue</span>.
+  <span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>Several rules target the same paragraph, so the browser must <strong>cascade</strong> to pick one.</li>
+      <li><code>p</code> (0,0,1) is the weakest; <code>.note</code> (0,1,0) beats it; <code>#special</code> (1,0,0) beats both.</li>
+      <li><code>body p</code> (0,0,2) has <em>more element points</em> than a plain <code>p</code>, so it beats the plain <code>p</code> too.</li>
+      <li>Because the ID selector has the highest specificity, the paragraph ends up <strong>blue</strong>.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Inheritance flowing down the tree</h3>
+  <p>This example shows how text properties inherited from a parent cascade to children, and how a child can override them. The box properties (margin/padding) are not inherited, which is why each box has its own spacing.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* Parent: sets color &amp; font — children will END UP INHERITING these */</span>
+    <span class="kw">section</span> {
+      <span class="kw">color</span>: <span class="str">#0f766e</span>;
+      <span class="kw">font-family</span>: <span class="str">Georgia</span>, <span class="kw">serif</span>;
+      <span class="kw">border</span>: <span class="num">2px</span> <span class="kw">solid</span> <span class="str">#ccc</span>;   <span class="comment">// border is NOT inherited</span>
+      <span class="kw">padding</span>: <span class="num">10px</span>;               <span class="comment">// padding is NOT inherited</span>
+    }
+
+    <span class="comment">/* Child: overrides color (a child can always ignore inheritance) */</span>
+    <span class="kw">section p</span> { <span class="kw">color</span>: <span class="str">#b91c1c</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;section&gt;</span>
+    This section is teal, in Georgia.
+    <span class="tag">&lt;p&gt;</span>But this paragraph overrides the color to red,
+    while still inheriting the Georgia font and its own padding.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;span&gt;</span>This span inherits teal and Georgia too.<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;/section&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>The <code>section</code>'s <code>color</code> and <code>font-family</code> are <strong>inherited</strong> by the <code>p</code> and <code>span</code> children.</li>
+      <li>The child <code>p</code> <strong>overrides</strong> the color to red via its own rule (you can always override inherited values).</li>
+      <li><code>border</code> and <code>padding</code> on the section are <em>not</em> inherited — the paragraph gets its own default (no border).</li>
+      <li>This is a clean example of inheritance flowing down and a child taking control when needed.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. In Example 1, try pausing <code>#special</code> to see the class's red win; in Example 2, remove the <code>section p</code> rule to see the paragraph inherit the parent's teal.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Predictable styling:</strong> Understanding the cascade lets you confidently override styles.</li>
+    <li><strong>Less repetition:</strong> Inheritance means you don't restate <code>color</code> or <code>font</code> on every child.</li>
+    <li><strong>Cleaner code:</strong> Using classes (low specificity) keeps your CSS easy to maintain and extend.</li>
+    <li><strong>Scalability:</strong> A clear specificity strategy makes large stylesheets manageable.</li>
+    <li><strong>Powerful control:</strong> When you need it, specific selectors and the cascade can target precisely.</li>
+    <li><strong>Easier debugging:</strong> Knowing why a rule wins helps you fix "why isn't my style applying?" quickly.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    The cascade, specificity, and inheritance are the rules that let CSS resolve conflicts. <strong>Inheritance</strong> passes values down the document tree. <strong>Specificity</strong> grades each selector (id beats class beats element). And the <strong>cascade</strong> is the overall process that, considering specificity, source order, and <code>!important</code>, settles on the final value for every property.
+  </p>
+  <p>
+    In summary: <strong>when two rules conflict, compare specificity first; if equal, the later one wins; <code>!important</code> trumps both; and inherited values only apply when no direct rule exists.</strong> Master these three ideas, and you'll be able to predict — and control — exactly how your page is styled. As the saying goes: <em>"The cascade is the art of choosing, and inheritance is the art of sharing."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · CSS Specificity, Cascade &amp; Inheritance</footer>
+</div>
+</body>
+</html>

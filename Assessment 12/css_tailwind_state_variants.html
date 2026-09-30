@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: State Variants (hover:, focus:, active:, group-hover:, dark:)</title>
+  <meta name="description" content="How Tailwind's state variants work — hover:, focus:, active:, group-hover:, dark: — with runnable examples, plus notes on @tailwindcss/typography and Headless UI.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind, variants, hover, focus, active, group-hover, dark mode, typography plugin, headless ui">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: State Variants</h1>
+    <p>How <code>hover:</code>, <code>focus:</code>, <code>active:</code>, <code>group-hover:</code> and <code>dark:</code> let one element react to its state — no <code>&amp;:hover</code> selectors, no extra CSS — with examples and a note on the typography plugin and Headless UI.</p>
+    <span class="badge">CSS Framework · Tailwind · Variants &amp; Ecosystem</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    A static page is one thing; a page that <em>reacts</em> is an interface. Tailwind handles reactivity with <strong>state variants</strong>: a prefix in front of any utility that says <em>"apply this only while the element is in this state"</em>. <code>hover:bg-blue-700</code> means "use blue-700 as the background <strong>only while hovered</strong>".
+  </p>
+  <p>
+    The syntax is always the same shape — <code>state:utility</code> — and states can be stacked, and stacked with responsive prefixes too: <code>md:hover:bg-blue-800</code> reads as "at md and up, while hovered, use blue-800". That's the entire mental model: <em>variant(s) first, the utility last.</em>
+  </p>
+  <pre><code><span class="comment">/* hand-written CSS */</span>
+<span class="kw">.btn</span> { <span class="kw">background</span>: <span class="str">#2563eb</span>; }
+<span class="kw">.btn:hover</span>  { <span class="kw">background</span>: <span class="str">#1d4ed8</span>; }
+<span class="kw">.btn:focus</span>  { <span class="kw">outline</span>: <span class="num">2px solid</span> <span class="str">#3b82f6</span>; }
+
+<span class="comment">&lt;!-- Tailwind: same behavior, one class list --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 focus:ring-2
+            focus:ring-blue-500"</span><span class="tag">&gt;</span>Click<span class="tag">&lt;/button&gt;</span></code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The state variants</h3>
+  <table>
+    <tr><th>Variant</th><th>Active when…</th><th>Typical use</th></tr>
+    <tr><td><code>hover:</code></td><td>the pointer is over the element</td><td>buttons darken, links underline, cards lift</td></tr>
+    <tr><td><code>focus:</code></td><td>the element has focus (click <em>or</em> Tab)</td><td>focus rings on buttons, inputs, links</td></tr>
+    <tr><td><code>focus-visible:</code></td><td>focus from the <em>keyboard</em> (not mouse)</td><td>show rings only for keyboard users — the accessibility-favorite</td></tr>
+    <tr><td><code>active:</code></td><td>the element is pressed / touch-down</td><td>"pressed" feedback: darker color, slight scale-down</td></tr>
+    <tr><td><code>disabled:</code></td><td>the element is disabled</td><td>grayed-out buttons, muted text</td></tr>
+    <tr><td><code>group-hover:</code></td><td>a <em>parent</em> marked <code>group</code> is hovered</td><td>card hover moves the arrow, reveals an action</td></tr>
+    <tr><td><code>peer-checked:</code> (bonus)</td><td>a previous sibling marked <code>peer</code> is checked</td><td>checkbox toggles a panel's styles</td></tr>
+    <tr><td><code>dark:</code></td><td>dark mode is active</td><td>the whole page's dark theme, per-element</td></tr>
+  </table>
+
+  <h3>group-hover — the parent-reacts pattern</h3>
+  <p>Two steps: put <code>group</code> on the parent, and any child can use <code>group-hover:*</code>. This is how you style a child from a parent's hover — the Tailwind version of <code>.card:hover .arrow { … }</code>:</p>
+  <pre><code><span class="tag">&lt;a</span> <span class="attr">class</span>=<span class="val">"group block p-4 border border-gray-200 rounded-xl
+          hover:border-blue-300"</span><span class="tag">&gt;</span>
+  <span class="comment">&lt;!-- child reacts when the PARENT is hovered --&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"text-gray-900 group-hover:text-blue-600"</span><span class="tag">&gt;</span>Read more<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"inline-block transition-transform
+              group-hover:translate-x-1"</span><span class="tag">&gt;</span>→<span class="tag">&lt;/span&gt;</span>
+<span class="tag">&lt;/a&gt;</span></code></pre>
+  <p>Multiple groups can be named (<code>group/card</code> + <code>group-hover/card:*</code>) when a card is nested inside another hoverable element.</p>
+
+  <h3>dark: — the dark-theme variant</h3>
+  <p><code>dark:</code> applies its utility while dark mode is active. In v4 the default is the visitor's <strong>OS preference</strong> (<code>prefers-color-scheme</code>) — zero setup. For a manual <em>class-based</em> toggle, v4 adds one CSS line and you toggle the <code>dark</code> class on <code>&lt;html&gt;</code> (v3 used <code>darkMode: "class"</code> in the config):</p>
+  <pre><code><span class="comment">/* v4: opt into class-based dark mode */</span>
+<span class="kw">@custom-variant</span> <span class="kw">dark</span> (<span class="kw">&amp;:where</span>(<span class="str">.dark</span>, <span class="str">.dark</span> <span class="kw">*</span>));
+
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-white dark:bg-gray-950
+            text-gray-900 dark:text-white"</span><span class="tag">&gt;</span></code></pre>
+
+  <h3>Stacking order</h3>
+  <p>Convention is <code>breakpoint:state:utility</code> — e.g. <code>md:group-hover:bg-blue-100</code>. Multiple states on one element are just multiple classes: <code>hover:bg-blue-700 active:bg-blue-800 focus:ring-2 focus:ring-blue-500</code>. Pair every state change with <code>transition</code> so it animates instead of snapping.</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> <code>hover</code> is for the mouse, <code>focus</code> is for the keyboard — never remove focus styling (<code>focus:outline-none</code>) without replacing it (<code>focus:ring-2</code>). Keyboard users have no hover; the focus ring is their cursor.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Typical state jobs</h3>
+    <table>
+      <tr><th>Job</th><th>Classes</th></tr>
+      <tr><td>Primary button</td><td><code>bg-blue-600 hover:bg-blue-700 active:bg-blue-800 active:scale-95 transition</code></td></tr>
+      <tr><td>Input with focus ring</td><td><code>border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500</code></td></tr>
+      <tr><td>Card that reacts as a whole</td><td>parent <code>group hover:border-blue-300</code>; child <code>group-hover:text-blue-600 group-hover:translate-x-1</code></td></tr>
+      <tr><td>Dark-mode page</td><td><code>bg-white dark:bg-gray-950</code>, <code>text-gray-900 dark:text-white</code></td></tr>
+      <tr><td>Keyboard-only focus</td><td><code>focus-visible:ring-2 focus-visible:ring-blue-500</code></td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — hover, active, focus and group-hover (needs internet)</h3>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="flex flex-col sm:flex-row items-stretch gap-4 mt-4">
+      <button class="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+                    active:scale-95 text-white font-semibold py-3 rounded-xl
+                    transition focus:outline-none focus:ring-2
+                    focus:ring-blue-500 focus:ring-offset-2">
+        Hover · press · Tab to focus
+      </button>
+      <a href="#" class="group flex-1 bg-white border border-gray-200 rounded-xl
+                        p-4 text-center hover:border-blue-300 transition">
+        <span class="font-medium text-gray-900 group-hover:text-blue-600">
+          Group card — hover me
+        </span>
+        <span class="inline-block ml-1 transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Short note — @tailwindcss/typography</h3>
+    <p>Utilities shine on <em>UI</em>, but styling a whole article by hand (every <code>&lt;h2&gt;</code>, <code>&lt;blockquote&gt;</code>, <code>&lt;table&gt;</code>…) is tedious. The <strong>typography plugin</strong> adds one class, <code>prose</code>, that auto-styles long-form content — headings, paragraphs, lists, links, code, tables — using the same Tailwind scale.</p>
+    <pre><code><span class="comment"># v4: npm i -D @tailwindcss/typography, then in your CSS:</span>
+<span class="kw">@plugin</span> <span class="str">"@tailwindcss/typography"</span>;
+<span class="comment">// (v3: require("@tailwindcss/typography") in tailwind.config plugins)</span>
+
+<span class="tag">&lt;article</span> <span class="attr">class</span>=<span class="val">"prose prose-blue max-w-prose
+             dark:prose-invert"</span><span class="tag">&gt;</span>
+  …raw HTML or rendered Markdown…
+<span class="tag">&lt;/article&gt;</span></code></pre>
+    <p>Modifiers: <code>prose-sm</code>/<code>prose-lg</code> (density), <code>prose-blue</code> (accent color), <code>prose-invert</code> (dark). It's the standard companion for blogs and docs inside a Tailwind app: <strong>utilities for the chrome, prose for the content.</strong></p>
+  </div>
+
+  <div class="card">
+    <h3>Short note — Headless UI</h3>
+    <p>
+      <strong>Headless UI</strong> (by the Tailwind team, for React and Vue) provides <em>unstyled</em> components — Dialog/modal, Disclosure, Listbox, Menu, Popover, Switch, Tab — with all the hard parts done: keyboard navigation, focus trapping, Escape handling, ARIA attributes. <code>npm i @headlessui/react</code>, drop in a <code>&lt;Dialog&gt;</code>, and you add the Tailwind classes yourself — which is exactly where this guide's variants get used: <code>group</code> on the panel, <code>focus-within:ring-2</code> on the trigger, <code>dark:</code> on every surface.
+    </p>
+    <p>In short: <strong>Headless UI owns the behavior, Tailwind owns the look.</strong> Together they're the most common way to build accessible, custom-looking interactive components.</p>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> <code>focus-visible:</code> (the <code>:focus-visible</code> pseudo-class) is why modern sites only show focus rings when you Tab around but not when you click — browsers decide "this user needs it" for you. It's the single highest-value accessibility variant for links and buttons.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Buttons and cards with every state</h3>
+  <p>One page exercising <code>hover:</code>, <code>active:</code>, <code>focus:</code> and <code>group-hover:</code> on a button, a card, and an input. Save as <code>index.html</code> (needs internet for the CDN).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Tailwind State Variants<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-8 text-gray-900"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto space-y-6"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- hover: + active: + focus: on one button --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-2xl border border-gray-200 p-6"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Primary button<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs text-gray-400 mt-1"</span><span class="tag">&gt;</span>
+      hover: darker · active: pressed · focus: ring (Tab to it)
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+                active:scale-95 text-white font-semibold px-6 py-3 rounded-lg
+                transition focus:outline-none focus:ring-2
+                focus:ring-blue-500 focus:ring-offset-2"</span><span class="tag">&gt;</span>
+      Press me
+    <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- group-hover: parent hovered, children react --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"group bg-white rounded-2xl border border-gray-200 p-6
+              hover:border-blue-300 transition"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Card with group-hover<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500 mt-1"</span><span class="tag">&gt;</span>
+      Hover the whole card — the title turns blue and the arrow moves.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-4 inline-flex items-center gap-2 font-medium
+                text-gray-900 group-hover:text-blue-600 transition"</span><span class="tag">&gt;</span>
+      Read more
+      <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"transition-transform group-hover:translate-x-1"</span><span class="tag">&gt;</span>→<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- focus: on a form field --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-2xl border border-gray-200 p-6"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Focus ring on input<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="val">"text"</span> <span class="attr">placeholder</span>=<span class="val">"Click or Tab into me"</span>
+      <span class="attr">class</span>=<span class="val">"mt-4 w-full border border-gray-300 rounded-lg px-4 py-2
+             text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+             focus:border-blue-500"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The button stacks three states: <code>hover:</code> darkens, <code>active:</code> darkens more and <code>scale-95</code> gives a "pressed" squash, and <code>focus:</code> draws an offset ring when you Tab to it. One <code>transition</code> class animates all of it.</li>
+      <li>The card is the <code>group</code> pattern: the parent has <code>group</code> + its own <code>hover:</code> border; two children react via <code>group-hover:text-blue-600</code> and <code>group-hover:translate-x-1</code> — no CSS selectors, no <code>&amp;:hover .child</code>.</li>
+      <li>The input shows the form-field recipe: neutral border at rest, blue border + ring on <code>focus:</code> — the standard accessible input treatment.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Hover the card, press-and-hold the button, and press Tab three times to see the focus rings. Try swapping the button's <code>focus:ring-2</code> for <code>focus-visible:ring-2</code> and compare click-focus vs keyboard-focus.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A page that follows dark mode</h3>
+  <p>Every surface carries a <code>dark:</code> twin. With v4's default strategy, the page simply follows your <em>OS</em> appearance — toggle your system's dark mode and watch it repaint.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Dark Mode with Tailwind<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 dark:bg-gray-950 p-8 transition-colors"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs font-semibold tracking-widest uppercase
+              text-blue-600 dark:text-blue-400"</span><span class="tag">&gt;</span>dark: variant<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"mt-3 text-3xl font-bold text-gray-900
+              dark:text-white"</span><span class="tag">&gt;</span>
+    Toggle your OS dark mode — this page follows.
+  <span class="tag">&lt;/h1&gt;</span>
+
+  <span class="comment">&lt;!-- every element carries a dark: twin --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 bg-white dark:bg-gray-900 border border-gray-200
+              dark:border-gray-800 rounded-2xl p-6"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"text-lg font-semibold text-gray-900 dark:text-white"</span><span class="tag">&gt;</span>
+      One element, two themes
+    <span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600 dark:text-gray-400"</span><span class="tag">&gt;</span>
+      bg-white → dark:bg-gray-900 · text-gray-900 → dark:text-white ·
+      border-gray-200 → dark:border-gray-800
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500
+                dark:hover:bg-blue-400 text-white text-sm font-semibold
+                px-5 py-2 rounded-lg transition"</span><span class="tag">&gt;</span>
+      Light and dark buttons
+    <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>Every visible element has a light class <em>and</em> a <code>dark:</code> twin — page, card, text, border, even the button's base and hover colors.</li>
+      <li>With v4's default strategy there's nothing else to set up: <code>dark:</code> tracks <code>prefers-color-scheme</code>, so the OS toggle repaints the page live.</li>
+      <li>Notice dark mode isn't "white text on black" — it's a <em>re-tuned palette</em>: surfaces step down (white → gray-900 → gray-950), muted text steps up (gray-600 → gray-400), and accents get lighter (blue-600 → blue-500) for contrast.</li>
+      <li>For an in-page toggle button instead, add the <code>@custom-variant dark</code> line from Section 2 and flip the <code>dark</code> class on <code>&lt;html&gt;</code> with a line of JS.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Switch your OS/browser to dark mode and back — no reload needed. To make it class-based (for a manual toggle), add <code>@custom-variant dark (&amp;:where(.dark, .dark *));</code> to a small <code>&lt;style&gt;</code> tag and toggle the <code>dark</code> class on <code>document.documentElement</code>.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Behavior without CSS:</strong> hover/focus/active effects are class lists, not selectors — no <code>&amp;:hover</code> nesting, no stylesheet round-trips, and deleting the element deletes its behavior.</li>
+    <li><strong>Consistent state vocabulary:</strong> everyone uses the same variants, so interactive elements feel identical across a whole product.</li>
+    <li><strong>group-hover unlocks real component interactions:</strong> card hovers, arrow slides, revealed actions — the classic <em>parent-hover-styled-child</em> pattern without any descendant selectors.</li>
+    <li><strong>Accessibility is one class away:</strong> <code>focus-visible:ring-2</code> gives keyboard users what hover gives the mouse; <code>disabled:</code> handles dead states; <code>dark:</code> follows the user's system preference for free.</li>
+    <li><strong>Composes with everything:</strong> state variants stack with responsive prefixes (<code>md:hover:bg-blue-800</code>), opacity (<code>bg-blue-500/50</code>), and transforms — the whole system is one syntax.</li>
+    <li><strong>A mature ecosystem around it:</strong> <code>@tailwindcss/typography</code> handles long-form content with <code>prose</code>, and Headless UI supplies the accessible interactive primitives (dialog, menu, combobox…) that you skin with exactly these variants.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    State variants are Tailwind's answer to "when should this look different?": <code>hover:</code> (pointer over), <code>focus:</code>/<code>focus-visible:</code> (keyboard and click focus), <code>active:</code> (pressed), <code>group-hover:</code> (a <code>group</code>-marked parent is hovered), and <code>dark:</code> (dark mode). The syntax is always <em>variants first, utility last</em>, they stack with each other and with responsive prefixes, and paired with <code>transition</code> they give every element polished, accessible interactivity without a single line of hand-written CSS.
+  </p>
+  <p>
+    And the ecosystem completes the picture: <strong>@tailwindcss/typography</strong> styles whole articles with one <code>prose</code> class, while <strong>Headless UI</strong> provides the keyboard-perfect interactive components that you style with the very variants on this page. Behavior from Headless, words from prose, everything else from utilities — that's the full Tailwind toolbox.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: State Variants</footer>
+</div>
+</body>
+</html>

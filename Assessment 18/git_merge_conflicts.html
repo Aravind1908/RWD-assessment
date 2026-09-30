@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Merge Conflicts — What They Are and How to Resolve Them</title>
+  <meta name="description" content="What a Git merge conflict is, what the conflict markers mean, and the steps to resolve one — with one simple runnable demo that causes and fixes a real conflict.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="git merge conflict, conflict markers, resolve conflict, merge --abort">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Git Merge Conflicts</h1>
+    <p>Two people changed the same lines in different ways, and Git stopped to ask which version wins. What the markers mean, the steps to resolve it, and one simple demo.</p>
+    <span class="badge">Version Control · Git · Conflicts</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    A <strong>merge conflict</strong> happens when both sides of a merge changed the <em>same part of a file in different ways</em>. Git can combine non-overlapping changes automatically — but where changes overlap it cannot guess which intent wins, so it marks the disputed region in the file, <strong>pauses the merge</strong>, and leaves the decision to you.
+  </p>
+  <p>
+    It is <strong>not an error state</strong>: no data is lost, both versions remain in history, and the merge can always be undone with <code>git merge --abort</code>. A conflict is Git asking for a decision only a human can make.
+  </p>
+  <pre><code><span class="comment"># what Git writes into a conflicted file:</span>
+line one
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+MAIN: my copy of line two
+=======
+FEATURE: their copy of line two
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature
+line three</code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>The Markers and the Resolution Steps</h2>
+
+  <h3>The three parts of a conflict</h3>
+  <table>
+    <tr><th>Marker</th><th>Means</th></tr>
+    <tr><td><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code></td><td>top of the dispute — the branch you're <em>on</em></td></tr>
+    <tr><td><code>=======</code></td><td>the divider</td></tr>
+    <tr><td><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</code></td><td>bottom — the branch being <em>merged in</em></td></tr>
+  </table>
+  <p>Between the first and last marker: two versions of the same region. Lines outside the markers merged cleanly — leave them alone. A file can have several such hunks.</p>
+
+  <h3>The resolution steps</h3>
+  <pre><code><span class="comment"># 1. the merge stops</span>
+git merge feature
+<span class="comment">#    CONFLICT (content): Merge conflict in notes.txt</span>
+
+<span class="comment"># 2. see what's conflicted</span>
+git status                    <span class="comment"># "both modified: notes.txt" — your work queue</span>
+
+<span class="comment"># 3. open the file, read the markers, decide line by line</span>
+<span class="comment">#    (keep mine / keep theirs / write the correct third version)</span>
+
+<span class="comment"># 4. save the file with the markers REMOVED</span>
+git add notes.txt             <span class="comment"># 5. staging the clean file = "resolved"</span>
+git commit                    <span class="comment"># 6. complete the merge (message pre-filled)</span>
+<span class="comment"># 7. run the tests, then push</span></code></pre>
+
+  <h3>Shortcuts and the panic button</h3>
+  <table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code>git checkout --ours notes.txt</code></td><td>take <em>your</em> whole version of the file</td></tr>
+    <tr><td><code>git checkout --theirs notes.txt</code></td><td>take the incoming branch's whole version</td></tr>
+    <tr><td><code>git mergetool</code></td><td>open a visual diff tool with accept buttons</td></tr>
+    <tr><td><code>git merge --abort</code></td><td><strong>undo the whole merge</strong> — back to the pre-merge state, any time during one</td></tr>
+  </table>
+  <div class="note">During a <code>rebase</code> the words <code>ours</code>/<code>theirs</code> swap. When in doubt, read the markers — they never lie.</div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+  <div class="card">
+    <h3>Where conflicts come from</h3>
+    <table>
+      <tr><th>Situation</th><th>How often</th></tr>
+      <tr><td>Both sides edit the same lines</td><td>the classic ~80%</td></tr>
+      <tr><td>Both sides add a file with the same name, different content</td><td>common for new helpers/tests</td></tr>
+      <tr><td>One side edits a file, the other deletes it</td><td>decide consciously: keep or drop</td></tr>
+    </table>
+  </div>
+  <div class="tip">
+    <strong>Resolve on the feature branch, never on main</strong> — if a PR shows conflicts, merge <em>main into your branch</em>, resolve, push. And keep conflicts small by habit: short features, and sync with main daily (<code>git fetch &amp;&amp; git merge origin/main</code>).
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Program</h2>
+  <p>One script: create a real conflict, read the markers, resolve it, finish the merge. Built in a temp folder, cleans up after itself.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+demo=$(mktemp -d)/conflict &amp;&amp; mkdir -p <span class="str">"$demo"</span> &amp;&amp; cd <span class="str">"$demo"</span>
+git init -q --initial-branch=main
+git config user.email <span class="str">"you@example.com"</span>
+git config user.name  <span class="str">"You"</span>
+printf <span class="str">"line one\nline two\nline three\n"</span> &gt; notes.txt
+git add notes.txt
+git commit -qm <span class="str">"base"</span>
+
+<span class="comment"># two sides rewrite the SAME line, differently</span>
+git switch -c feature
+sed -i <span class="str">'s/line two/FEATURE copy/'</span> notes.txt
+git commit -qam <span class="str">"feature: rewrite line two"</span>
+git switch main
+sed -i <span class="str">'s/line two/MAIN copy/'</span> notes.txt
+git commit -qam <span class="str">"main: rewrite line two"</span>
+
+<span class="kw">echo</span> <span class="str">"== the merge stops: conflict =="</span>
+git merge feature || <span class="kw">true</span>       <span class="comment"># expected: the merge "fails"</span>
+git status --short              <span class="comment"># UU notes.txt — both modified, unmerged</span>
+cat notes.txt                   <span class="comment"># the markers appear here</span>
+
+<span class="kw">echo</span> <span class="str">"== resolve: keep both, drop the markers =="</span>
+printf <span class="str">"line one\nMAIN copy\nFEATURE copy\nline three\n"</span> &gt; notes.txt
+git add notes.txt               <span class="comment"># staging the clean file = "resolved"</span>
+git commit -qm <span class="str">"Merge branch 'feature'"</span>
+git log --oneline --graph       <span class="comment"># the merge commit, with the decision inside</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation:</strong>
+    <ul>
+      <li>The <code>|| true</code> lets the script continue after the merge "fails" — a conflict is the expected outcome, not a crash.</li>
+      <li><code>UU notes.txt</code> in <code>status</code> means unmerged on both sides — every <code>UU</code> file in the list is one decision to make.</li>
+      <li>Reading the markers: <code>HEAD</code> is main's rewrite (the branch we're on), the bottom is feature's. The resolution — "keep both as two lines" here, but equally valid: one side, or a new third version — is whatever you <em>save</em>.</li>
+      <li><code>git add</code> + <code>git commit</code> finish the merge: the final <code>--graph</code> shows the merge commit carrying the decision into history.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_git_merge_conflict.sh</code> and run <code>bash example1_git_merge_conflict.sh</code>. The middle of the output — the file with markers — is the whole lesson. (If you ever want out mid-merge: <code>git merge --abort</code>.)
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Safe by design</strong> — Git fails loudly and reversibly: both versions stay in history, and <code>--abort</code> is always available. "Let me just try the merge" is a zero-risk experiment.</li>
+    <li><strong>The decision is visible</strong> — the markers show both options in the file itself, and the merge commit records what was chosen.</li>
+    <li><strong>Graded tooling</strong> — line-by-line edits for real decisions, <code>--ours</code>/<code>--theirs</code> for whole files, <code>mergetool</code> and editor support (VS Code's inline buttons) for visual comfort.</li>
+    <li><strong>Preventable by schedule</strong> — short features plus daily syncs shrink each merge; the 400-line conflict is almost always a branch that ignored main for weeks.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    A merge conflict is Git saying: <em>you both changed the same lines — decide.</em> The steps: <strong>merge → status → read the markers → save the file without markers → add → commit</strong>, with <code>--ours</code>/<code>--theirs</code> for whole-file calls and <code>git merge --abort</code> as the guaranteed exit.
+  </p>
+  <p>
+    The real skill is the discipline around it: <em>short features, sync with main often, resolve on the feature branch, and treat every conflict as a small product decision worth making deliberately.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Git Merge Conflicts</footer>
+</div>
+</body>
+</html>

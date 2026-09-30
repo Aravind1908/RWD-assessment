@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: Responsive Prefixes (sm:, md:, lg:, xl:, 2xl:)</title>
+  <meta name="description" content="How Tailwind's responsive prefixes sm:, md:, lg:, xl:, 2xl: work mobile-first, with a card-grid example and a responsive navbar.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind, responsive, breakpoints, sm md lg xl 2xl, mobile-first, media queries">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: Responsive Prefixes (sm:, md:, lg:, xl:, 2xl:)</h1>
+    <p>How Tailwind does responsive design mobile-first — no media queries written, just <code>md:</code> and <code>lg:</code> in front of any utility — demonstrated with a card grid and a navbar.</p>
+    <span class="badge">CSS Framework · Tailwind · Responsive</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    In hand-written CSS, responsive design means writing <code>@media</code> blocks. In Tailwind, the same idea is built into the class names: <strong>responsive prefixes</strong> — <code>sm:</code>, <code>md:</code>, <code>lg:</code>, <code>xl:</code>, <code>2xl:</code> — go in front of <em>any</em> utility and mean <strong>"from this screen width upward, use this value instead"</strong>.
+  </p>
+  <p>
+    The system is <strong>mobile-first by construction</strong>: the class <em>without</em> a prefix is what phones see, and each prefix layers an upgrade on top for wider screens. There is no "mobile prefix" to write — you simply <em>don't</em> prefix the base version.
+  </p>
+  <pre><code><span class="comment">&lt;!-- phones: stacked column; from md: (768px) up: a row --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex flex-col md:flex-row"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/div&gt;</span>
+
+<span class="comment">/* What Tailwind actually generates behind the scenes: */</span>
+<span class="kw">.flex-col</span> { <span class="kw">flex-direction</span>: <span class="kw">column</span>; }
+<span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">768px</span>) {
+  <span class="kw">.md\:flex-row</span> { <span class="kw">flex-direction</span>: <span class="kw">row</span>; }
+}</code></pre>
+  <p>You never write the media query — the prefix <em>is</em> the media query. The rest of this page covers the five breakpoints, how they layer, and a real card grid built from them.</p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The five default breakpoints</h3>
+  <table>
+    <tr><th>Prefix</th><th>Applies at</th><th>Typical device</th></tr>
+    <tr><td>(none)</td><td>every width — the mobile base</td><td>phones</td></tr>
+    <tr><td><code>sm:</code></td><td><code>min-width: 640px</code></td><td>landscape phones</td></tr>
+    <tr><td><code>md:</code></td><td><code>min-width: 768px</code></td><td>tablets in portrait</td></tr>
+    <tr><td><code>lg:</code></td><td><code>min-width: 1024px</code></td><td>tablets in landscape / small laptops</td></tr>
+    <tr><td><code>xl:</code></td><td><code>min-width: 1280px</code></td><td>desktops</td></tr>
+    <tr><td><code>2xl:</code></td><td><code>min-width: 1536px</code></td><td>large desktops</td></tr>
+  </table>
+  <p>Each prefixed class generates a <code>min-width</code> media query around that one utility — so <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3</code> is three utilities, two of them wrapped in media queries.</p>
+
+  <h3>How mobile-first layering works</h3>
+  <pre><code><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"p-4 md:p-6 lg:p-8 gap-4 lg:gap-8"</span><span class="tag">&gt;</span>
+  <span class="comment">/* below 768px  → p-4,  gap-4   (the base) */</span>
+  <span class="comment">/* 768px and up → p-6  overrides p-4; gap-4 still applies */</span>
+  <span class="comment">/* 1024px and up → p-8 and gap-8 override everything below */</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+  <p>Every breakpoint only <strong>overrides the classes it names</strong> — everything else stays as-is from the base. That's why mobile-first works with so little code: the phone layout is the default, and each larger screen sends a short list of upgrades.</p>
+
+  <h3>Prefixes combine with state variants</h3>
+  <pre><code><span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 md:hover:bg-blue-800"</span><span class="tag">&gt;</span>
+  <span class="comment">/* any hover      → blue-700 */</span>
+  <span class="comment">/* hover AND md+  → blue-800 (both conditions must hold) */</span>
+<span class="tag">&lt;/button&gt;</span></code></pre>
+  <p>Order convention: <code>breakpoint:state:utility</code>. A prefix can go in front of <em>anything</em> — colors, spacing, type, layout: <code>text-2xl lg:text-4xl</code>, <code>hidden md:block</code>, <code>max-w-md xl:max-w-4xl</code>.</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> There is no "below md" prefix in the normal flow — that's what mobile-first means. For the rare exception ("this only on small screens"), Tailwind provides <strong><code>max-md:</code></strong> and friends (<code>max-lg:grid-cols-1</code>), which generate <code>max-width</code> queries. Use them sparingly; the upward flow is the system's grain.
+  </div>
+
+  <p>
+    The breakpoints are defaults, not laws. In v4 you retune them in CSS — <code>@theme { --breakpoint-md: 48rem; }</code> — and in v3 in <code>tailwind.config.js</code> under <code>theme.screens</code>. Whatever the numbers, the working method is the same: <em>pick breakpoints where your content breaks, not by device name.</em>
+  </p>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Typical responsive jobs</h3>
+    <table>
+      <tr><th>Job</th><th>Classes</th></tr>
+      <tr><td>Card grid: 1 → 2 → 3 columns</td><td><code>grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3</code></td></tr>
+      <tr><td>Nav: stacked → row</td><td><code>flex flex-col sm:flex-row</code></td></tr>
+      <tr><td>Hide on phones, show on tablets+</td><td><code>hidden md:block</code></td></tr>
+      <tr><td>Headline steps up with the screen</td><td><code>text-3xl lg:text-5xl</code></td></tr>
+      <tr><td>Roomier padding on big screens</td><td><code>p-4 md:p-8</code></td></tr>
+      <tr><td>More columns for side content</td><td><code>grid-cols-1 xl:grid-cols-3</code></td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — the card grid, live (needs internet)</h3>
+    <p class="mq-status" style="font-size:0.88rem;color:var(--muted)">Current layout: <strong></strong></p>
+    <style>
+      .mq-status strong::after { content:"1 column — below sm: (640px)"; color:var(--accent-dark); }
+      @media (min-width:640px)  { .mq-status strong::after { content:"2 columns — sm: (640px) and up"; } }
+      @media (min-width:1024px) { .mq-status strong::after { content:"3 columns — lg: (1024px) and up"; } }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      <div class="bg-blue-600 rounded-xl p-6 text-white text-center font-semibold">Card 1</div>
+      <div class="bg-blue-500 rounded-xl p-6 text-white text-center font-semibold">Card 2</div>
+      <div class="bg-blue-400 rounded-xl p-6 text-white text-center font-semibold">Card 3</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Rule of thumb:</strong> <code>sm:</code> for "a bit wider than a phone", <code>md:</code> for "tablet and up" (the most-used prefix), <code>lg:</code> for "real desktop", and <code>xl:</code>/<code>2xl:</code> for luxury on big screens. Most layouts only need base + <code>md:</code> + <code>lg:</code> — resist adding breakpoints you don't need.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Mobile-first card grid</h3>
+  <p>Six cards that sit in 1 column on phones, 2 columns from <code>sm:</code>, and 3 columns from <code>lg:</code>. Save as <code>index.html</code> (needs internet for the CDN).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Mobile-First Card Grid<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-6 text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-5xl mx-auto"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>Card grid: 1 → 2 → 3 columns<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>
+      Resize the window: base = mobile, sm: from 640px, lg: from 1024px.
+    <span class="tag">&lt;/p&gt;</span>
+
+    <span class="comment">&lt;!-- the whole responsive behavior is this one class list --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-xl border border-gray-200 p-5"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Design<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>Layouts that adapt to any screen.<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-xl border border-gray-200 p-5"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Develop<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>Composed from utility classes.<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-xl border border-gray-200 p-5"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"font-semibold"</span><span class="tag">&gt;</span>Deploy<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-1 text-sm text-gray-500"</span><span class="tag">&gt;</span>Purged, tiny production CSS.<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+      <span class="comment">&lt;!-- …repeat the same three card blocks once more (6 cards total) --&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The entire responsive behavior is one class list: <code>grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3</code> — no media query typed anywhere.</li>
+      <li>Phones get <code>grid-cols-1</code> (the base). From 640px, <code>sm:grid-cols-2</code> takes over. From 1024px, <code>lg:grid-cols-3</code> takes over.</li>
+      <li><code>gap-4</code> is unprefixed on purpose — the same 16px gap works at every width, so it needs no prefixes at all.</li>
+      <li>Each card is identical: white, gray-200 border, <code>p-5</code>, a bold title and a muted line — the standard card vocabulary from the color guide.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize across 640px and 1024px and watch the columns change. Try <code>md:grid-cols-2</code> instead of <code>sm:</code> and notice the 2-column range shift.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Responsive navbar</h3>
+  <p>One navbar that stacks vertically on phones and becomes a horizontal bar from <code>sm:</code> — plus a headline that steps up with the screen. Prefixes on layout, gaps, and type, all in one page.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Responsive Navbar<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-white"</span><span class="tag">&gt;</span>
+  <span class="comment">&lt;!-- stacked column on phones, row from sm: --&gt;</span>
+  <span class="tag">&lt;nav</span> <span class="attr">class</span>=<span class="val">"max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col
+              sm:flex-row items-center justify-between gap-3 sm:gap-6"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"text-lg font-bold text-blue-600"</span><span class="tag">&gt;</span>acme.<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex flex-col sm:flex-row items-center
+                gap-3 sm:gap-6 text-sm font-medium"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"text-gray-600 hover:text-blue-600"</span><span class="tag">&gt;</span>Features<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"text-gray-600 hover:text-blue-600"</span><span class="tag">&gt;</span>Pricing<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="val">"#"</span> <span class="attr">class</span>=<span class="val">"bg-blue-600 hover:bg-blue-700 text-white px-4
+                  py-2 rounded-lg transition"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+
+  <span class="comment">&lt;!-- the headline steps up with the screen --&gt;</span>
+  <span class="tag">&lt;main</span> <span class="attr">class</span>=<span class="val">"max-w-5xl mx-auto px-4 sm:px-6 py-16"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-3xl sm:text-4xl font-bold tracking-tight"</span><span class="tag">&gt;</span>
+      Stacked on phones, in a row from sm: (640px)
+    <span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-4 text-gray-600 sm:text-lg max-w-xl"</span><span class="tag">&gt;</span>
+      One navbar, two layouts — only the sm: prefixes differ.
+    <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>The nav is <code>flex flex-col sm:flex-row</code> — the same "stacked → row" move as the card grid, applied to navigation.</li>
+      <li><code>px-4 sm:px-6</code> and <code>gap-3 sm:gap-6</code> show that <em>spacing</em> scales up too: tighter gutters and gaps on phones, roomier on tablets+.</li>
+      <li><code>text-3xl sm:text-4xl</code> demonstrates responsive type — headlines usually get one step bigger with the viewport.</li>
+      <li>Everything below 640px comes from the unprefixed classes; above it, the <code>sm:</code> set overrides — a perfect mobile-first layering in a ~30-line page.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize across 640px: the nav flips from column to row, the gutters widen, and the headline grows. Swap <code>sm:flex-row</code> for <code>md:flex-row</code> to push the switch to tablet width.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Zero media queries to write:</strong> one prefix does what a whole <code>@media</code> block does — less CSS to write, name, and maintain.</li>
+    <li><strong>Mobile-first by default:</strong> the unprefixed class <em>is</em> the mobile style, so small screens get the lightest possible markup and behavior.</li>
+    <li><strong>Composable at the class level:</strong> any utility accepts any prefix (<code>md:grid-cols-2</code>, <code>lg:text-5xl</code>, <code>xl:max-w-4xl</code>), and prefixes stack with state variants (<code>md:hover:bg-blue-800</code>).</li>
+    <li><strong>Consistent breakpoints project-wide:</strong> everyone on the team uses the same 640/768/1024/1280/1536 grid (or your custom set), so layouts shift at the same widths everywhere.</li>
+    <li><strong>Visible in the markup:</strong> the responsive behavior is right there in the class list — no need to open a stylesheet and hunt for which media query owns which rule.</li>
+    <li><strong>Easy to tune:</strong> breakpoints are theme values — change <code>--breakpoint-md</code> (v4) once and every <code>md:</code> class in the project follows.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Tailwind's responsive prefixes — <code>sm:</code> (640px), <code>md:</code> (768px), <code>lg:</code> (1024px), <code>xl:</code> (1280px), <code>2xl:</code> (1536px) — turn responsive design into a class-name problem: write the mobile layout unprefixed, then layer <code>min-width</code> upgrades in front of the specific utilities that change. <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3</code> is a full responsive card grid in five words, with no media query written by hand.
+  </p>
+  <p>
+    The habits: <em>base = mobile, prefixes go upward, and every breakpoint should exist because your content needed it — not because a device has a name.</em> Combined with the state variants in the companion document <strong>css_tailwind_state_variants.html</strong>, prefixes and states cover virtually every "when should this look different?" question a UI has.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: Responsive Prefixes</footer>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

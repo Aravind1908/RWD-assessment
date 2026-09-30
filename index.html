@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A dashboard for navigating all twenty HTML, CSS, Tailwind CSS, Git, GitHub, and deployment assessments.">
+  <title>Assessment Dashboard</title>
+  <style>
+    :root { --ink:#0f1b33; --muted:#5c6b84; --line:#d9e3f3; --surface:#fff; --page:#eef4fd; --blue:#2563eb; --blue-dark:#1a4bc4; --blue-light:#e8f0fe; --ease:cubic-bezier(.22,.8,.32,1); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--page); }
+    .hero { position:relative; overflow:hidden; padding:52px 24px 82px; color:#fff; background:linear-gradient(120deg,#0a1b40 0%,#1d4ed8 55%,#4d8dff 100%); }
+    .hero::before,.hero::after { content:""; position:absolute; border:1px solid rgba(255,255,255,.16); border-radius:50%; }
+    .hero::before { width:420px; height:420px; right:-120px; top:-215px; } .hero::after { width:270px; height:270px; left:-95px; bottom:-175px; }
+    .hero-content { position:relative; z-index:1; max-width:1120px; margin:auto; }
+    .eyebrow { margin:0 0 10px; font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#bcd4ff; }
+    h1 { max-width:700px; margin:0; font-size:clamp(1.9rem,4.4vw,3.3rem); line-height:1.1; letter-spacing:-.04em; }
+    .intro { max-width:580px; margin:14px 0 0; font-size:1rem; line-height:1.6; color:#dce7ff; }
+    main { max-width:1220px; padding:0 24px 44px; margin:-36px auto 0; position:relative; z-index:2; }
+    .platform { display:grid; grid-template-columns:236px minmax(0,1fr); gap:22px; align-items:start; }
+    .learning-sidebar { position:sticky; top:16px; padding:16px; border:1px solid var(--line); border-radius:16px; background:var(--surface); box-shadow:0 10px 24px rgba(20,45,110,.09); }
+    .sidebar-label { margin:0 0 12px; color:var(--blue); font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+    .learning-content { min-width:0; }
+    .overview { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px; border-radius:12px; background:var(--blue-light); }
+    .overview strong { display:block; font-size:1rem; } .overview span { color:var(--muted); font-size:.88rem; }
+    .count { flex:0 0 auto; display:grid; place-items:center; width:42px; height:42px; border-radius:12px; color:#fff; font-weight:800; background:var(--blue); }
+    .category-nav { display:flex; flex-direction:column; gap:6px; margin-top:16px; }
+    .category-nav a { padding:10px 12px; border:1px solid var(--line); border-radius:9px; color:#26437a; font-size:.87rem; font-weight:700; text-decoration:none; transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease),transform .18s var(--ease); }
+    .category-nav a.active { color:#fff; border-color:var(--blue); background:var(--blue); }
+    .category-nav a:hover,.category-nav a:focus-visible { color:#fff; border-color:var(--blue); background:var(--blue); outline:none; transform:translateX(3px); }
+    .category-nav a.nav-html.active,.category-nav a.nav-html:hover { border-color:#2563eb; background:#2563eb; }
+    .category-nav a.nav-css.active,.category-nav a.nav-css:hover { border-color:#0e7490; background:#0e7490; }
+    .category-nav a.nav-tailwind.active,.category-nav a.nav-tailwind:hover { border-color:#4f46e5; background:#4f46e5; }
+    .category-nav a.nav-git.active,.category-nav a.nav-git:hover { border-color:#b45309; background:#b45309; }
+    .category-nav a.nav-deployment.active,.category-nav a.nav-deployment:hover { border-color:#15803d; background:#15803d; }
+    .categories { margin-top:0; }
+    .category { scroll-margin-top:20px; padding:22px; border-radius:20px; border:1px solid var(--cat-border); background:var(--cat-surface); }
+    .category + .category { margin-top:26px; }
+    .category.cat-html { --cat:#2563eb; --cat-tint:#e2ecfe; --cat-border:#c9daf9; --cat-surface:#f4f8ff; }
+    .category.cat-css { --cat:#0e7490; --cat-tint:#dcf1f5; --cat-border:#bfe1ea; --cat-surface:#f1fafc; }
+    .category.cat-tailwind { --cat:#4f46e5; --cat-tint:#e6e4fb; --cat-border:#cdc9f6; --cat-surface:#f6f5fe; }
+    .category.cat-git { --cat:#b45309; --cat-tint:#fef3c7; --cat-border:#f4d49b; --cat-surface:#fffbeb; }
+    .category.cat-deployment { --cat:#15803d; --cat-tint:#dcfce7; --cat-border:#b7e4c7; --cat-surface:#f0fdf4; }
+    .category-heading { display:flex; align-items:baseline; gap:10px; margin:0 0 15px; }
+    .category-heading h2 { margin:0; font-size:1.2rem; color:var(--cat); }
+    .category-heading span { color:var(--muted); font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .card { position:relative; min-height:205px; padding:20px; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 2px 8px rgba(21,42,92,.05); transition:transform .28s var(--ease),box-shadow .28s var(--ease),border-color .28s var(--ease); }
+    .card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(30,70,170,.14); border-color:var(--cat); }
+    .js .reveal { opacity:0; transform:translateY(18px); transition:opacity .5s var(--ease),transform .5s var(--ease); }
+    .js .reveal.is-visible { opacity:1; transform:translateY(0); }
+    .js .grid .reveal:nth-child(1) { transition-delay:0s; } .js .grid .reveal:nth-child(2) { transition-delay:.06s; } .js .grid .reveal:nth-child(3) { transition-delay:.12s; }
+    .number { display:grid; place-items:center; width:36px; height:36px; margin-bottom:16px; border-radius:10px; color:var(--cat); font-weight:800; font-size:.88rem; background:var(--cat-tint); }
+    h2 { margin:0 0 6px; font-size:1.08rem; letter-spacing:-.015em; } .topic { min-height:42px; margin:0 0 16px; color:var(--muted); font-size:.88rem; line-height:1.5; }
+    .links { display:flex; flex-wrap:wrap; gap:7px; }
+    .links a { padding:6px 10px; border:1px solid var(--cat-border); border-radius:7px; color:var(--cat); font-size:.76rem; font-weight:700; line-height:1.2; text-decoration:none; transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease); }
+    .links a:hover,.links a:focus-visible { color:#fff; background:var(--cat); border-color:var(--cat); outline:none; }
+    .site-footer { margin-top:48px; padding:38px 24px 22px; color:#dce7ff; background:linear-gradient(120deg,#0a1b40 0%,#1d4ed8 100%); }
+    .footer-inner { max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; gap:28px; }
+    .footer-about strong { display:block; margin-bottom:6px; font-size:1.05rem; color:#fff; }
+    .footer-about p { margin:0; max-width:320px; font-size:.86rem; line-height:1.6; color:#bcd4ff; }
+    .footer-links { display:flex; flex-wrap:wrap; gap:36px; }
+    .footer-col h3 { margin:0 0 10px; font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#8fb4ff; }
+    .footer-col ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .footer-col a { color:#e3ecff; font-size:.87rem; text-decoration:none; transition:color .18s var(--ease),transform .18s var(--ease); display:inline-block; }
+    .footer-col a:hover,.footer-col a:focus-visible { color:#fff; transform:translateX(3px); outline:none; }
+    .footer-bottom { max-width:1120px; margin:28px auto 0; padding-top:16px; border-top:1px solid rgba(255,255,255,.16); font-size:.8rem; color:#a9c2f2; text-align:center; }
+    @media (max-width:640px) { .site-footer { padding:30px 18px 18px; } .footer-inner { flex-direction:column; gap:22px; } .footer-links { gap:24px; } }
+    @media (max-width:850px) { .platform { grid-template-columns:196px minmax(0,1fr); gap:18px; } .learning-sidebar { padding:13px; } .grid { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:640px) {
+      .hero { padding:42px 18px 72px; }
+      main { padding:0 14px 32px; }
+      .platform { display:block; }
+      .learning-sidebar { position:static; padding:14px; border-radius:16px; box-shadow:0 8px 20px rgba(20,45,110,.08); }
+      .sidebar-label { margin-bottom:9px; }
+      .overview { padding:12px; }
+      .category-nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); }
+      .category-nav a { display:flex; min-height:48px; align-items:center; justify-content:center; padding:9px 8px; text-align:center; font-size:.78rem; line-height:1.3; }
+      .category-nav a:hover,.category-nav a:focus-visible { transform:none; }
+      .learning-content { margin-top:20px; }
+      .category { padding:16px; border-radius:16px; }
+      .category + .category { margin-top:22px; }
+      .category-heading { gap:7px; }
+      .category-heading h2 { font-size:1.1rem; }
+      .category-heading span { font-size:.72rem; }
+      .grid { grid-template-columns:1fr; gap:12px; }
+      .card { min-height:0; padding:18px; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="hero"><div class="hero-content"><p class="eyebrow">RWD Learning</p><h1>Assessment Dashboard</h1><p class="intro">Select an assessment below to explore the concepts, examples, and practice material in each lesson.</p></div></header>
+  <main class="platform">
+    <aside class="learning-sidebar">
+      <p class="sidebar-label">Your learning path</p>
+      <section class="overview reveal" aria-label="Assessment overview"><div><strong>RWD Course</strong><span>20 assessments to explore.</span></div><div class="count" aria-label="20 assessments">20</div></section>
+      <nav class="category-nav" aria-label="Assessment categories">
+        <a href="#html-assessments" class="nav-html">HTML · 01–04</a>
+        <a href="#css-assessments" class="nav-css">CSS · 05–09</a>
+        <a href="#tailwind-assessments" class="nav-tailwind">Tailwind CSS · 10–14</a>
+        <a href="#git-assessments" class="nav-git">Git &amp; GitHub · 15–19</a>
+        <a href="#deployment-assessments" class="nav-deployment">Deployment · 20</a>
+      </nav>
+    </aside>
+    <section class="learning-content">
+    <div class="categories" aria-label="Assessment categories">
+      <section class="category cat-html" aria-labelledby="html-assessments">
+        <div class="category-heading reveal"><h2 id="html-assessments">HTML</h2><span>Assessments 01–04</span></div>
+        <div class="grid">
+      <article class="card reveal"><div class="number">01</div><h2>HTML Foundations</h2><p class="topic">Semantic elements and meta tags.</p><div class="links"><a href="Assessment%201/semantic_elements_explained.html">Semantic Elements</a><a href="Assessment%201/meta_tag_explained.html">Meta Tags</a></div></article>
+      <article class="card reveal"><div class="number">02</div><h2>Web Essentials</h2><p class="topic">Web technologies and HTML5 document structure.</p><div class="links"><a href="Assessment%202/web_technologies_overview.html">Web Technologies</a><a href="Assessment%202/html5_document_structure.html">Document Structure</a></div></article>
+      <article class="card reveal"><div class="number">03</div><h2>Navigation &amp; Tables</h2><p class="topic">Hyperlinks, navigation, and table structure.</p><div class="links"><a href="Assessment%203/hyperlinks_navigation_html5.html">Hyperlinks</a><a href="Assessment%203/html5_table_structure.html">HTML5 Tables</a></div></article>
+      <article class="card reveal"><div class="number">04</div><h2>HTML Forms</h2><p class="topic">Form controls, details, and browser validation.</p><div class="links"><a href="Assessment%204/html5_forms_detail.html">Forms Detail</a><a href="Assessment%204/html5_form_validation.html">Form Validation</a></div></article>
+        </div>
+      </section>
+      <section class="category cat-css" aria-labelledby="css-assessments">
+        <div class="category-heading reveal"><h2 id="css-assessments">CSS</h2><span>Assessments 05–09</span></div>
+        <div class="grid">
+      <article class="card reveal"><div class="number">05</div><h2>CSS Basics</h2><p class="topic">Selector types, developer tools, and Emmet.</p><div class="links"><a href="Assessment%205/css_selectors_types.html">CSS Selectors</a><a href="Assessment%205/browser_devtools_emmet.html">DevTools &amp; Emmet</a></div></article>
+      <article class="card reveal"><div class="number">06</div><h2>CSS Styling</h2><p class="topic">Typography, positions, pseudo classes, colors, and gradients.</p><div class="links"><a href="Assessment%206/css_typography_web_fonts.html">Typography</a><a href="Assessment%206/css_positioning_types.html">Positioning</a><a href="Assessment%206/css_pseudo_classes_elements.html">Pseudo Classes</a><a href="Assessment%206/css_colors_gradients.html">Colors &amp; Gradients</a></div></article>
+      <article class="card reveal"><div class="number">07</div><h2>CSS Layout Principles</h2><p class="topic">The box model, specificity, cascade, and inheritance.</p><div class="links"><a href="Assessment%207/css_box_model.html">Box Model</a><a href="Assessment%207/css_specificity_cascade_inheritance.html">Specificity &amp; Cascade</a></div></article>
+      <article class="card reveal"><div class="number">08</div><h2>Modern CSS Layout</h2><p class="topic">Flexible and grid-based page layouts.</p><div class="links"><a href="Assessment%208/css_flexbox_layout.html">Flexbox</a><a href="Assessment%208/css_grid_layout.html">CSS Grid</a></div></article>
+      <article class="card reveal"><div class="number">09</div><h2>Responsive &amp; Motion</h2><p class="topic">Responsive design, transitions, and modern animations.</p><div class="links"><a href="Assessment%209/css_responsive_design.html">Responsive Design</a><a href="Assessment%209/css_transitions_animations_modern.html">Transitions &amp; Animations</a></div></article>
+        </div>
+      </section>
+      <section class="category cat-tailwind" aria-labelledby="tailwind-assessments">
+        <div class="category-heading reveal"><h2 id="tailwind-assessments">Tailwind CSS</h2><span>Assessments 10–14</span></div>
+        <div class="grid">
+      <article class="card reveal"><div class="number">10</div><h2>Tailwind Foundations</h2><p class="topic">Setting up Tailwind and using its utility-first workflow.</p><div class="links"><a href="Assessment%2010/css_tailwind_setup.html">Tailwind Setup</a><a href="Assessment%2010/css_tailwind_utility_first.html">Utility-First CSS</a></div></article>
+      <article class="card reveal"><div class="number">11</div><h2>Tailwind Styling</h2><p class="topic">Tailwind utilities for color, typography, spacing, and sizing.</p><div class="links"><a href="Assessment%2011/css_tailwind_colors_typography.html">Colors &amp; Typography</a><a href="Assessment%2011/css_tailwind_spacing_sizing.html">Spacing &amp; Sizing</a></div></article>
+      <article class="card reveal"><div class="number">12</div><h2>Responsive &amp; Interactive Tailwind</h2><p class="topic">Responsive prefixes and state variants for adaptable, interactive interfaces.</p><div class="links"><a href="Assessment%2012/css_tailwind_responsive_prefixes.html">Responsive Prefixes</a><a href="Assessment%2012/css_tailwind_state_variants.html">State Variants</a></div></article>
+      <article class="card reveal"><div class="number">13</div><h2>Tailwind Layouts &amp; Comparison</h2><p class="topic">Flexbox and grid utilities, plus a comparison with Bootstrap.</p><div class="links"><a href="Assessment%2013/css_tailwind_flex_grid_utils.html">Flexbox &amp; Grid</a><a href="Assessment%2013/css_tailwind_vs_bootstrap.html">Tailwind vs Bootstrap</a></div></article>
+      <article class="card reveal"><div class="number">14</div><h2>Tailwind Customization</h2><p class="topic">Configure Tailwind, use the @apply directive, and add dark mode.</p><div class="links"><a href="Assessment%2014/css_tailwind_config.html">Configuration</a><a href="Assessment%2014/css_tailwind_apply.html">@apply Directive</a><a href="Assessment%2014/css_tailwind_dark_mode.html">Dark Mode</a></div></article>
+        </div>
+      </section>
+      <section class="category cat-git" aria-labelledby="git-assessments">
+        <div class="category-heading reveal"><h2 id="git-assessments">Git &amp; GitHub</h2><span>Assessments 15–19</span></div>
+        <div class="grid">
+      <article class="card reveal"><div class="number">15</div><h2>Git &amp; Version Control</h2><p class="topic">Understand version control and Git’s core commands and file states.</p><div class="links"><a href="Assessment%2015/git_version_control.html">Version Control</a><a href="Assessment%2015/git_core_commands.html">Core Commands</a></div></article>
+      <article class="card reveal"><div class="number">16</div><h2>Git Ignore &amp; Remotes</h2><p class="topic">Manage ignored files and work with remote repositories.</p><div class="links"><a href="Assessment%2016/git_gitignore.html">.gitignore</a><a href="Assessment%2016/git_remote_commands.html">Remote Commands</a></div></article>
+      <article class="card reveal"><div class="number">17</div><h2>Markdown &amp; Hosting Basics</h2><p class="topic">Learn Markdown syntax and compare static and cloud hosting.</p><div class="links"><a href="Assessment%2017/markdown_syntax.html">Markdown Syntax</a><a href="Assessment%2017/static_vs_cloud_hosting.html">Hosting Types</a></div></article>
+      <article class="card reveal"><div class="number">18</div><h2>Git Branches &amp; Merging</h2><p class="topic">Create branches, merge changes, and resolve merge conflicts.</p><div class="links"><a href="Assessment%2018/git_branches.html">Git Branches</a><a href="Assessment%2018/git_merge_conflicts.html">Merge Conflicts</a></div></article>
+      <article class="card reveal"><div class="number">19</div><h2>GitHub Collaboration</h2><p class="topic">Use forks, clones, pull requests, and GitHub Flavored Markdown.</p><div class="links"><a href="Assessment%2019/git_fork_clone_pr.html">Fork, Clone &amp; Pull Requests</a><a href="Assessment%2019/github_flavored_markdown.html">GitHub Flavored Markdown</a></div></article>
+        </div>
+      </section>
+      <section class="category cat-deployment" aria-labelledby="deployment-assessments">
+        <div class="category-heading reveal"><h2 id="deployment-assessments">Deployment</h2><span>Assessment 20</span></div>
+        <div class="grid">
+      <article class="card reveal"><div class="number">20</div><h2>Deploying Websites</h2><p class="topic">Publish websites with Netlify and Vercel, including Git-based deployment.</p><div class="links"><a href="Assessment%2020/netlify_deployment.html">Netlify</a><a href="Assessment%2020/vercel_deployment.html">Vercel</a></div></article>
+        </div>
+      </section>
+    </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-about">
+        <strong>Assessment Dashboard</strong>
+        <p>Your hub for all twenty HTML, CSS, Tailwind CSS, Git, GitHub, and deployment assessments in the RWD learning path.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h3>Categories</h3>
+          <ul>
+            <li><a href="#html-assessments">HTML · 01–04</a></li>
+            <li><a href="#css-assessments">CSS · 05–09</a></li>
+            <li><a href="#tailwind-assessments">Tailwind CSS · 10–14</a></li>
+            <li><a href="#git-assessments">Git &amp; GitHub · 15–19</a></li>
+            <li><a href="#deployment-assessments">Deployment · 20</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Popular lessons</h3>
+          <ul>
+            <li><a href="Assessment%201/semantic_elements_explained.html">Semantic Elements</a></li>
+            <li><a href="Assessment%206/css_colors_gradients.html">Colors &amp; Gradients</a></li>
+            <li><a href="Assessment%208/css_grid_layout.html">CSS Grid</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Quick links</h3>
+          <ul>
+            <li><a href="#">Back to top</a></li>
+            <li><a href="Assessment%2020/vercel_deployment.html">Latest lesson</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="footer-bottom">Assessment dashboard &middot; RWD learning journey</p>
+  </footer>
+  <script>
+    document.documentElement.classList.add('js');
+    const items = document.querySelectorAll('.reveal');
+    const showItem = element => element.classList.add('is-visible');
+
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            showItem(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(item => observer.observe(item));
+    } else {
+      items.forEach(showItem);
+    }
+
+    // Scrollspy: highlight the sidebar category link for the section in view
+    const navLinks = Array.from(document.querySelectorAll('.category-nav a'));
+    const sections = Array.from(document.querySelectorAll('.category'));
+    const linkFor = id => navLinks.find(link => link.getAttribute('href') === '#' + id);
+
+    const setActive = id => {
+      const target = linkFor(id);
+      if (!target) return;
+      navLinks.forEach(link => {
+        const isActive = link === target;
+        link.classList.toggle('active', isActive);
+        if (isActive) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    };
+
+    if (sections.length && 'IntersectionObserver' in window) {
+      sections.forEach(section => {
+        const heading = section.querySelector('h2[id]');
+        if (heading) section.id = heading.id;
+      });
+
+      const visibleRatios = new Map();
+      const spy = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          visibleRatios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        });
+        let topId = null, topRatio = 0;
+        visibleRatios.forEach((ratio, id) => {
+          if (ratio > topRatio) { topRatio = ratio; topId = id; }
+        });
+        if (topId) setActive(topId);
+      }, { rootMargin: '-35% 0px -55% 0px', threshold: [0, .25, .5, .75, 1] });
+      sections.forEach(section => spy.observe(section));
+
+      setActive(sections[0].id);
+    }
+  </script>
+</body>
+</html>

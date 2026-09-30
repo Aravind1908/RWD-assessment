@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static Web Hosting vs Cloud Hosting Platforms</title>
+  <meta name="description" content="Static web hosting vs cloud hosting platforms — what runs where, examples of each (GitHub Pages, Netlify, Vercel vs VPS, PaaS, serverless), a comparison table, and a decision guide.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="static hosting, cloud hosting, GitHub Pages, Netlify, Vercel, VPS, PaaS, serverless, hosting comparison">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Static Web Hosting vs Cloud Hosting Platforms</h1>
+    <p>Two families of hosting, divided by one question: <strong>does anything need to run on the server?</strong> Static hosts are file cabinets with a CDN in front; cloud platforms give you (some of) a computer that runs your code. Examples of both, side by side.</p>
+    <span class="badge">Web Development · Hosting</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    "Hosting" answers two questions: <em>where do the files live?</em> and <em>who executes the code?</em> Every hosting option on the market is a different answer to those two — and the industry splits into two big families:
+  </p>
+  <ul>
+    <li><strong>Static web hosting</strong> — the server never executes your code. It stores finished files (HTML, CSS, JavaScript, images, fonts) and hands them to visitors, usually through a CDN. All the "logic" runs <em>in the visitor's browser</em>.</li>
+    <li><strong>Cloud hosting platforms</strong> — you get a machine or a service that <em>runs your code</em>: a full virtual server, a managed platform, or per-request functions. The server thinks: it builds pages, talks to databases, holds sessions, streams websockets.</li>
+  </ul>
+  <p>
+    The dividing line, in one question: <strong>can I pre-render everything and be done?</strong> If yes — static hosting. If some page or action needs live server work (a database, an upload, a websocket, per-user rendering) — you need a cloud platform (or at least a serverless function bolted onto a static host).
+  </p>
+  <pre><code><span class="comment"># the same button click, two hosting worlds</span>
+<span class="tag">static</span>    browser ──request──&gt; CDN edge ──returns──&gt; saved HTML file
+           (browser then runs the JS locally)
+
+<span class="tag">cloud</span>     browser ──request──&gt; server ──runs──&gt; your code + database
+                                        └─&gt; returns a freshly built page</code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>How Each Model Works (with Examples)</h2>
+
+  <h3>Static web hosting — the server is a very polite file cabinet</h3>
+  <p>
+    You upload a <em>build</em> — a folder of finished files — and the host serves them from CDN edge locations worldwide. There is no runtime, no process to keep alive, no database on the box. The visitor's browser downloads the files and runs the JavaScript; any "backend" must live somewhere else (an API, a BaaS like Supabase/Firebase, or serverless functions).
+  </p>
+  <table>
+    <tr><th>Provider</th><th>What it is</th></tr>
+    <tr><td><strong>GitHub Pages</strong></td><td>free static hosting straight from a repository (or <code>gh-pages</code> branch)</td></tr>
+    <tr><td><strong>Netlify</strong></td><td>drag-and-drop deploys, previews per branch, forms + serverless functions</td></tr>
+    <tr><td><strong>Vercel</strong></td><td>same static-first model, first-class for Next.js, plus edge functions</td></tr>
+    <tr><td><strong>Cloudflare Pages</strong></td><td>static + Workers (edge runtime) on a global network</td></tr>
+    <tr><td><strong>AWS S3 + CloudFront</strong></td><td>the "DIY" static stack: a bucket for files, a CDN in front</td></tr>
+    <tr><td><strong>Firebase Hosting</strong></td><td>static + Cloud Functions, tied to Firebase's database/auth</td></tr>
+  </table>
+
+  <h3>Cloud hosting platforms — three flavors of "a computer that runs your code"</h3>
+  <table>
+    <tr><th>Flavor</th><th>What you get</th><th>Examples</th></tr>
+    <tr><td><strong>VPS</strong> (virtual private server)</td><td>A whole virtual machine. Root access, any OS, you install and run everything yourself.</td><td>DigitalOcean Droplets, Linode, Hetzner, AWS EC2</td></tr>
+    <tr><td><strong>PaaS</strong> (platform as a service)</td><td>Push a repo (or container); the platform runs it, manages scaling, TLS and the OS.</td><td>Render, Railway, Heroku, AWS Elastic Beanstalk, Google App Engine</td></tr>
+    <tr><td><strong>Serverless / FaaS</strong></td><td>No machines at all — your code runs per request, billed by the second, scales to zero.</td><td>AWS Lambda, Cloudflare Workers; also Netlify/Vercel functions</td></tr>
+  </table>
+  <p>
+    The spectrum within "cloud" is a control-vs-convenience trade: a VPS gives you everything (and everything to maintain); a PaaS takes the ops off your plate; serverless takes away the whole machine — which is exactly why it pairs so naturally with static hosting.
+  </p>
+
+  <h3>Head to head</h3>
+  <table>
+    <tr><th></th><th>Static hosting</th><th>Cloud platform</th></tr>
+    <tr><td>Runs your code</td><td>no — the browser does</td><td>yes — server, platform or function</td></tr>
+    <tr><td>What you deploy</td><td>a folder of built files</td><td>a repo, container image, or function bundle</td></tr>
+    <tr><td>State (databases, sessions)</td><td>none — use external services</td><td>your stack, managed or self-run</td></tr>
+    <tr><td>Scaling</td><td>automatic, via CDN</td><td>managed (PaaS) or your job (VPS)</td></tr>
+    <tr><td>Cost</td><td>free tiers up to a few $/mo</td><td>~$5/mo VPS up to enterprise</td></tr>
+    <tr><td>Control</td><td>none (by design)</td><td>total (VPS) to moderate (PaaS)</td></tr>
+    <tr><td>Maintenance</td><td>zero servers to patch</td><td>all of it (VPS) to almost none (PaaS)</td></tr>
+    <tr><td>Time to first deploy</td><td>minutes</td><td>minutes (PaaS) to hours (VPS)</td></tr>
+    <tr><td>Best for</td><td>marketing sites, docs, portfolios, blogs, SPAs</td><td>full-stack apps, APIs, websockets, auth state, background jobs</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>The line is blurrier than it looks.</strong> Netlify, Vercel and Cloudflare are "static-first" platforms that bolt <em>serverless functions</em> onto the static layer — so a site can be 95% static files with a thin server for the 5% that thinks. And a React SPA is <em>statically hosted</em> even though its JS bundle is huge: the browser runs it all; the server only ever serves files.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Decision guide — if your project is…</h3>
+    <table>
+      <tr><th>…then</th><th>Use</th></tr>
+      <tr><td>a blog, portfolio, docs site, landing page</td><td>static: GitHub Pages or Netlify — done in minutes</td></tr>
+      <tr><td>a React/Vue SPA + a separate API</td><td>static for the frontend (Vercel/Netlify) + cloud platform or BaaS for the API</td></tr>
+      <tr><td>a Django / Rails / PHP / Node full-stack app</td><td>PaaS (Render, Railway, Heroku) — or a VPS if you want the keys</td></tr>
+      <tr><td>websockets, long-running jobs, custom servers</td><td>VPS or a PaaS with worker support (Render workers, Railway)</td></tr>
+      <tr><td>minimum cost, zero maintenance, a small backend</td><td>static + serverless functions + managed DB (Supabase/Firebase/Neon)</td></tr>
+      <tr><td>high-traffic public launch, global audience</td><td>static on a CDN-backed host — scaling is free and instant</td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>The pre-render test</h3>
+    <p style="font-size:0.9rem;color:var(--muted);margin-top:0">
+      Can you run <code>npm run build</code> and drop the output folder on a shelf so that visitors get exactly what they need — with no process running behind it? If yes, it's a static site and static hosting is the cheap, fast, safe choice. The moment a request needs the server to <em>compute an answer</em> (query a DB, verify a token, stream a video state), you've crossed into cloud territory.
+    </p>
+  </div>
+
+  <div class="tip">
+    <strong>The modern default is "both":</strong> a static edge for every page a human sees, a little server (function or PaaS) for the parts that compute, and a managed database behind that. Most production products in 2026 are exactly this shape.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — A static site you could deploy in 30 seconds</h3>
+  <p>The entire website is <em>one file</em> — which is the point: this is all the host needs. No config, no runtime, no install step.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Priya's Corner<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    body { font-family: system-ui, sans-serif; max-width: 42rem;
+           margin: 3rem auto; padding: 0 1rem; color: #1f2430;
+           line-height: 1.7; background: #f6f8fb; }
+    main { background: #fff; border-radius: 12px; padding: 2rem;
+           border: 1px solid #e3e7ee; }
+    a { color: #2563eb; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;main&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Hello — I'm Priya.<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span>I build small web tools. This page is one HTML file:
+        no server, no database — it lives on a CDN.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;p&gt;</span><a href="about.html">About me</a> · <a href="notes.md">Notes</a><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>Everything is pre-built: the styles are inline, the content is literal. The host's only job is to <em>send this file back</em> — that's the whole definition of static hosting.</li>
+      <li>Deploying means giving this file to any static host: drag the folder onto <strong>Netlify Drop</strong>, push it to a repo with <strong>GitHub Pages</strong> enabled, or <code>aws s3 sync . s3://my-bucket</code>. No install, no runtime, no server to patch.</li>
+      <li>If this were a Next.js/React project instead, you'd still deploy the same way — <code>npm run build</code> produces a folder of static files, and the host serves that folder.</li>
+      <li>The links to <code>about.html</code> and <code>notes.md</code> work because static hosts serve <em>any</em> file in the folder — multi-page sites are just multi-file folders.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Open <code>example1_static_site.html</code> in a browser (it's the site itself). To "deploy" it for real: create a free Netlify account and drag this file onto Netlify Drop, or push it to a GitHub repo and enable Pages — you'll get a public URL in under a minute.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — The same feature, three ways to host it</h3>
+  <p>One feature — "a page that greets you by name, with the server's time" — hosted three different ways. Watch where the thinking moves.</p>
+
+  <pre><code><span class="comment">/* (a) STATIC: the page is pre-built; the browser does everything.
+       The "server time" has to be faked — or fetched from an API. */</span>
+<span class="tag">&lt;script&gt;</span>
+  <span class="kw">const</span> name = <span class="tag">localStorage</span>.<span class="tag">getItem</span>(<span class="str">'name'</span>) || <span class="str">'stranger'</span>;
+  <span class="tag">document</span>.<span class="tag">querySelector</span>(<span class="str">'#hi'</span>).<span class="tag">textContent</span> = <span class="str">`Hi ${name}!`</span>;
+  <span class="comment">// just DOM text — zero server involved</span>
+<span class="tag">&lt;/script&gt;</span>
+
+<span class="comment">// (b) PaaS (Render/Heroku/Railway): a tiny Node server that THINKS.</span>
+<span class="comment">//     You push the repo; the platform runs it and scales it.</span>
+<span class="tag">server</span>.<span class="tag">get</span>(<span class="str">'/'</span>, (req, res) =&gt; {
+  <span class="tag">res</span>.<span class="tag">send</span>(<span class="str">`&lt;h1&gt;Hi ${name}, server time is ${new Date().toISOString()}</h1&gt;`</span>)
+})
+<span class="comment">// Procfile:  web: node server.js   ← the platform knows how to start it</span>
+
+<span class="comment"># (c) VPS (DigitalOcean/Hetzner/EC2): the same server.js, but YOU</span>
+<span class="comment">#     run it — install Node, run it behind nginx, patch the OS.</span>
+<span class="comment">#     Full control, full responsibility.</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>Same feature, three homes. In (a) the page is frozen at build time — "server time" must come from elsewhere, because there is no server. In (b) and (c) the server computes a fresh answer for every request.</li>
+      <li>(b) vs (c) is the cloud-platform spectrum: identical code, but on the PaaS the <em>platform</em> runs, scales and patches it; on the VPS <em>you</em> do — with root access and no platform fee in return.</li>
+      <li>That's the whole decision in miniature: <em>pre-render and ship files</em> (a), or <em>run code that answers live</em> (b)/(c) — and within "run code", how much ops do you want to keep?</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      The runnable version is <code>example2_cloud_node_server.js</code>: <code>node example2_cloud_node_server.js</code>, then open <code>http://localhost:3000</code>. It behaves like (b) locally — on a PaaS you'd push that same file to Render/Heroku and it listens on the port the platform assigns (<code>$PORT</code>); on a VPS you'd run it under <code>systemd</code>/nginx and own every layer below.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages (of each — and of knowing the difference)</h2>
+  <ul>
+    <li><strong>Static: speed.</strong> Files live at CDN edge locations near your visitors — a 100 KB page can be served from anywhere on Earth in single-digit milliseconds.</li>
+    <li><strong>Static: security surface.</strong> No server process, no runtime, no login to steal. There's very little to attack — the files are read-only to everyone.</li>
+    <li><strong>Static: cost and scaling.</strong> Free tiers are genuinely free, and a viral traffic spike costs almost nothing — scaling is the CDN's job.</li>
+    <li><strong>Static: zero maintenance.</strong> No OS patches, no dependency updates, no 3 a.m. "the box is down". Deploy a build, and you're done.</li>
+    <li><strong>Cloud platforms: capability.</strong> Databases, auth sessions, file uploads, websockets, cron jobs, background workers — anything that needs a server to think.</li>
+    <li><strong>Cloud platforms: the control dial.</strong> PaaS removes ops, VPS restores control, serverless removes the machine — you pay exactly for the ops you don't want.</li>
+    <li><strong>Knowing the line:</strong> picking static when you need a server is a broken product; picking a $40 VPS when you need a brochure site is a $40 bill plus a maintenance habit. The pre-render test settles it in ten seconds.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Static hosting and cloud platforms are not competitors — they're answers to different questions. <strong>Static</strong> (GitHub Pages, Netlify, Vercel, Cloudflare Pages, S3+CloudFront) means "the server serves finished files and the browser does the work": cheap, fast, safe, zero maintenance. <strong>Cloud platforms</strong> (VPS like DigitalOcean/EC2, PaaS like Render/Heroku, serverless like Lambda) mean "the server runs my code": the only option when a request needs a live answer.
+  </p>
+  <p>
+    The practical shape of most modern products is a stack of both: <em>static files at the edge for what humans see, a little server for what needs to be computed, and a managed database behind it.</em> Ask the pre-render question first — "can I ship a folder and be done?" — and the hosting choice takes care of itself.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Static Web Hosting vs Cloud Hosting Platforms</footer>
+</div>
+</body>
+</html>

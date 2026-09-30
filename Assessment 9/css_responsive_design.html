@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to responsive design — mobile-first media queries, breakpoints, and container queries — with a comparison of container queries vs media queries.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="responsive design, media queries, mobile-first, breakpoints, container queries, @container, @media, fluid layout">
+  <title>Responsive Design: Media Queries, Breakpoints &amp; Container Queries</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+    /* Live responsive demos */
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    .mq-cards { display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px; }
+    .mq-cards > div { background:var(--accent); color:#fff; padding:18px; border-radius:8px; text-align:center; }
+    .mq-status { font-size:0.88rem; color:var(--muted); }
+    .mq-status strong::after { content:"mobile — 1 column (under 600px)"; color:var(--accent-dark); }
+    @media (min-width:600px) {
+      .mq-cards { grid-template-columns:1fr 1fr; }
+      .mq-status strong::after { content:"tablet — 2 columns (600–899px)"; }
+    }
+    @media (min-width:900px) {
+      .mq-cards { grid-template-columns:1fr 1fr 1fr; }
+      .mq-status strong::after { content:"desktop — 3 columns (900px and up)"; }
+    }
+    .cq-row { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; }
+    .cq-box { container-type:inline-size; border:1px dashed var(--accent); border-radius:8px; padding:12px; background:#fff; }
+    .cq-narrow { width:250px; flex:none; }
+    .cq-wide { flex:1; min-width:min(100%,320px); }
+    .cq-label { font-size:0.8rem; color:var(--muted); margin-bottom:8px; }
+    .cq-card { display:flex; flex-direction:column; gap:10px; background:#eff6ff; border-radius:8px; padding:14px; }
+    .cq-avatar { width:48px; height:48px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; flex:none; }
+    .cq-card p { margin:0; font-size:0.9rem; }
+    @container (min-width:380px) {
+      .cq-card { flex-direction:row; align-items:center; }
+    }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Responsive Design: Media Queries, Breakpoints &amp; Container Queries</h1>
+    <p>What responsive design is, how mobile-first media queries and breakpoints work, and how container queries let components respond to their container — with a side-by-side comparison.</p>
+    <span class="badge">CSS · Responsive · Media &amp; Container Queries</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>Responsive design</strong> means building one website that looks good and works well on <em>every</em> screen size — phones, tablets, laptops, and large desktops — instead of building a separate site for each device. The layout fluidly adapts: columns stack on a phone, sit side by side on a tablet, and spread out on a desktop.
+  </p>
+  <p>
+    The idea was coined by Ethan Marcotte (2010) and rests on three ingredients:
+  </p>
+  <ul>
+    <li><strong>Fluid grids</strong> — layouts sized in flexible units (<code>%</code>, <code>fr</code>) instead of fixed pixels.</li>
+    <li><strong>Flexible images</strong> — images that shrink to fit their container (<code>max-width: 100%</code>).</li>
+    <li><strong>Media queries</strong> — CSS rules that apply only when the screen meets a condition (e.g. <em>wider than 768px</em>).</li>
+  </ul>
+  <p>
+    Modern best practice is <strong>mobile-first</strong>: write the base styles for the smallest screen, then <em>add</em> enhancements for larger screens with <code>min-width</code> media queries. And the newest evolution, <strong>container queries</strong>, lets a <em>component</em> respond to the width of its own container rather than the whole screen — perfect for reusable cards and widgets.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Step 0 — the viewport meta tag (required)</h3>
+  <p>Without this tag, phones render the page at desktop width and zoom out. Every responsive page needs it in the <code>&lt;head&gt;</code>:</p>
+  <pre><code><span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span></code></pre>
+
+  <h3>Media query syntax</h3>
+  <pre><code><span class="comment">/* Base (mobile) styles first */</span>
+<span class="kw">.cards</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">grid-template-columns</span>: <span class="num">1fr</span>; }
+
+<span class="comment">/* At 600px and wider, switch to 2 columns */</span>
+<span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">600px</span>) {
+  <span class="kw">.cards</span> { <span class="kw">grid-template-columns</span>: <span class="num">1fr 1fr</span>; }
+}</code></pre>
+  <p>A media query has two parts: the <code>@media</code> rule with a <strong>condition</strong> in parentheses (most often <code>min-width</code> or <code>max-width</code>), and a block of styles that apply only when the condition is true. The widths where the layout changes are called <strong>breakpoints</strong>.</p>
+
+  <h3>Mobile-first vs desktop-first</h3>
+  <table>
+    <tr><th>Approach</th><th>Query used</th><th>Base styles target</th><th>Status</th></tr>
+    <tr><td><strong>Mobile-first</strong></td><td><code>min-width</code> (600px, 900px…)</td><td>Phones — then enhance upwards</td><td>Modern, recommended</td></tr>
+    <tr><td>Desktop-first</td><td><code>max-width</code> (1024px, 768px…)</td><td>Desktops — then shrink down</td><td>Older style</td></tr>
+  </table>
+
+  <h3>Common breakpoints</h3>
+  <table>
+    <tr><th>Device</th><th>Typical width</th><th>Typical layout</th></tr>
+    <tr><td>Mobile</td><td>Under <code>600px</code></td><td>1 column, stacked navigation</td></tr>
+    <tr><td>Tablet</td><td><code>600–899px</code></td><td>2 columns, condensed navigation</td></tr>
+    <tr><td>Laptop / desktop</td><td><code>900–1279px</code></td><td>3 columns, full navigation</td></tr>
+    <tr><td>Large desktop</td><td><code>1280px</code> and up</td><td>Centered max-width container, more columns</td></tr>
+  </table>
+
+  <h3>Container query syntax</h3>
+  <p>Container queries need <strong>two steps</strong>: first declare a parent as a container with <code>container-type</code>, then query it with <code>@container</code>:</p>
+  <pre><code><span class="comment">/* Step 1: mark the parent as a container (width-queryable) */</span>
+<span class="kw">.box</span> { <span class="kw">container-type</span>: <span class="kw">inline-size</span>; }
+
+<span class="comment">/* Step 2: when THAT box (not the screen) is 380px+, lay the card out horizontally */</span>
+<span class="kw">@container</span> (<span class="kw">min-width</span>: <span class="num">380px</span>) {
+  <span class="kw">.card</span> { <span class="kw">flex-direction</span>: <span class="kw">row</span>; }
+}</code></pre>
+  <table>
+    <tr><th><code>container-type</code> value</th><th>Meaning</th></tr>
+    <tr><td><code>normal</code></td><td>Default — not a query container.</td></tr>
+    <tr><td><code>inline-size</code></td><td>Queryable by <strong>width</strong> — the one you want 99% of the time.</td></tr>
+    <tr><td><code>size</code></td><td>Queryable by width <em>and</em> height — but the element can no longer size itself from its content, so use with care.</td></tr>
+  </table>
+  <p>You can also <strong>name</strong> a container (<code>container-name: sidebar</code>) and target it explicitly: <code>@container sidebar (min-width: 400px) { … }</code>. Without a name, <code>@container</code> uses the nearest container ancestor.</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> Media queries ask <em>"how wide is the screen?"</em> while container queries ask <em>"how wide is my parent box?"</em> — and the golden rule of breakpoints is: <strong>choose them where your content breaks, not by device names.</strong>
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. Mobile-first media queries</h3>
+    <p>Write the phone layout as plain CSS, then layer <code>min-width</code> queries on top. Each query only <em>adds or overrides</em> what the bigger screen needs — small, fast CSS for phones, richer layouts for desktops.</p>
+    <pre><code><span class="comment">/* Phone: stacked */</span>
+<span class="kw">.layout</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">gap</span>: <span class="num">12px</span>; }
+<span class="comment">/* Tablet and up: sidebar + content */</span>
+<span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">768px</span>) {
+  <span class="kw">.layout</span> { <span class="kw">grid-template-columns</span>: <span class="num">220px 1fr</span>; }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. Breakpoints — let the content decide</h3>
+    <p>There are no magic numbers: slowly narrow your browser until the layout looks cramped — <em>that</em> width is your breakpoint. Still, most projects settle near <code>600px</code>, <code>900px</code>, and <code>1200px</code>, which cover phones, tablets, and desktops nicely.</p>
+    <pre><code><span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">600px</span>)  { <span class="comment">/* tablet */</span> }
+<span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">900px</span>)  { <span class="comment">/* laptop */</span> }
+<span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">1200px</span>) { <span class="comment">/* desktop */</span> }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. Fluid grids &amp; flexible images</h3>
+    <p>Breakpoints handle big changes; fluid units handle everything in between. <code>auto-fit</code> + <code>minmax()</code> makes a grid that adds or removes columns automatically, and one image rule prevents overflow everywhere.</p>
+    <pre><code><span class="kw">.gallery</span> { <span class="kw">display</span>: <span class="kw">grid</span>;
+  <span class="kw">grid-template-columns</span>: <span class="kw">repeat</span>(<span class="kw">auto-fit</span>, <span class="kw">minmax</span>(<span class="num">200px</span>, <span class="num">1fr</span>)); }
+<span class="kw">img</span> { <span class="kw">max-width</span>: <span class="num">100%</span>; <span class="kw">height</span>: <span class="kw">auto</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. Container queries — components that adapt anywhere</h3>
+    <p>The classic problem: the <em>same</em> card component appears in a wide main column and a narrow sidebar. A media query can't help — the screen is identical in both cases. A container query can: each card adapts to its own box.</p>
+    <pre><code><span class="kw">.box</span> { <span class="kw">container-type</span>: <span class="kw">inline-size</span>; <span class="kw">container-name</span>: <span class="kw">cardbox</span>; }
+<span class="kw">@container</span> <span class="kw">cardbox</span> (<span class="kw">min-width</span>: <span class="num">380px</span>) {
+  <span class="kw">.card</span> { <span class="kw">flex-direction</span>: <span class="kw">row</span>; }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. Container queries vs media queries</h3>
+    <table>
+      <tr><th></th><th>Media queries</th><th>Container queries</th></tr>
+      <tr><td><strong>Respond to</strong></td><td>Viewport (screen) size</td><td>Parent container's size</td></tr>
+      <tr><td><strong>Syntax</strong></td><td><code>@media (min-width: …)</code></td><td><code>@container (min-width: …)</code> + <code>container-type</code> on parent</td></tr>
+      <tr><td><strong>Setup needed</strong></td><td>Viewport <code>&lt;meta&gt;</code> tag</td><td><code>container-type: inline-size</code> on the wrapper</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Page layout, navigation, page-level breakpoints</td><td>Reusable components: cards, widgets, sidebar/main reuse</td></tr>
+      <tr><td><strong>Support</strong></td><td>Universal (all browsers, forever)</td><td>Modern browsers (Baseline since 2023)</td></tr>
+    </table>
+    <p>They are <strong>complements, not rivals</strong>: use media queries for the page skeleton and container queries for the components inside it.</p>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 1 — media-query cards (resize your browser!)</h3>
+    <p class="mq-status">Current breakpoint: <strong></strong></p>
+    <div class="mq-cards"><div>Card 1</div><div>Card 2</div><div>Card 3</div></div>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 2 — one card, two containers (same screen!)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">Both cards share identical CSS — each adapts to its own box, not the screen.</p>
+    <div class="cq-row">
+      <div class="cq-box cq-narrow">
+        <div class="cq-label">Narrow box (250px) → stacked</div>
+        <div class="cq-card"><div class="cq-avatar">A</div><p><strong>Asha</strong><br>Frontend developer who loves CSS.</p></div>
+      </div>
+      <div class="cq-box cq-wide">
+        <div class="cq-label">Wide box → side by side</div>
+        <div class="cq-card"><div class="cq-avatar">A</div><p><strong>Asha</strong><br>Frontend developer who loves CSS.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> Media queries can test more than width: <code>(orientation: portrait)</code>, <code>(prefers-color-scheme: dark)</code>, and <code>(prefers-reduced-motion: reduce)</code> let you adapt to orientation, dark mode, and motion sensitivity too.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Mobile-first cards with breakpoints</h3>
+  <p>This page shows three cards that stack in 1 column on phones, switch to 2 columns at <code>600px</code>, and 3 columns at <code>900px</code> — pure mobile-first <code>min-width</code> queries.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* MOBILE FIRST: 1 column by default */</span>
+    <span class="kw">.cards</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">grid-template-columns</span>: <span class="num">1fr</span>; <span class="kw">gap</span>: <span class="num">12px</span>; }
+    <span class="kw">.cards &gt; div</span> { <span class="kw">background</span>: <span class="str">#2563eb</span>; <span class="kw">color</span>: <span class="str">white</span>;
+      <span class="kw">padding</span>: <span class="num">18px</span>; <span class="kw">border-radius</span>: <span class="num">8px</span>; <span class="kw">text-align</span>: <span class="kw">center</span>; }
+
+    <span class="comment">/* TABLET: 2 columns at 600px and up */</span>
+    <span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">600px</span>) {
+      <span class="kw">.cards</span> { <span class="kw">grid-template-columns</span>: <span class="num">1fr 1fr</span>; }
+    }
+
+    <span class="comment">/* DESKTOP: 3 columns at 900px and up */</span>
+    <span class="kw">@media</span> (<span class="kw">min-width</span>: <span class="num">900px</span>) {
+      <span class="kw">.cards</span> { <span class="kw">grid-template-columns</span>: <span class="num">1fr 1fr 1fr</span>; }
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"cards"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Card 1<span class="tag">&lt;/div&gt;</span><span class="tag">&lt;div&gt;</span>Card 2<span class="tag">&lt;/div&gt;</span><span class="tag">&lt;div&gt;</span>Card 3<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The viewport <code>&lt;meta&gt;</code> tag lets phones report their true width.</li>
+      <li>Base styles target mobile: a single-column grid — no query needed.</li>
+      <li><code>@media (min-width: 600px)</code> adds a second column for tablets and everything larger.</li>
+      <li><code>@media (min-width: 900px)</code> adds a third column for laptops/desktops.</li>
+      <li>Because queries use <code>min-width</code>, wider screens inherit all the smaller breakpoints' rules — the essence of mobile-first.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A container-query profile card</h3>
+  <p>The same profile card is placed in a narrow (250px) box and a wide box. With zero media queries, each instance adapts to its own container: stacked in the narrow box, horizontal in the wide one.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* Step 1: each wrapper becomes a query container */</span>
+    <span class="kw">.box</span> { <span class="kw">container-type</span>: <span class="kw">inline-size</span>;
+      <span class="kw">border</span>: <span class="num">1px</span> <span class="kw">dashed</span> <span class="str">#2563eb</span>; <span class="kw">padding</span>: <span class="num">12px</span>; <span class="kw">margin-bottom</span>: <span class="num">16px</span>; }
+    <span class="kw">.narrow</span> { <span class="kw">width</span>: <span class="num">250px</span>; }
+
+    <span class="comment">/* Card stacks vertically by default */</span>
+    <span class="kw">.card</span> { <span class="kw">display</span>: <span class="kw">flex</span>; <span class="kw">flex-direction</span>: <span class="kw">column</span>; <span class="kw">gap</span>: <span class="num">10px</span>;
+      <span class="kw">background</span>: <span class="str">#eff6ff</span>; <span class="kw">padding</span>: <span class="num">14px</span>; <span class="kw">border-radius</span>: <span class="num">8px</span>; }
+
+    <span class="comment">/* Step 2: when the CONTAINER (not the screen) reaches 380px, go horizontal */</span>
+    <span class="kw">@container</span> (<span class="kw">min-width</span>: <span class="num">380px</span>) {
+      <span class="kw">.card</span> { <span class="kw">flex-direction</span>: <span class="kw">row</span>; <span class="kw">align-items</span>: <span class="kw">center</span>; }
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"box narrow"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>… stacked card …<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"box"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>… horizontal card …<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>container-type: inline-size</code> turns each <code>.box</code> into a width-queryable container.</li>
+      <li>The card's default CSS stacks it vertically — this is what the narrow 250px box shows.</li>
+      <li><code>@container (min-width: 380px)</code> fires per-box: only the wide box qualifies, so only that card turns horizontal.</li>
+      <li>No media query is involved — both cards render differently on the <em>same</em> screen at the <em>same</em> time.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. For Example 1, resize the window across 600px and 900px to watch the columns change. For Example 2, try changing <code>250px</code> to <code>450px</code> and watch the "narrow" card flip horizontal — no screen resize needed.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>One site for every device:</strong> A single codebase serves phones, tablets, and desktops — no separate "mobile site" to maintain.</li>
+    <li><strong>Better user experience:</strong> Content is always readable and tappable without pinching, zooming, or sideways scrolling.</li>
+    <li><strong>SEO-friendly:</strong> Search engines (Google indexes mobile-first) reward mobile-friendly pages with better rankings.</li>
+    <li><strong>Mobile-first is faster:</strong> Phones download lean base styles first and only add enhancements larger screens need.</li>
+    <li><strong>Truly reusable components:</strong> Container queries let one card or widget adapt to a sidebar, a modal, or full width with no extra classes.</li>
+    <li><strong>Future-proof:</strong> Content-based breakpoints and container-relative components keep working as new device sizes appear.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Responsive design is the practice of making one website adapt gracefully to any screen, built on fluid grids, flexible images, and queries. <strong>Mobile-first media queries</strong> with <code>min-width</code> <strong>breakpoints</strong> shape the page skeleton — phone layout by default, enhancements layered on — while <strong>container queries</strong> let individual components respond to their own box instead of the screen.
+  </p>
+  <p>
+    In summary: <strong>use media queries for the page, container queries for the parts, and always pick breakpoints where your content breaks — not by device name.</strong> Master these, and your layouts will look intentional everywhere. As the saying goes: <em>"Content is like water — design the glass, and let it take its shape."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Responsive Design: Media Queries, Breakpoints &amp; Container Queries</footer>
+</div>
+</body>
+</html>

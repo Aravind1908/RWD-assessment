@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: tailwind.config.js — content, theme.extend &amp; plugins</title>
+  <meta name="description" content="The structure of tailwind.config.js — content paths (purging unused styles), theme.extend for custom colors/fonts/spacing, and plugins — with live CDN demos and a real build.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind config, tailwind.config.js, content, purging, safelist, theme.extend, custom colors, fonts, spacing, plugins">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: tailwind.config.js</h1>
+    <p>The three keys every project actually uses — <strong>content</strong> (what to scan and purge), <strong>theme.extend</strong> (custom colors, fonts, spacing) and <strong>plugins</strong> — shown live in the browser and in a real build.</p>
+    <span class="badge">CSS Framework · Tailwind · Configuration</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    A Tailwind project is a framework <em>plus a build step</em>. The build reads one file — <strong>tailwind.config.js</strong> — and everything you tell it there shapes the CSS it generates: which files contain your class names, which design tokens exist, and which extra utilities the framework gains.
+  </p>
+  <p>
+    Three keys cover most real configs: <code>content</code>, <code>theme.extend</code> and <code>plugins</code>. Everything else you'll ever touch — screens, shadows, radii — is a token under <code>theme</code>.
+  </p>
+  <pre><code><span class="comment">/** @type {import('tailwindcss').Config} */</span>
+<span class="kw">export</span> <span class="kw">default</span> {
+  <span class="tag">content</span>: [<span class="str">'./index.html'</span>, <span class="str">'./src/**/*.{js,ts,jsx,tsx}'</span>],
+  <span class="tag">theme</span>: {
+    <span class="tag">extend</span>: { <span class="tag">colors</span>: { <span class="tag">brand</span>: <span class="str">'#2563eb'</span> } },
+  },
+  <span class="tag">plugins</span>: [],
+}</code></pre>
+  <p>
+    In v3 this is a JavaScript file at the project root, found automatically. In v4 the same three ideas moved into CSS — content is auto-detected, tokens live in <code>@theme</code> — so the file becomes optional; the note in Section 2 maps each key to its v4 home.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>content — what Tailwind scans (why unused styles disappear)</h3>
+  <p>
+    The build scans every file matching the <code>content</code> globs, extracts every string that looks like a utility name, and generates CSS <strong>only for the classes it finds</strong>. Anything it never sees is never emitted — that's the purge, and it's why a small page ships a few kilobytes of CSS instead of the whole framework.
+  </p>
+  <p>
+    Note what's <em>not</em> a separate step: dev builds include the full framework (fast iteration), production (minified) builds contain only used classes. "Purging" is simply what production mode means.
+  </p>
+  <pre><code><span class="kw">export</span> <span class="kw">default</span> {
+  <span class="tag">content</span>: [
+    <span class="str">'./index.html'</span>,
+    <span class="str">'./src/**/*.{js,ts,jsx,tsx}'</span>,   <span class="comment">// every file that can hold class names</span>
+  ],
+}</code></pre>
+  <p>
+    The globs decide the universe. Add every place class names can appear — server components, template files, a shared design-system package — and nothing you render gets purged away. In v3.3+ you can also mark paths <code>relative</code> to the config and <code>ignore</code> generated files.
+  </p>
+  <pre><code><span class="comment">// class names built at runtime never appear literally → they'd be purged.</span>
+<span class="comment">// safelist rescues exactly the classes you generate dynamically:</span>
+<span class="tag">safelist</span>: [
+  <span class="str">'bg-green-500'</span>,
+  { <span class="tag">pattern</span>: <span class="str">/^bg-(red|blue|green)-500$/</span>, <span class="tag">variant</span>: [<span class="str">'hover'</span>] },
+]</code></pre>
+  <p>
+    The <code>pattern</code> entry matches every string the regex describes — the classic fix for <code>bg-${status}-500</code>, a class name that exists nowhere in any file.
+  </p>
+
+  <h3>theme.extend — your brand as tokens</h3>
+  <p>
+    <code>theme</code> is the full set of scales the utilities draw from — colors, spacing, screens, fonts, shadows, radii. Assigning a category directly replaces the entire scale; <code>extend</code> merges yours in alongside the defaults. Almost always use <code>extend</code>: you keep every gray and blue while adding your own.
+  </p>
+  <pre><code><span class="tag">theme</span>: {
+  <span class="tag">extend</span>: {
+    <span class="tag">colors</span>: {
+      <span class="tag">brand</span>: { <span class="num">50</span>: <span class="str">'#eff6ff'</span>, <span class="num">500</span>: <span class="str">'#2563eb'</span>, <span class="num">600</span>: <span class="str">'#1d4ed8'</span>, <span class="num">950</span>: <span class="str">'#172554'</span> },
+    },
+    <span class="tag">fontFamily</span>: {
+      <span class="tag">display</span>: [<span class="str">'"Trebuchet MS"'</span>, <span class="str">'Verdana'</span>, <span class="str">'sans-serif'</span>],
+    },
+    <span class="tag">spacing</span>: {
+      <span class="tag">gutter</span>: <span class="str">'1.25rem'</span>,   <span class="comment">// p-gutter, gap-gutter …</span>
+      <span class="num">18</span>: <span class="str">'4.5rem'</span>,        <span class="comment">// numeric keys: × 0.25rem in v3</span>
+    },
+  },
+}</code></pre>
+  <ul>
+    <li><code>colors</code> — a named color becomes a family: <code>bg-brand-500</code>, <code>text-brand-950</code>, and opacity modifiers work on it (<code>bg-brand-500/50</code>).</li>
+    <li><code>fontFamily</code> — the array is a fallback chain (load the fonts via <code>@font-face</code> or a <code>&lt;link&gt;</code>); the key becomes a utility, <code>font-display</code>.</li>
+    <li><code>spacing</code> — every key joins the spacing scale, so <code>p-gutter</code> works anywhere <code>p-4</code> does.</li>
+  </ul>
+
+  <h3>plugins — add utilities, or borrow a community one</h3>
+  <p>
+    A plugin is a function the build runs to register extra utilities, variants or component styles — the same hooks the framework itself uses. The useful ones are npm packages; the simple ones fit in five lines.
+  </p>
+  <pre><code><span class="tag">plugins</span>: [
+  <span class="kw">require</span>(<span class="str">'@tailwindcss/forms'</span>),   <span class="comment">// normalizes inputs, selects, checkboxes</span>
+  <span class="kw">function</span> ({ <span class="tag">addUtilities</span> }) {
+    <span class="tag">addUtilities</span>({
+      <span class="str">'.text-shadow'</span>: { <span class="tag">textShadow</span>: <span class="str">'0 2px 4px rgba(0,0,0,0.25)'</span> },
+    })
+  },
+]</code></pre>
+  <p>
+    <code>@tailwindcss/forms</code> is the canonical "plugin that earns its keep": one <code>require</code> and every input, select and checkbox looks consistent and accessible. The custom plugin shows the shape — receive the API (<code>addUtilities</code>, <code>addVariant</code>, <code>theme</code>) and register what you want.
+  </p>
+
+  <h3>The other keys, at a glance</h3>
+  <table>
+    <tr><th>Key</th><th>Effect</th><th>When you need it</th></tr>
+    <tr><td><code>darkMode</code></td><td><code>'media'</code> (OS preference) or <code>'class'</code> (your toggle)</td><td>dark mode — covered in the dark-mode guide</td></tr>
+    <tr><td><code>prefix</code></td><td><code>'tw-'</code> → <code>tw-bg-blue-500</code></td><td>sharing a page with another framework</td></tr>
+    <tr><td><code>important</code></td><td>utilities emit <code>!important</code></td><td>Tailwind must win inside third-party CSS</td></tr>
+    <tr><td><code>corePlugins</code></td><td>disable whole categories (<code>boxShadow</code>, <code>preflight</code>…)</td><td>shedding CSS you never use</td></tr>
+    <tr><td><code>theme.screens</code></td><td>custom breakpoints</td><td>non-standard device widths</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>Tailwind v4 — same three keys, new homes:</strong> <code>content</code> → auto-detected (it scans the project; narrow it with <code>@source</code>); <code>theme.extend</code> → CSS custom properties in <code>@theme { --color-brand-500: #2563eb; --font-display: "Trebuchet MS"; --spacing-gutter: 1.25rem; }</code>; <code>plugins</code> → still JavaScript, loaded with <code>@plugin</code>. Every concept and gotcha in this guide transfers directly.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Where the config earns its keep</h3>
+    <table>
+      <tr><th>Need</th><th>Config key</th></tr>
+      <tr><td>Brand color system</td><td><code>theme.extend.colors</code></td></tr>
+      <tr><td>Web font as a utility</td><td><code>theme.extend.fontFamily</code> (+ <code>@font-face</code>)</td></tr>
+      <tr><td>An 8pt-style spacing rhythm</td><td><code>theme.extend.spacing</code></td></tr>
+      <tr><td><code>bg-${status}-500</code> built in JS</td><td><code>safelist</code> (pattern)</td></tr>
+      <tr><td>Consistent, accessible form controls</td><td><code>@tailwindcss/forms</code></td></tr>
+      <tr><td>Dark-mode trigger</td><td><code>darkMode</code> (see the dark-mode guide)</td></tr>
+      <tr><td>Non-standard breakpoints</td><td><code>theme.extend.screens</code></td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — custom tokens on the Play CDN (needs internet)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">The CDN reads a <code>tailwind.config</code> global in exactly the shape of the file — so tokens work in a single HTML file.</p>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: {
+          colors: { brand: { 50:'#eff6ff', 500:'#2563eb', 600:'#1d4ed8' } },
+          fontFamily: { display: ['"Trebuchet MS"','sans-serif'] },
+          spacing: { gutter: '1.25rem' },
+        } }
+      }
+    </script>
+    <div class="mt-4 p-gutter flex flex-wrap items-center gap-3 bg-white border border-gray-200 rounded-xl">
+      <span class="font-display text-lg font-bold">font-display</span>
+      <button class="bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold px-4 py-2 rounded-lg">bg-brand-600</button>
+      <span class="bg-brand-500 text-white text-xs px-2 py-1 rounded">bg-brand-500</span>
+    </div>
+    <p class="text-xs text-gray-500 mt-3">None of <code>brand-*</code>, <code>font-display</code> or the <code>p-gutter</code> padding above exist in the defaults — all of it from one inline config object.</p>
+  </div>
+
+  <div class="tip">
+    <strong>The config is code.</strong> It's versioned, reviewed and diffable like any other file in the repo — which is exactly why brand tokens belong in it instead of being re-decided in a hundred class attributes.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — theme.extend in the browser (Play CDN)</h3>
+  <p>The Play CDN reads a <code>tailwind.config</code> global with the same shape as the file, so custom tokens work in a single HTML file — no build. Save as <code>index.html</code> (needs internet).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>theme.extend — Play CDN<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;script&gt;</span>
+    <span class="comment">/* the Play CDN reads the same shape as tailwind.config.js */</span>
+    <span class="tag">tailwind.config</span> = {
+      <span class="tag">theme</span>: {
+        <span class="tag">extend</span>: {
+          <span class="tag">colors</span>: { <span class="tag">brand</span>: { <span class="num">50</span>:<span class="str">'#eff6ff'</span>, <span class="num">500</span>:<span class="str">'#2563eb'</span>, <span class="num">600</span>:<span class="str">'#1d4ed8'</span>, <span class="num">950</span>:<span class="str">'#172554'</span> } },
+          <span class="tag">fontFamily</span>: { <span class="tag">display</span>: [<span class="str">'"Trebuchet MS"'</span>,<span class="str">'Verdana'</span>,<span class="str">'sans-serif'</span>] },
+          <span class="tag">spacing</span>: { <span class="tag">gutter</span>: <span class="str">'1.25rem'</span> },
+        }
+      }
+    }
+  <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-gutter text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto mt-10 bg-white border border-gray-200
+              rounded-2xl p-6 shadow-sm"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"font-display text-2xl font-bold text-brand-950"</span><span class="tag">&gt;</span>Custom tokens<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600"</span><span class="tag">&gt;</span>
+      Brand colors, a display font and a gutter spacing key —
+      none of these exist in Tailwind's defaults.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-5 flex items-center gap-3"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"bg-brand-600 hover:bg-brand-500 text-white text-sm
+                  font-semibold px-4 py-2 rounded-lg"</span><span class="tag">&gt;</span>Brand button<span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"bg-brand-500/10 text-brand-600 text-xs font-mono
+                  px-2 py-1 rounded"</span><span class="tag">&gt;</span>bg-brand-500/10<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The CDN config object <em>is</em> a <code>tailwind.config.js</code> minus the wrapper — prototype the tokens here, then paste the same object into the real file.</li>
+      <li><code>brand</code> is defined with four shades, so <code>bg-brand-600</code>, <code>text-brand-950</code> and the opacity modifier <code>bg-brand-500/10</code> all resolve.</li>
+      <li><code>fontFamily.display</code> becomes the <code>font-display</code> utility; <code>spacing.gutter</code> becomes <code>p-gutter</code> — named keys join the same scale as <code>p-4</code>.</li>
+      <li>The <code>&lt;body&gt;</code> itself uses <code>p-gutter</code>: the custom token is doing layout work from line one.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Add a <code>700</code> shade to <code>brand</code> and a second spacing key — the CDN recompiles instantly, which is what makes it good for token prototyping.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A real build: config + PostCSS + page</h3>
+  <p>The production shape: <code>tailwind.config.js</code> declares the content globs, a safelist and the tokens; PostCSS runs the build; the page uses the custom utilities and the forms plugin. In a minified build the CSS contains <em>only</em> the classes this page uses.</p>
+
+  <pre><code><span class="comment">// tailwind.config.js</span>
+<span class="kw">export</span> <span class="kw">default</span> {
+  <span class="tag">content</span>: [<span class="str">'./index.html'</span>, <span class="str">'./src/**/*.{js,ts,jsx,tsx}'</span>],
+  <span class="tag">safelist</span>: [{ <span class="tag">pattern</span>: <span class="str">/^bg-(red|blue|green)-500$/</span> }],
+  <span class="tag">theme</span>: {
+    <span class="tag">extend</span>: {
+      <span class="tag">colors</span>: { <span class="tag">brand</span>: { <span class="num">50</span>:<span class="str">'#eff6ff'</span>, <span class="num">500</span>:<span class="str">'#2563eb'</span>, <span class="num">600</span>:<span class="str">'#1d4ed8'</span>, <span class="num">950</span>:<span class="str">'#172554'</span> } },
+      <span class="tag">fontFamily</span>: { <span class="tag">display</span>: [<span class="str">'"Trebuchet MS"'</span>,<span class="str">'Verdana'</span>,<span class="str">'sans-serif'</span>] },
+      <span class="tag">spacing</span>: { <span class="tag">gutter</span>: <span class="str">'1.25rem'</span> },
+    }
+  },
+  <span class="tag">plugins</span>: [<span class="kw">require</span>(<span class="str">'@tailwindcss/forms'</span>)],
+}</code></pre>
+
+  <pre><code><span class="comment">// postcss.config.js</span>
+<span class="kw">module</span>.<span class="tag">exports</span> = {
+  <span class="tag">plugins</span>: { <span class="tag">tailwindcss</span>: {}, <span class="tag">autoprefixer</span>: {} },
+}
+<span class="comment">// input.css</span>
+<span class="kw">@tailwind</span> <span class="tag">base</span>;
+<span class="kw">@tailwind</span> <span class="tag">components</span>;
+<span class="kw">@tailwind</span> <span class="tag">utilities</span>;</code></pre>
+
+  <pre><code><span class="comment">&lt;!-- index.html --&gt;</span>
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"css/tailwind.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-gutter text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;main</span> <span class="attr">class</span>=<span class="val">"max-w-md mx-auto mt-10 bg-white rounded-2xl
+               border border-gray-200 p-6 shadow-sm"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"font-display text-2xl font-bold"</span><span class="tag">&gt;</span>Production build<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600"</span><span class="tag">&gt;</span>
+      The CSS on this page contains only the classes it uses.
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">class</span>=<span class="val">"mt-4 w-full rounded-lg border-gray-300 text-sm"</span>
+           <span class="attr">placeholder</span>=<span class="val">"the forms plugin styles me"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-3 bg-brand-600 hover:bg-brand-500 text-white
+                text-sm font-semibold px-4 py-2 rounded-lg"</span><span class="tag">&gt;</span>Save<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>content</code> lists every file that can contain class names — the build scans them all and emits CSS for nothing else; a page this small typically lands at 5–15 KB minified.</li>
+      <li>The <code>safelist</code> pattern rescues classes built at runtime (<code>bg-${status}-500</code>) that no scanner would ever find in a file.</li>
+      <li><code>plugins: [require('@tailwindcss/forms')]</code> is why the <code>&lt;input&gt;</code> looks right with almost no classes — the plugin styles form elements directly.</li>
+      <li>Dev vs production: <code>npx tailwindcss --watch</code> (unminified) is fast and complete; add <code>--minify</code> and you get the shipped, purged CSS.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      This one needs a build: in a folder with a <code>package.json</code>, run <code>npm install -D tailwindcss@3 postcss autoprefixer @tailwindcss/forms</code>, create the four files above, then <code>npx tailwindcss -i input.css -o css/tailwind.css --minify</code>. The <code>tailwind_postcss_starter</code> folder in this workspace already has the pipeline — drop this config in and run <code>npm run dev</code>. Open <code>css/tailwind.css</code>: it contains exactly this page's classes.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Purging is the default, not a feature:</strong> production CSS contains only classes found in your <code>content</code> files — typically 5–15 KB per page, instead of a full component sheet.</li>
+    <li><strong>Design tokens, centralized:</strong> brand colors, fonts and spacing are declared once; <code>extend</code> keeps every default scale intact while you add your own.</li>
+    <li><strong>Safe dynamic classes:</strong> <code>safelist</code> patterns rescue <code>bg-${status}-500</code> without shipping the entire color system.</li>
+    <li><strong>Plugins are shareable capabilities:</strong> forms, typography, daisyUI — one <code>require</code> for behavior consistent across the app.</li>
+    <li><strong>One shape, two worlds:</strong> the same config object runs on the Play CDN and in the PostCSS build, so prototypes and production never disagree.</li>
+    <li><strong>It's code:</strong> versioned, reviewed, diffable — your design system as a file you can change in a pull request.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    <code>tailwind.config.js</code> answers three questions: <em>where are my class names?</em> (<strong>content</strong> — the scanner's universe, and therefore what gets purged), <em>what tokens do I have?</em> (<strong>theme.extend</strong> — colors, fonts and spacing merged into the defaults), and <em>what extra capabilities do I need?</em> (<strong>plugins</strong> — community packages or five-line customs). The skeleton to memorize:
+  </p>
+  <pre><code><span class="kw">export</span> <span class="kw">default</span> {
+  <span class="tag">content</span>: [<span class="str">'./index.html'</span>, <span class="str">'./src/**/*.{js,ts,jsx,tsx}'</span>],
+  <span class="tag">theme</span>: { <span class="tag">extend</span>: { <span class="tag">colors</span>: {}, <span class="tag">fontFamily</span>: {}, <span class="tag">spacing</span>: {} } },
+  <span class="tag">plugins</span>: [],
+}</code></pre>
+  <p>
+    In v4 the same three answers live in CSS — auto-detected content, <code>@theme</code> tokens, <code>@plugin</code>. The mental model doesn't change: <em>Tailwind generates CSS from what your config says exists and your files actually use.</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: tailwind.config.js</footer>
+</div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3c53cd0ec820d93',t:'MTc4OTYxNzk3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

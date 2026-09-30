@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to CSS transitions, @keyframes animations, and scroll-driven animations — plus a note on modern CSS: variables, calc(), clamp(), nesting, and @layer.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="CSS transitions, keyframes, animations, scroll-driven animations, animation-timeline, CSS variables, calc, clamp, nesting, cascade layers">
+  <title>CSS Transitions, Animations &amp; Modern CSS</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#ea580c; --accent-dark:#c2410c; --accent-soft:#ffedd5; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#ea580c,#c2410c); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+    /* Live motion demos */
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    .btn-motion { background:var(--accent); color:#fff; border:none; padding:12px 26px; border-radius:8px; font-size:1rem; cursor:pointer; transition:background-color 0.3s ease, transform 0.3s ease; }
+    .btn-motion:hover { background:var(--accent-dark); transform:scale(1.06); }
+    .stage { height:150px; border:1px dashed var(--accent); border-radius:8px; position:relative; margin-top:14px; background:#fff; overflow:hidden; }
+    .ball { width:36px; height:36px; border-radius:50%; background:var(--accent); position:absolute; left:24px; top:8px; animation:ball-bounce 1s ease-in-out infinite alternate; }
+    @keyframes ball-bounce { from { transform:translateY(0); } to { transform:translateY(96px); } }
+    .spin { width:40px; height:40px; border-radius:50%; border:5px solid var(--accent-soft); border-top-color:var(--accent); margin-top:14px; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Live modern-CSS demo (layer + nesting + variables + calc + clamp) */
+    @layer demo-base, demo-theme;
+    @layer demo-theme {
+      .modern-card {
+        --card-bg:#ffedd5;
+        --card-ink:#7c2d12;
+        background:var(--card-bg);
+        color:var(--card-ink);
+        border-radius:12px;
+        padding:calc(12px + 1vw);
+        font-size:clamp(0.95rem, 2.5vw, 1.15rem);
+        & h4 { margin:0 0 8px; font-size:clamp(1.1rem, 3vw, 1.5rem); }
+        & p { margin:0; }
+        & strong { color:var(--accent-dark); }
+      }
+    }
+    @layer demo-base {
+      .modern-card { border:2px solid var(--accent); }
+    }
+
+    /* Live scroll-driven demo */
+    .scroll-area { height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:#fff; }
+    .scroll-progress { position:sticky; top:0; height:8px; background:var(--accent); transform-origin:left; transform:scaleX(1); }
+    .scroll-content { padding:4px 16px 16px; font-size:0.9rem; }
+    @supports (animation-timeline: scroll()) {
+      .scroll-progress { animation:grow-bar linear; animation-timeline:scroll(); }
+    }
+    @keyframes grow-bar { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>CSS Transitions, Animations &amp; Modern CSS</h1>
+    <p>How to add motion with transitions, @keyframes animations, and scroll-driven animations — plus a note on modern CSS: variables, calc(), clamp(), nesting, and @layer.</p>
+    <span class="badge">CSS · Motion · Modern CSS</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    CSS can bring a page to life <strong>without a single line of JavaScript</strong>. There are three motion tools, each for a different job:
+  </p>
+  <ul>
+    <li><strong>Transitions</strong> — smoothly glide a property from state A to state B when something changes (e.g. a button changing color on hover).</li>
+    <li><strong><code>@keyframes</code> animations</strong> — play multi-step, self-running animations (e.g. a bouncing ball or a loading spinner), with full control over timing and repeats.</li>
+    <li><strong>Scroll-driven animations</strong> — tie an animation's progress to the scroll position instead of time (e.g. a progress bar that fills as you scroll down).</li>
+  </ul>
+  <p>
+    Alongside motion, modern CSS has grown powerful everyday tools: <strong>variables</strong> for theming, <strong><code>calc()</code></strong> and <strong><code>clamp()</code></strong> for fluid math, native <strong>nesting</strong> for cleaner code, and <strong><code>@layer</code></strong> for taming the cascade. This guide covers the motion trio in depth, then adds a compact note on all five modern features.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Transitions — smooth A → B changes</h3>
+  <pre><code><span class="kw">button</span> {
+  <span class="kw">background-color</span>: <span class="str">#ea580c</span>;
+  <span class="kw">transition</span>: <span class="kw">background-color</span> <span class="num">0.3s</span> <span class="kw">ease</span>;  <span class="comment">/* property, duration, timing */</span>
+}
+<span class="kw">button:hover</span> { <span class="kw">background-color</span>: <span class="str">#c2410c</span>; }</code></pre>
+  <p>The <code>transition</code> shorthand is <code>property duration timing-function delay</code>. Put it on the <em>base</em> state (not <code>:hover</code>), so the change animates both ways. Only <strong>animatable</strong> properties transition — colors, sizes, opacity, transforms — while <code>display</code> cannot.</p>
+
+  <h3>@keyframes animations — self-running, multi-step motion</h3>
+  <pre><code><span class="comment">/* Step 1: describe the keyframes (the "script") */</span>
+<span class="kw">@keyframes</span> <span class="kw">bounce</span> {
+  <span class="num">0%</span>   { <span class="kw">transform</span>: <span class="kw">translateY</span>(<span class="num">0</span>); }
+  <span class="num">50%</span>  { <span class="kw">transform</span>: <span class="kw">translateY</span>(<span class="num">-40px</span>); }
+  <span class="num">100%</span> { <span class="kw">transform</span>: <span class="kw">translateY</span>(<span class="num">0</span>); }
+}
+<span class="comment">/* Step 2: attach it (name, duration, timing, repeats) */</span>
+<span class="kw">.ball</span> { <span class="kw">animation</span>: <span class="kw">bounce</span> <span class="num">1s</span> <span class="kw">ease-in-out</span> <span class="kw">infinite</span>; }</code></pre>
+  <p>The <code>animation</code> shorthand packs up to eight values: <code>name duration timing-function delay iteration-count direction fill-mode play-state</code>. Useful extras: <code>infinite</code> (loop forever), <code>alternate</code> (ping-pong back and forth), and <code>both</code> fill-mode (hold the first/last frame).</p>
+
+  <h3>Scroll-driven animations — motion tied to scrolling</h3>
+  <pre><code><span class="kw">.progress</span> {
+  <span class="kw">animation</span>: <span class="kw">grow</span> <span class="kw">linear</span>;
+  <span class="kw">animation-timeline</span>: <span class="kw">scroll</span>();  <span class="comment">/* progress follows the scroller */</span>
+}
+<span class="kw">@keyframes</span> <span class="kw">grow</span> {
+  <span class="kw">from</span> { <span class="kw">transform</span>: <span class="kw">scaleX</span>(<span class="num">0</span>); }
+  <span class="kw">to</span>   { <span class="kw">transform</span>: <span class="kw">scaleX</span>(<span class="num">1</span>); }
+}</code></pre>
+  <p>Normal animations run on a <strong>time</strong> timeline; <code>animation-timeline</code> swaps in a <strong>scroll</strong> timeline instead. Two flavors exist:</p>
+  <table>
+    <tr><th>Timeline</th><th>Progress follows…</th><th>Classic use</th></tr>
+    <tr><td><code>scroll()</code></td><td>How far a scroll container has scrolled</td><td>Reading-progress bar, parallax header</td></tr>
+    <tr><td><code>view()</code></td><td>How far an element has travelled through the viewport</td><td>Fade/slide-in reveals as items scroll into view</td></tr>
+  </table>
+
+  <h3>Modern CSS at a glance</h3>
+  <table>
+    <tr><th>Feature</th><th>Syntax</th><th>One-line meaning</th></tr>
+    <tr><td>Variables</td><td><code>--brand: #ea580c;</code> → <code>color: var(--brand);</code></td><td>Reusable named values; change once, update everywhere.</td></tr>
+    <tr><td><code>calc()</code></td><td><code>width: calc(100% - 40px);</code></td><td>Do math mixing units (<code>%</code>, <code>px</code>, <code>vw</code>…). Spaces around <code>+</code>/<code>-</code> required.</td></tr>
+    <tr><td><code>clamp()</code></td><td><code>font-size: clamp(1rem, 2.5vw, 1.5rem);</code></td><td>Fluid value with a min and max: <code>clamp(min, ideal, max)</code>.</td></tr>
+    <tr><td>Nesting</td><td><code>.card { &amp; h2 { … } }</code></td><td>Write child selectors inside the parent rule, like Sass — now native CSS.</td></tr>
+    <tr><td><code>@layer</code></td><td><code>@layer base, theme;</code></td><td>Named cascade layers; later layers beat earlier ones regardless of specificity.</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>Key rule:</strong> Transitions react to <em>state changes</em> (hover, focus, class toggles); <code>@keyframes</code> animations <em>run by themselves</em> on a time or scroll timeline. And in modern CSS, <strong>unlayered styles always beat <code>@layer</code> styles</strong> — so put resets in early layers and keep overrides unlayered or in later layers.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. Transitions — polish every interaction</h3>
+    <p>Hover states, focus rings, expanding menus — any A→B change feels premium with a short transition. Keep them quick (150–300ms) and favor <code>transform</code> and <code>opacity</code>, which animate on the GPU without jank.</p>
+    <pre><code><span class="kw">.btn</span> { <span class="kw">transition</span>: <span class="kw">transform</span> <span class="num">0.2s</span> <span class="kw">ease</span>, <span class="kw">background-color</span> <span class="num">0.2s</span> <span class="kw">ease</span>; }
+<span class="kw">.btn:hover</span> { <span class="kw">transform</span>: <span class="kw">scale</span>(<span class="num">1.05</span>); <span class="kw">background-color</span>: <span class="str">#c2410c</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. @keyframes animations — loaders, bounces, attention-grabbers</h3>
+    <p>Need more than two states, or motion that starts by itself? Define the script with <code>@keyframes</code> (<code>from</code>/<code>to</code> or percentages), then attach it. A spinner is just a rotating border; a bounce is <code>translateY</code> ping-ponged with <code>alternate</code>.</p>
+    <pre><code><span class="kw">@keyframes</span> <span class="kw">spin</span> { <span class="kw">to</span> { <span class="kw">transform</span>: <span class="kw">rotate</span>(<span class="num">360deg</span>); } }
+<span class="kw">.spinner</span> { <span class="kw">animation</span>: <span class="kw">spin</span> <span class="num">1s</span> <span class="kw">linear</span> <span class="kw">infinite</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. Scroll-driven animations — the page choreographs itself</h3>
+    <p>With <code>animation-timeline: scroll()</code>, a progress bar's fill <em>is</em> the scroll position — scroll back up and it un-fills. With <code>view()</code>, elements can fade in exactly as they enter the viewport. Always guard with <code>@supports</code> so older browsers get a sane static fallback.</p>
+    <pre><code><span class="kw">@supports</span> (<span class="kw">animation-timeline</span>: <span class="kw">scroll</span>()) {
+  <span class="kw">.progress</span> { <span class="kw">animation</span>: <span class="kw">grow</span> <span class="kw">linear</span>; <span class="kw">animation-timeline</span>: <span class="kw">scroll</span>(); }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. Note — CSS variables (custom properties)</h3>
+    <p>Declare once (usually on <code>:root</code>), reuse everywhere with <code>var()</code> — including fallback values. Theming a whole site becomes a one-line change, and variables can even be updated live from JavaScript.</p>
+    <pre><code><span class="kw">:root</span> { <span class="kw">--brand</span>: <span class="str">#ea580c</span>; <span class="kw">--gap</span>: <span class="num">16px</span>; }
+<span class="kw">.btn</span> { <span class="kw">background</span>: <span class="kw">var</span>(<span class="kw">--brand</span>); <span class="kw">margin</span>: <span class="kw">var</span>(<span class="kw">--gap</span>, <span class="num">12px</span>); }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. Note — calc() &amp; clamp() for fluid sizing</h3>
+    <p><code>calc()</code> mixes units (<code>100% - 40px</code>). <code>clamp(min, ideal, max)</code> goes further: fluid type that grows with the viewport but never gets too small or too big — responsive typography in a single line, no media queries needed.</p>
+    <pre><code><span class="kw">.sidebar</span> { <span class="kw">width</span>: <span class="kw">calc</span>(<span class="num">100%</span> - <span class="num">40px</span>); }
+<span class="kw">h1</span> { <span class="kw">font-size</span>: <span class="kw">clamp</span>(<span class="num">1.5rem</span>, <span class="num">5vw</span>, <span class="num">3rem</span>); }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>6. Note — nesting &amp; @layer</h3>
+    <p><strong>Nesting</strong> lets child selectors live inside their parent (<code>&amp;</code> means "this selector"), cutting repetition. <strong><code>@layer</code></strong> organizes the cascade into named buckets — <code>reset</code>, <code>base</code>, <code>components</code>, <code>utilities</code> — where a later layer beats an earlier one no matter the specificity, ending specificity wars.</p>
+    <pre><code><span class="kw">@layer</span> <span class="kw">base</span>, <span class="kw">theme</span>;
+<span class="kw">@layer</span> <span class="kw">theme</span> {
+  <span class="kw">.card</span> { <span class="kw">background</span>: <span class="str">#ffedd5</span>;
+    <span class="kw">&amp; h2</span> { <span class="kw">color</span>: <span class="str">#7c2d12</span>; } <span class="comment">/* nested! */</span>
+  }
+}</code></pre>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 1 — hover the button, watch the ball &amp; spinner</h3>
+    <button class="btn-motion" type="button">Hover me — I transition!</button>
+    <div class="stage" aria-hidden="true"><div class="ball"></div></div>
+    <div class="spin" aria-hidden="true"></div>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 2 — modern CSS card (layers + nesting + variables + calc + clamp)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">Resize the window: the card's padding (<code>calc</code>) and text size (<code>clamp</code>) scale fluidly.</p>
+    <div class="modern-card">
+      <h4>Themed entirely by variables</h4>
+      <p>Background and ink come from <strong>--card-bg</strong> and <strong>--card-ink</strong>. The border lives in an earlier <strong>@layer</strong>, and this whole rule uses native <strong>nesting</strong>.</p>
+    </div>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 3 — scroll inside this box, watch the bar</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">The orange bar is driven by <code>animation-timeline: scroll()</code> — its fill <em>is</em> the scroll position. (In browsers without support, it simply stays full.)</p>
+    <div class="scroll-area">
+      <div class="scroll-progress"></div>
+      <div class="scroll-content">
+        <p>Scroll me! Line one of the demo text. Keep going…</p>
+        <p>Line two. The bar above grows as this box scrolls — no JavaScript involved.</p>
+        <p>Line three. Scroll back up and the bar shrinks again: scroll-linked, not time-linked.</p>
+        <p>Line four. This same technique powers full-page reading-progress bars.</p>
+        <p>Line five — you made it to the bottom. The bar should now be full!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> Always respect users who prefer less motion: wrap decorative animation in <code>@media (prefers-reduced-motion: no-preference)</code>, or provide a <code>reduce</code> override that disables it.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — A transitioning button + a bouncing ball</h3>
+  <p>A button that smoothly scales and darkens on hover (transition), plus a ball that bounces forever using <code>@keyframes</code> with <code>infinite alternate</code>.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* TRANSITION: smooth hover on the button */</span>
+    <span class="kw">.btn</span> { <span class="kw">background</span>: <span class="str">#ea580c</span>; <span class="kw">color</span>: <span class="str">white</span>;
+      <span class="kw">padding</span>: <span class="num">12px 26px</span>; <span class="kw">border</span>: <span class="kw">none</span>; <span class="kw">border-radius</span>: <span class="num">8px</span>;
+      <span class="kw">transition</span>: <span class="kw">background-color</span> <span class="num">0.3s</span> <span class="kw">ease</span>, <span class="kw">transform</span> <span class="num">0.3s</span> <span class="kw">ease</span>; }
+    <span class="kw">.btn:hover</span> { <span class="kw">background-color</span>: <span class="str">#c2410c</span>; <span class="kw">transform</span>: <span class="kw">scale</span>(<span class="num">1.06</span>); }
+
+    <span class="comment">/* KEYFRAMES: the bounce script … */</span>
+    <span class="kw">@keyframes</span> <span class="kw">bounce</span> {
+      <span class="kw">from</span> { <span class="kw">transform</span>: <span class="kw">translateY</span>(<span class="num">0</span>); }
+      <span class="kw">to</span>   { <span class="kw">transform</span>: <span class="kw">translateY</span>(<span class="num">96px</span>); }
+    }
+    <span class="comment">/* … attached to the ball, looping with alternate for a smooth ping-pong */</span>
+    <span class="kw">.ball</span> { <span class="kw">width</span>: <span class="num">36px</span>; <span class="kw">height</span>: <span class="num">36px</span>; <span class="kw">border-radius</span>: <span class="num">50%</span>;
+      <span class="kw">background</span>: <span class="str">#ea580c</span>;
+      <span class="kw">animation</span>: <span class="kw">bounce</span> <span class="num">1s</span> <span class="kw">ease-in-out</span> <span class="kw">infinite</span> <span class="kw">alternate</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"btn"</span><span class="tag">&gt;</span>Hover me<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ball"</span><span class="tag">&gt;</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The <code>transition</code> sits on the base <code>.btn</code> (not <code>:hover</code>), so the color/scale glide smoothly <em>both</em> on hover-in and hover-out.</li>
+      <li><code>@keyframes bounce</code> defines only two frames (<code>from</code>/<code>to</code>); the browser interpolates everything between.</li>
+      <li><code>infinite alternate</code> makes the ball loop forever, reversing direction each cycle for a seamless bounce.</li>
+      <li>Both effects animate <code>transform</code>/colors only — cheap, GPU-friendly properties that stay smooth.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Scroll progress bar + modern-CSS themed card</h3>
+  <p>A fixed progress bar driven by <code>animation-timeline: scroll()</code> (guarded by <code>@supports</code>), plus a card themed with variables, fluid <code>clamp()</code> type, <code>calc()</code> padding, nesting, and <code>@layer</code>.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="kw">@layer</span> <span class="kw">base</span>, <span class="kw">theme</span>;  <span class="comment">/* later layers win */</span>
+
+    <span class="kw">@layer</span> <span class="kw">base</span> {
+      <span class="kw">.progress</span> { <span class="kw">position</span>: <span class="kw">fixed</span>; <span class="kw">top</span>: <span class="num">0</span>; <span class="kw">left</span>: <span class="num">0</span>; <span class="kw">right</span>: <span class="num">0</span>;
+        <span class="kw">height</span>: <span class="num">8px</span>; <span class="kw">background</span>: <span class="str">#ea580c</span>; <span class="kw">transform-origin</span>: <span class="kw">left</span>; }
+    }
+
+    <span class="comment">/* Scroll-driven: bar fill = page scroll position (supporting browsers) */</span>
+    <span class="kw">@supports</span> (<span class="kw">animation-timeline</span>: <span class="kw">scroll</span>()) {
+      <span class="kw">.progress</span> { <span class="kw">animation</span>: <span class="kw">grow</span> <span class="kw">linear</span>; <span class="kw">animation-timeline</span>: <span class="kw">scroll</span>(); }
+    }
+    <span class="kw">@keyframes</span> <span class="kw">grow</span> {
+      <span class="kw">from</span> { <span class="kw">transform</span>: <span class="kw">scaleX</span>(<span class="num">0</span>); } <span class="kw">to</span> { <span class="kw">transform</span>: <span class="kw">scaleX</span>(<span class="num">1</span>); }
+    }
+
+    <span class="kw">@layer</span> <span class="kw">theme</span> {
+      <span class="kw">.card</span> {
+        <span class="kw">--bg</span>: <span class="str">#ffedd5</span>; <span class="kw">--ink</span>: <span class="str">#7c2d12</span>;  <span class="comment">/* variables */</span>
+        <span class="kw">background</span>: <span class="kw">var</span>(<span class="kw">--bg</span>); <span class="kw">color</span>: <span class="kw">var</span>(<span class="kw">--ink</span>);
+        <span class="kw">padding</span>: <span class="kw">calc</span>(<span class="num">12px</span> + <span class="num">1vw</span>);              <span class="comment">/* calc */</span>
+        <span class="kw">font-size</span>: <span class="kw">clamp</span>(<span class="num">0.95rem</span>, <span class="num">2.5vw</span>, <span class="num">1.15rem</span>);  <span class="comment">/* clamp */</span>
+        <span class="kw">&amp; h2</span> { <span class="kw">margin-top</span>: <span class="num">0</span>; }                 <span class="comment">/* nesting */</span>
+      }
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"progress"</span><span class="tag">&gt;</span><span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"card"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>Themed card<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p&gt;</span>… long page content to scroll …<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>@layer base, theme</code> declares the order up front; the <code>theme</code> card styles beat <code>base</code> styles regardless of specificity.</li>
+      <li>The <code>.progress</code> bar is <code>position: fixed</code> at the top; <code>animation-timeline: scroll()</code> links its <code>scaleX</code> growth to page scroll.</li>
+      <li><code>@supports</code> means older browsers skip the scroll link and simply show the bar — a graceful fallback.</li>
+      <li>The card packs all five modern features: <code>--bg</code>/<code>--ink</code> variables, <code>calc()</code> padding, <code>clamp()</code> fluid type, a nested <code>&amp; h2</code>, all inside <code>@layer theme</code>.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. For Example 1, hover the button and watch the ball loop. For Example 2, add several paragraphs of text so the page scrolls, then scroll up and down to drive the bar; try changing <code>--bg</code> or the <code>clamp()</code> values to re-theme instantly.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>No JavaScript needed:</strong> Hovers, loaders, bounces, and scroll effects run on pure CSS — less code, fewer bugs.</li>
+    <li><strong>Smooth performance:</strong> <code>transform</code> and <code>opacity</code> animations run on the GPU, staying silky at 60fps.</li>
+    <li><strong>Better feedback &amp; delight:</strong> Transitions confirm interactions; keyframes guide attention; scroll effects make long pages feel alive.</li>
+    <li><strong>One-line theming:</strong> CSS variables let you re-skin an entire site by changing a single value.</li>
+    <li><strong>Truly fluid design:</strong> <code>calc()</code> and <code>clamp()</code> create layouts and type that adapt continuously — often with zero media queries.</li>
+    <li><strong>Maintainable cascade:</strong> Nesting keeps related rules together, and <code>@layer</code> ends specificity wars with explicit priority order.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    CSS motion comes in three flavors: <strong>transitions</strong> for smooth A→B reactions to state changes, <strong><code>@keyframes</code> animations</strong> for self-running multi-step sequences, and <strong>scroll-driven animations</strong> that bind progress to <code>scroll()</code> or <code>view()</code> timelines instead of the clock. Behind them stands modern CSS — <strong>variables</strong> for theming, <strong><code>calc()</code></strong> and <strong><code>clamp()</code></strong> for fluid math, <strong>nesting</strong> for readable structure, and <strong><code>@layer</code></strong> for a sane cascade.
+  </p>
+  <p>
+    In summary: <strong>reach for transitions on interaction, keyframes for loops and sequences, scroll timelines for scroll-linked effects — and build everything on variables, clamp(), and layers.</strong> Used with restraint (and respect for <code>prefers-reduced-motion</code>), these turn static pages into polished experiences. As the saying goes: <em>"Motion with meaning — animate to communicate, not to decorate."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · CSS Transitions, Animations &amp; Modern CSS</footer>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

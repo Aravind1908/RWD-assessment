@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tailwind CSS core utilities — spacing (p-, m-, gap-) and sizing (w-, h-, max-w-) — explained with the default spacing scale and runnable examples.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind, spacing, padding, margin, gap, sizing, width, height, max-w, spacing scale">
+  <title>Tailwind CSS: Spacing &amp; Sizing Utilities (p-, m-, gap-, w-, h-, max-w-)</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: Spacing &amp; Sizing Utilities</h1>
+    <p>The core utilities that shape every layout — padding (<code>p-</code>), margin (<code>m-</code>), <code>gap-</code>, width/height (<code>w-</code>, <code>h-</code>) and <code>max-w-</code> — with the full default spacing scale explained.</p>
+    <span class="badge">CSS Framework · Tailwind · Core Utilities</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Of all Tailwind's utility families, <strong>spacing and sizing</strong> are the workhorses — they appear in nearly every single line of a real layout. They decide how far apart things sit (padding, margin, gap) and how big things are (width, height, max-width).
+  </p>
+  <p>
+    The key idea: <strong>you never type pixels</strong>. Every value is a <em>number on a scale</em>, and that number means "how many units of 0.25rem". So <code>p-4</code> is always 4 × 0.25rem = <strong>1rem (16px)</strong> at the default 16px base font. Learn the scale once and every <code>p-…</code>, <code>m-…</code>, <code>gap-…</code>, <code>w-…</code>, <code>h-…</code> becomes instantly readable.
+  </p>
+  <pre><code><span class="comment">&lt;!-- "a button with 8px vertical / 24px horizontal padding" --&gt;</span>
+<span class="comment">&lt;!-- hand-written CSS:  padding: 8px 24px;</span>
+<span class="comment">// Tailwind: --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"py-2 px-6"</span><span class="tag">&gt;</span>Sign up<span class="tag">&lt;/button&gt;</span>
+<span class="comment">// py-2  = 2 × 0.25rem = 0.5rem = 8px  (top+bottom)</span>
+<span class="comment">// px-6  = 6 × 0.25rem = 1.5rem = 24px (left+right)</span></code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The default spacing scale</h3>
+  <p>One unit = <code>0.25rem</code> (4px at the default base). The most common steps you'll actually use:</p>
+  <table>
+    <tr><th>Suffix</th><th>rem</th><th>px (at 16px base)</th><th>Typical use</th></tr>
+    <tr><td><code>0</code></td><td>0</td><td>0px</td><td>no space</td></tr>
+    <tr><td><code>px</code></td><td>—</td><td>1px</td><td>hairline gaps (<code>p-px</code>)</td></tr>
+    <tr><td><code>0.5</code></td><td>0.125rem</td><td>2px</td><td>tiniest nudges</td></tr>
+    <tr><td><code>1</code></td><td>0.25rem</td><td>4px</td><td>tight icon/text gaps</td></tr>
+    <tr><td><code>1.5</code></td><td>0.375rem</td><td>6px</td><td>—</td></tr>
+    <tr><td><code>2</code></td><td>0.5rem</td><td>8px</td><td>small padding, pill gaps</td></tr>
+    <tr><td><code>3</code></td><td>0.75rem</td><td>12px</td><td>small margins</td></tr>
+    <tr><td><code>4</code></td><td>1rem</td><td>16px</td><td>default rhythm — cards, gaps</td></tr>
+    <tr><td><code>5</code></td><td>1.25rem</td><td>20px</td><td>—</td></tr>
+    <tr><td><code>6</code></td><td>1.5rem</td><td>24px</td><td>card padding, section gaps</td></tr>
+    <tr><td><code>8</code></td><td>2rem</td><td>32px</td><td>larger padding, block gaps</td></tr>
+    <tr><td><code>10</code> / <code>12</code></td><td>2.5rem / 3rem</td><td>40 / 48px</td><td>section spacing</td></tr>
+    <tr><td><code>16</code> / <code>20</code></td><td>4rem / 5rem</td><td>64 / 80px</td><td>hero padding, big margins</td></tr>
+    <tr><td><code>24</code> / <code>32</code></td><td>6rem / 8rem</td><td>96 / 128px</td><td>large page sections</td></tr>
+    <tr><td><code>40</code> / <code>48</code> / <code>56</code> / <code>64</code></td><td>10–16rem</td><td>160–256px</td><td>huge layouts, offsets</td></tr>
+  </table>
+  <div class="note">
+    <strong>Good to know:</strong> In Tailwind <strong>v4 the spacing scale is dynamic</strong> — <em>any</em> number works, because it's computed as <code>number × 0.25rem</code> (<code>p-13</code> = 3.25rem). The table above is still the vocabulary in 95% of real code.
+  </div>
+
+  <h3>Padding — <code>p-</code></h3>
+  <pre><code><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"p-4"</span><span class="tag">&gt;</span>        <span class="comment">/* all four sides: 1rem */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"pt-2 pr-4 pb-2 pl-6"</span><span class="tag">&gt;</span>  <span class="comment">/* top, right, bottom, left — individually */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"px-6"</span><span class="tag">&gt;</span>        <span class="comment">/* x-axis: left AND right = 1.5rem */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"py-3"</span><span class="tag">&gt;</span>        <span class="comment">/* y-axis: top AND bottom = 0.75rem */</span><span class="tag">&lt;/div&gt;</span></code></pre>
+  <p>Pattern: <code>p</code> = all sides, <code>pt/pr/pb/pl</code> = one side, <code>px</code> = both horizontal, <code>py</code> = both vertical. Buttons almost always use <code>py-* px-*</code>.</p>
+
+  <h3>Margin — <code>m-</code></h3>
+  <p>Identical letter pattern: <code>m-4</code> (all sides), <code>mt-2</code>, <code>mb-6</code>, <code>mx-auto</code> (horizontal centering — the classic one), <code>my-8</code>. A minus prefix makes it <strong>negative</strong>: <code>-mt-4</code> pulls an element up (overlapping avatars, badges).</p>
+  <pre><code><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-3xl mx-auto"</span><span class="tag">&gt;</span>  <span class="comment">/* mx-auto = auto left+right margins → centered column */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"-mt-4"</span><span class="tag">&gt;</span>          <span class="comment">/* pull up over the previous element */</span><span class="tag">&lt;/div&gt;</span></code></pre>
+
+  <h3>Gap — <code>gap-</code> (flex &amp; grid only)</h3>
+  <p><code>gap</code> spaces <strong>the items inside</strong> a flex/grid container — and unlike margins, it never adds space before the first or after the last item:</p>
+  <pre><code><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex gap-4"</span><span class="tag">&gt;</span>   <span class="comment">/* 1rem between every pair of children */</span>
+  <span class="tag">&lt;div&gt;</span>1<span class="tag">&lt;/div&gt;&lt;div&gt;</span>2<span class="tag">&lt;/div&gt;&lt;div&gt;</span>3<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"grid gap-x-8 gap-y-2"</span><span class="tag">&gt;</span> <span class="comment">/* horizontal vs vertical gaps, separately */</span><span class="tag">&lt;/div&gt;</span></code></pre>
+
+  <h3>Sizing — <code>w-</code>, <code>h-</code></h3>
+  <p>Width and height <strong>share the same spacing scale</strong>: <code>w-4</code> = 1rem, <code>h-16</code> = 4rem. On top of the scale you get fractions and keywords:</p>
+  <table>
+    <tr><th>Utility</th><th>Means</th><th>Example</th></tr>
+    <tr><td><code>w-4</code> … <code>w-96</code></td><td>scale value (× 0.25rem)</td><td><code>w-16</code> = 4rem (64px avatar)</td></tr>
+    <tr><td><code>w-1/2</code> <code>w-1/3</code> <code>w-2/3</code> <code>w-1/4</code> …</td><td>fractions of the parent</td><td><code>w-1/2</code> = 50%</td></tr>
+    <tr><td><code>w-full</code> <code>h-full</code></td><td>100%</td><td><code>w-full</code> = 100% width</td></tr>
+    <tr><td><code>w-screen</code> <code>h-screen</code></td><td>100vw / 100vh</td><td>full-viewport hero</td></tr>
+    <tr><td><code>w-auto</code> / <code>w-min</code> / <code>w-max</code> / <code>w-fit</code></td><td>auto / min-content / max-content / fit-content</td><td>shrink-to-fit chips</td></tr>
+  </table>
+
+  <h3>Max width — <code>max-w-</code> (and friends)</h3>
+  <p><code>max-w-*</code> has its <em>own</em> scale — a handful of standard "content column" widths:</p>
+  <table>
+    <tr><th>Utility</th><th>Width</th><th>Utility</th><th>Width</th></tr>
+    <tr><td><code>max-w-xs</code></td><td>20rem</td><td><code>max-w-2xl</code></td><td>42rem</td></tr>
+    <tr><td><code>max-w-sm</code></td><td>24rem</td><td><code>max-w-3xl</code></td><td>48rem</td></tr>
+    <tr><td><code>max-w-md</code></td><td>28rem</td><td><code>max-w-4xl</code></td><td>56rem</td></tr>
+    <tr><td><code>max-w-lg</code></td><td>32rem</td><td><code>max-w-5xl</code></td><td>64rem</td></tr>
+    <tr><td><code>max-w-xl</code></td><td>36rem</td><td><code>max-w-6xl</code> / <code>7xl</code></td><td>72rem / 80rem</td></tr>
+    <tr><td colspan="4"><code>max-w-full</code> (100%) · <code>max-w-min</code> · <code>max-w-max</code> · <code>max-w-fit</code> · <code>max-w-prose</code> (65ch — ideal text measure)</td></tr>
+  </table>
+  <p><code>min-w-*</code>, <code>min-h-*</code>, <code>max-h-*</code> use the same scale. The most common pairing on the planet: <code>max-w-5xl mx-auto</code> — "cap the width, then center it".</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> <strong>gap</strong> spaces things <em>apart inside</em> a container; <strong>margin</strong> pushes <em>one element</em> away from its neighbors; <strong>padding</strong> is the space <em>inside</em> an element. And everything lives on the same 0.25rem scale — so a <code>gap-4</code> matches a <code>px-4</code> perfectly.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Typical jobs for each family</h3>
+    <table>
+      <tr><th>Family</th><th>Job</th><th>Typical values</th></tr>
+      <tr><td><code>p-</code>/<code>px-</code>/<code>py-</code></td><td>space inside cards, buttons, navs</td><td><code>px-6 py-2</code> (button), <code>p-6</code> (card), <code>px-6</code> (page gutters)</td></tr>
+      <tr><td><code>m-</code>/<code>mt-</code>/<code>mb-</code></td><td>space between blocks</td><td><code>mt-4</code>, <code>mb-8</code>, <code>mx-auto</code> (centering)</td></tr>
+      <tr><td><code>gap-</code></td><td>space between flex/grid children</td><td><code>gap-2</code> (pills), <code>gap-4</code> (cards), <code>gap-8</code> (features)</td></tr>
+      <tr><td><code>w-</code>/<code>h-</code></td><td>fixed-size boxes: avatars, icons, media</td><td><code>w-16 h-16</code> (avatar), <code>w-full h-40</code> (media placeholder)</td></tr>
+      <tr><td><code>max-w-*</code></td><td>cap content width, readable measure</td><td><code>max-w-3xl mx-auto</code> (article), <code>max-w-5xl mx-auto</code> (page)</td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 1 — the spacing scale, made visible (needs internet)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">Each white cell has padding from <code>p-0</code> to <code>p-6</code>; the blue box shows exactly how much space that is.</p>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">
+      <div class="bg-white border border-gray-200 rounded-lg p-0"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-0</div></div>
+      <div class="bg-white border border-gray-200 rounded-lg p-1"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-1</div></div>
+      <div class="bg-white border border-gray-200 rounded-lg p-2"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-2</div></div>
+      <div class="bg-white border border-gray-200 rounded-lg p-3"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-3</div></div>
+      <div class="bg-white border border-gray-200 rounded-lg p-4"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-4</div></div>
+      <div class="bg-white border border-gray-200 rounded-lg p-6"><div class="bg-blue-500 h-20 w-full flex items-center justify-center text-white text-xs font-mono">p-6</div></div>
+    </div>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo 2 — gap and w- on the same scale (needs internet)</h3>
+    <div class="mt-4 space-y-3">
+      <div class="flex items-center gap-2"><span class="text-xs font-mono text-gray-500 w-20 shrink-0">gap-2</span><div class="w-10 h-10 bg-blue-600 rounded-md"></div><div class="w-10 h-10 bg-blue-500 rounded-md"></div><div class="w-10 h-10 bg-blue-400 rounded-md"></div></div>
+      <div class="flex items-center gap-4"><span class="text-xs font-mono text-gray-500 w-20 shrink-0">gap-4</span><div class="w-10 h-10 bg-blue-600 rounded-md"></div><div class="w-10 h-10 bg-blue-500 rounded-md"></div><div class="w-10 h-10 bg-blue-400 rounded-md"></div></div>
+      <div class="flex items-center gap-8"><span class="text-xs font-mono text-gray-500 w-20 shrink-0">gap-8</span><div class="w-10 h-10 bg-blue-600 rounded-md"></div><div class="w-10 h-10 bg-blue-500 rounded-md"></div><div class="w-10 h-10 bg-blue-400 rounded-md"></div></div>
+      <div class="flex items-center gap-3"><span class="text-xs font-mono text-gray-500 w-20 shrink-0">w-4…w-32</span><div class="w-4 h-8 bg-blue-300 rounded-sm"></div><div class="w-8 h-8 bg-blue-400 rounded-sm"></div><div class="w-16 h-8 bg-blue-500 rounded-sm"></div><div class="w-32 h-8 bg-blue-600 rounded-sm"></div></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Rule of thumb:</strong> use <code>gap</code> for space <em>between siblings</em> (no first/last-item edge cases), <code>mt-</code>/<code>mb-</code> for space <em>around a single element</em>, and <code>px-</code>/<code>py-</code> for <em>inside</em> an element. If two adjacent numbers don't match (a <code>gap-3</code> next to a <code>px-5</code>), the layout will feel "off" — matching scale values is what makes pages look aligned.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Spacing scale playground</h3>
+  <p>A live page where every box's padding or gap comes from the scale, so you can see 0.25rem units with your eyes. Save as <code>index.html</code> (needs internet for the CDN).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Spacing Scale Playground<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-8 text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>Spacing scale playground<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>1 unit = 0.25rem (4px) — watch the blue inset grow<span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- padding ladder: p-0 → p-8 --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-lg p-0"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-500 h-24 w-full flex items-center justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>p-0<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-lg p-2"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-500 h-24 w-full flex items-center justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>p-2 = 8px<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-lg p-4"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-500 h-24 w-full flex items-center justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>p-4 = 16px<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white border border-gray-200 rounded-lg p-8"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-500 h-24 w-full flex items-center justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>p-8 = 32px<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- gap ladder: same squares, bigger gap --&gt;</span>
+  <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"mt-12 text-lg font-semibold"</span><span class="tag">&gt;</span>gap- between siblings — no margins<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-4 flex items-center gap-4"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-gray-500 w-16 shrink-0"</span><span class="tag">&gt;</span>gap-4<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-600 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-500 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-400 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-4 flex items-center gap-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-gray-500 w-16 shrink-0"</span><span class="tag">&gt;</span>gap-8<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-600 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-500 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-12 h-12 bg-blue-400 rounded-lg"</span><span class="tag">&gt;&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The grid uses <code>gap-4</code>, and each cell a different <code>p-0 → p-8</code> — so you <em>see</em> the scale: each step is exactly 4px (0.25rem) more inset than the previous one.</li>
+      <li>The gap rows hold identical <code>w-12 h-12</code> squares; only <code>gap-4 → gap-8</code> changes, doubling the space between them.</li>
+      <li>Notice there's no <code>mt-</code>/<code>mb-</code> between the squares — <code>gap</code> handles all inter-item spacing cleanly.</li>
+      <li>The outer page uses <code>p-8</code> (32px gutters), <code>mt-8</code> and <code>mt-12</code> for section spacing — the same vocabulary, applied at a larger scale.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Try editing <code>gap-4</code> to <code>gap-16</code>, or a cell's <code>p-4</code> to <code>p-13</code> (v4's dynamic scale accepts any number).
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A layout built only from sizing utilities</h3>
+  <p>A profile-style card where every dimension — avatar, media placeholder, fraction bars, max-width bars — is a <code>w-</code>/<code>h-</code>/<code>max-w-</code> utility. No single pixel is typed.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Sizing Utilities Layout<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-100 p-8 text-gray-900"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- page column: cap at 48rem, center --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-3xl mx-auto"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-white rounded-2xl shadow p-8"</span><span class="tag">&gt;</span>
+
+      <span class="comment">&lt;!-- avatar: 4rem × 4rem circle --&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"flex items-center gap-4"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-16 h-16 rounded-full bg-blue-600 text-white font-bold text-xl
+                    flex items-center justify-center"</span><span class="tag">&gt;</span>A<span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div&gt;</span>
+          <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-xl font-bold"</span><span class="tag">&gt;</span>Profile layout<span class="tag">&lt;/h1&gt;</span>
+          <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>Only w-, h- and max-w- utilities<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+
+      <span class="comment">&lt;!-- media: full width, fixed 10rem height --&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 h-40 w-full bg-blue-100 rounded-xl flex items-center
+              justify-center text-blue-500 text-sm font-mono"</span><span class="tag">&gt;</span>w-full h-40<span class="tag">&lt;/div&gt;</span>
+
+      <span class="comment">&lt;!-- fractions of the parent width --&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-6 flex gap-4"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-1/4 h-16 bg-blue-600 rounded-lg flex items-center
+                    justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>w-1/4<span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"w-1/2 h-16 bg-blue-500 rounded-lg flex items-center
+                    justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>w-1/2<span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+
+      <span class="comment">&lt;!-- max-width scale, centered --&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-8 space-y-3"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-10 max-w-md mx-auto bg-blue-300 rounded flex items-center
+                    justify-center text-blue-800 text-xs font-mono"</span><span class="tag">&gt;</span>max-w-md = 28rem<span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-10 max-w-xl mx-auto bg-blue-500 rounded flex items-center
+                    justify-center text-white text-xs font-mono"</span><span class="tag">&gt;</span>max-w-xl = 36rem<span class="tag">&lt;/div&gt;</span>
+      <span class="tag">&lt;/div&gt;</span>
+
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li><code>max-w-3xl mx-auto</code> caps the whole page at 48rem and centers it — the standard "readable content column" pattern.</li>
+      <li>The avatar is <code>w-16 h-16</code> (4rem × 4rem) — sizing off the <em>same</em> scale as spacing, so it harmonizes with the surrounding <code>gap-4</code>.</li>
+      <li><code>w-full h-40</code> = "fill the width, 160px tall" — the usual way to reserve space for an image or hero media without knowing its width.</li>
+      <li>Fraction utilities (<code>w-1/4</code>, <code>w-1/2</code>) size against the <em>parent</em>, so they're responsive for free.</li>
+      <li>The bottom bars show the <code>max-w-</code> scale: each bar takes the full width <em>up to</em> its cap, and <code>mx-auto</code> centers the leftover space.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Resize the window: the fractions and <code>w-full</code> adapt automatically, and the <code>max-w-3xl</code> column stops growing at 768px. Swap <code>max-w-3xl</code> for <code>max-w-xl</code> and watch the page column narrow.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Instantly readable values:</strong> <code>px-6 py-2</code> tells you 24px/8px at a glance — a consistent, memorable vocabulary instead of ad-hoc numbers.</li>
+    <li><strong>Alignment by construction:</strong> because everything shares the 0.25rem scale, padding, margins, gaps, and small widths all snap to the same rhythm — pages look aligned without effort.</li>
+    <li><strong>No pixel hunting:</strong> you never ask "was that 15px or 17px?" — you pick the nearest scale step, and it's guaranteed to match the rest of the design.</li>
+    <li><strong>Fewer utilities to learn:</strong> one scale powers <code>p-</code>, <code>m-</code>, <code>gap-</code>, <code>w-</code>, <code>h-</code>, and more — learn it once, use it everywhere.</li>
+    <li><strong>Responsive sizing for free:</strong> fractions (<code>w-1/2</code>) and <code>w-full</code> adapt to any parent; <code>max-w-*</code> + <code>mx-auto</code> gives you fluid, centered columns with two classes.</li>
+    <li><strong>Easy overrides:</strong> responsive prefixes make per-breakpoint spacing trivial: <code>p-4 md:p-8</code>, <code>gap-4 lg:gap-8</code> — tighter on phones, roomier on desktops.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Spacing and sizing are the skeleton of every Tailwind layout, and both run on one idea: <strong>numbers on a 0.25rem scale</strong>. <code>p-</code>/<code>px-</code>/<code>py-</code> put space inside an element, <code>m-</code> pushes elements apart (with <code>mx-auto</code> as the centering classic), and <code>gap-</code> spaces flex/grid children without edge cases. Sizing reuses the same scale for <code>w-</code>/<code>h-</code>, adds fractions and keywords, and <code>max-w-</code> adds a small set of standard content-column widths.
+  </p>
+  <p>
+    The habit to build: <em>think in 4px steps, and keep neighboring values on the same scale step.</em> Do that, and your layouts will feel professionally aligned long before you ever touch a design system. Next up in this series: <strong>css_tailwind_colors_typography.html</strong> — the colors and type scale that give those layouts their face.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: Spacing &amp; Sizing Utilities</footer>
+</div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a39cfe615bac570c',t:'MTc4OTE5NTk5MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

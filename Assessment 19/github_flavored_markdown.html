@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Flavored Markdown — Task Lists, Collapsible Sections &amp; a Professional README</title>
+  <meta name="description" content="What GitHub Flavored Markdown is — task lists, collapsible sections and other extensions — plus the anatomy of a professional README.md: badges, screenshots, installation, contributing, license.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="GFM, GitHub Flavored Markdown, task list, details summary, README, badges, shields.io, contributing, license">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .rendered { background:#fff; border:1px solid var(--border); border-left:4px solid #22c55e; border-radius:10px; padding:14px 18px; margin:10px 0 18px; font-size:0.92rem; }
+    details { background:#f8fafc; border:1px dashed var(--border); border-radius:8px; padding:8px 14px; margin:8px 0; }
+    summary { cursor:pointer; font-weight:600; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>GitHub Flavored Markdown</h1>
+    <p>Core Markdown plus the extensions GitHub renders everywhere — task lists, collapsible sections, tables, autolinks — and the anatomy of a professional <code>README.md</code>: badges, screenshot, installation, contributing, license. One complete example.</p>
+    <span class="badge">Documentation · GFM · README</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>GitHub Flavored Markdown (GFM)</strong> is the dialect GitHub renders on every repo, issue, pull request and Discussion page. It's plain core Markdown (headings, emphasis, lists, code, links, images) plus a small set of extensions — and it's the de-facto standard you'll actually meet in the wild.
+  </p>
+  <table>
+    <tr><th>GFM extension</th><th>Source</th></tr>
+    <tr><td>Tables</td><td><code>| a | b |</code> + a dashes row</td></tr>
+    <tr><td>Strikethrough</td><td><code>~~old~~</code></td></tr>
+    <tr><td>Task lists</td><td><code>- [ ]</code> / <code>- [x]</code></td></tr>
+    <tr><td>Autolinks</td><td>bare <code>https://…</code> becomes a link</td></tr>
+    <tr><td>Collapsible sections</td><td><code>&lt;details&gt;…&lt;summary&gt;…&lt;/details&gt;</code></td></tr>
+    <tr><td>Emoji &amp; mentions</td><td><code>:rocket:</code>, <code>@octocat</code>, <code>#123</code> (issue refs auto-link)</td></tr>
+  </table>
+  <p>Everything below uses GFM; anything you write here renders identically on GitHub.</p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Task lists</h3>
+  <p>A list item that starts with <code>[ ]</code> (open) or <code>[x]</code> (done) becomes a checkbox. In <strong>issues and PRs</strong> the boxes are clickable — turning an issue body into a checklist that anyone on the team can tick off.</p>
+  <pre><code>- [x] Parse the config file
+- [x] Add JSON storage
+- [ ] Windows path support
+- [ ] Write the docs</code></pre>
+  <div class="rendered">
+    <ul style="list-style:none">
+      <li><input type="checkbox" checked disabled> Parse the config file</li>
+      <li><input type="checkbox" checked disabled> Add JSON storage</li>
+      <li><input type="checkbox" disabled> Windows path support</li>
+      <li><input type="checkbox" disabled> Write the docs</li>
+    </ul>
+  </div>
+
+  <h3>Collapsible sections</h3>
+  <p>GFM accepts raw HTML, and GitHub's signature use of it is the <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> pair: content that's hidden until clicked. Full Markdown works inside. Perfect for "Advanced configuration" in a README — visible to those who need it, invisible to everyone else.</p>
+  <pre><code>&lt;details&gt;
+&lt;summary&gt;Advanced configuration (click to expand)&lt;/summary&gt;
+
+tasklight reads `~/.config/tasklight/config.json`:
+
+```json
+{ "theme": "dark", "sort": "created" }
+```
+
+&lt;/details&gt;</code></pre>
+  <div class="rendered">
+    <details>
+      <summary>Advanced configuration (click to expand)</summary>
+      <p>tasklight reads <code>~/.config/tasklight/config.json</code>:</p>
+      <pre style="margin:8px 0">{ "theme": "dark", "sort": "created" }</pre>
+      <p>Sections nest too — put a <code>&lt;details&gt;</code> inside another.</p>
+    </details>
+  </div>
+
+  <h3>The anatomy of a professional README.md</h3>
+  <p>Every well-regarded open-source README is the same nine parts, in the same order — a landing page for the code:</p>
+  <ol>
+    <li><strong>Title + one-line pitch</strong> — what it is, in a sentence</li>
+    <li><strong>Badges</strong> — CI status, version, license (small trust signals, generated by shields.io)</li>
+    <li><strong>Screenshot / demo</strong> — a picture or GIF beats a paragraph</li>
+    <li><strong>Features</strong> — three to five bullets, the reasons to care</li>
+    <li><strong>Installation</strong> — one fenced code block, copy-paste runnable</li>
+    <li><strong>Quick start / usage</strong> — the minimal commands to get value</li>
+    <li><strong>Advanced</strong> — details go in a collapsible section</li>
+    <li><strong>Contributing</strong> — how to help, plus a task list of good first issues</li>
+    <li><strong>License</strong> — the legal line</li>
+  </ol>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+  <div class="card">
+    <h3>Badges — the trust signals</h3>
+    <pre style="margin-top:0">![Build](https://img.shields.io/github/actions/workflow/status/OWNER/REPO/ci.yml)
+![Version](https://img.shields.io/github/v/tag/OWNER/REPO)
+![License](https://img.shields.io/github/license/OWNER/REPO)</pre>
+    <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0">
+      A badge is just a Markdown <em>image</em> whose URL is generated by <a href="https://shields.io" style="color:var(--accent-dark)">shields.io</a> — it queries your repo (CI runs, latest tag, license file) and returns a live status pill. Three badges max; they answer "is this maintained? which version? can I use it?" before anyone reads a word.
+    </p>
+  </div>
+  <div class="tip">
+    <strong>Write the README for the stranger who lands at 1 a.m.</strong> If they can install and run the tool in under five minutes from the README alone — and if the first screen answers "what is this, does it work, is it safe?" — the file has done its job.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Program</h2>
+  <p>One complete, professional <code>README.md</code> using every element from this guide — all nine parts, with a live badge, a collapsible section and a task list. Saved as a standalone <code>.md</code> file in this workspace.</p>
+
+  <pre><code><span class="comment"># tasklight</span>
+
+A *small* task tracker that lives in **one file**. No server,
+no database — your tasks are a JSON file you own.
+
+<span class="comment">[badges] [screenshot] [features] [install] [usage] [advanced→details]</span>
+<span class="comment">[contributing→task list] [license]   ← the full file, part by part:</span>
+
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+## Screenshot
+![Tasklight in the terminal](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)
+
+## Features
+- Plain JSON storage — no database, trivial to back up
+- Terminal themes
+- Runs anywhere Node runs
+
+## Install
+```bash
+npm install -g tasklight
+```
+
+## Quick start
+```bash
+tasklight add "write the docs"
+tasklight list
+tasklight done 1
+```
+
+## Advanced
+&lt;details&gt;
+&lt;summary&gt;Configuration file (click to expand)&lt;/summary&gt;
+
+```json
+{ "theme": "dark", "sort": "created" }
+```
+
+&lt;/details&gt;
+
+## Contributing
+Good first issues:
+- [ ] Add a `tasklight edit &lt;id&gt;` command
+- [ ] Windows path support
+- [x] JSON file storage
+
+## License
+MIT — see [LICENSE](LICENSE.md).</code></pre>
+
+  <div class="card">
+    <strong>Explanation:</strong>
+    <ul>
+      <li>Every part of the nine-part anatomy appears exactly once, in order — badges answer the three trust questions, the screenshot gives the "oh, I get it" moment, and Install/Quick start are copy-paste runnable.</li>
+      <li>The two shields.io images are <em>live badges</em> (static variants here; on a real repo they reflect actual CI runs and tags).</li>
+      <li>The config file sits in a <code>&lt;details&gt;</code> block — the README stays scannable while the power content stays reachable.</li>
+      <li>The Contributing section's task list doubles as a "good first issues" board: prospective contributors see exactly what's open.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Open <code>example1_pro_readme.md</code> (this workspace) in VS Code (<code>Ctrl+Shift+V</code>), or save it as <code>README.md</code> in any GitHub repo — the rendered page is the result. Badges and the image need internet.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>One file does the landing page's job</strong> — no website build step: the README <em>is</em> the project's front page, rendered for free on GitHub.</li>
+    <li><strong>Interactive, yet plain text</strong> — task lists tick themselves off in issues, <code>&lt;details&gt;</code> hides depth on demand, and the source still diffs cleanly in Git.</li>
+    <li><strong>Badges make trust automatic</strong> — CI status and version update themselves; a passing green badge is worth a paragraph of "it's maintained!"</li>
+    <li><strong>A standard structure builds credibility</strong> — when every section is where readers expect it, the project reads as professional before a line of code is examined.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    GFM is core Markdown plus the extensions GitHub actually uses: <strong>task lists</strong> (<code>- [ ]</code>) that turn issues into checklists, <strong>collapsible sections</strong> (<code>&lt;details&gt;/&lt;summary&gt;</code>) that keep depth optional, and the everyday extras — tables, strikethrough, autolinks, emoji, issue references.
+  </p>
+  <p>
+    A professional <code>README.md</code> is the same nine parts every time: <em>title → badges → screenshot → features → install → quick start → advanced (collapsed) → contributing (with a task list) → license.</em> Nailed in that order, it converts a stranger into a user in five minutes.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · GitHub Flavored Markdown</footer>
+</div>
+</body>
+</html>

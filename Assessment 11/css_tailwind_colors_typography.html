@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS: Color &amp; Typography Utilities</title>
+  <meta name="description" content="Tailwind CSS color utilities (text-, bg-, border-) and typography utilities (text-lg, font-bold, leading-, tracking-) explained with the color scale, type scale, and runnable examples.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="tailwind, color utilities, text-, bg-, border-, typography, font-weight, line-height, letter-spacing">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Tailwind CSS: Color &amp; Typography Utilities</h1>
+    <p>How <code>text-</code>/<code>bg-</code>/<code>border-</code> colors work on the 50→950 scale, and how the type utilities — <code>text-lg</code>, <code>font-bold</code>, <code>leading-</code>, <code>tracking-</code> — build a full typographic hierarchy.</p>
+    <span class="badge">CSS Framework · Tailwind · Core Utilities</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Spacing and sizing decide where things sit; <strong>color and typography decide how they read</strong>. These two utility families give every Tailwind page its face — and both work the same way: <em>pick from a fixed scale</em> instead of inventing values.
+  </p>
+  <ul>
+    <li><strong>Colors</strong> come in palettes of <strong>11 steps</strong> (50 → 950). You never type a hex code in markup — you choose a <em>step</em>: <code>text-blue-600</code>, <code>bg-gray-100</code>, <code>border-blue-300</code>.</li>
+    <li><strong>Type</strong> comes in fixed scales for <strong>size</strong> (<code>text-xs</code> … <code>text-9xl</code>), <strong>weight</strong> (<code>font-normal</code> … <code>font-black</code>), <strong>line-height</strong> (<code>leading-none</code> … <code>leading-loose</code>) and <strong>letter-spacing</strong> (<code>tracking-tighter</code> … <code>tracking-widest</code>).</li>
+  </ul>
+  <p>
+    The payoff is consistency: two people styling the same card pick <code>text-gray-900</code> for the heading and <code>text-gray-600</code> for the body — the same choices everyone else makes — so projects look coherent without a style guide.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The color scale: 50 → 950</h3>
+  <p>Every named color (blue, red, emerald, amber, …) has 11 steps — 50 is the lightest tint, 500 the "base" brand color, 950 nearly black:</p>
+  <table>
+    <tr><th>Step</th><th>Typical job</th></tr>
+    <tr><td><code>50</code></td><td>lightest tint — section/page backgrounds</td></tr>
+    <tr><td><code>100</code></td><td>tinted badges, pill backgrounds</td></tr>
+    <tr><td><code>200</code></td><td>soft accents, dividers on tinted surfaces</td></tr>
+    <tr><td><code>300</code></td><td>borders on light/tinted surfaces</td></tr>
+    <tr><td><code>400</code></td><td>placeholder text, disabled states</td></tr>
+    <tr><td><code>500</code></td><td>the brand base color</td></tr>
+    <tr><td><code>600</code></td><td>primary buttons, links, accent text</td></tr>
+    <tr><td><code>700</code></td><td>hover/pressed states, strong accent text on tints</td></tr>
+    <tr><td><code>800</code></td><td>headings on tinted/dark surfaces</td></tr>
+    <tr><td><code>900</code></td><td>main headings, dark text</td></tr>
+    <tr><td><code>950</code></td><td>near-black text, dark headers &amp; footers</td></tr>
+  </table>
+
+  <h3>Color utility syntax — property + color + step</h3>
+  <pre><code><span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-blue-600"</span><span class="tag">&gt;</span>   <span class="comment">/* text COLOR blue-600 */</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-gray-100"</span><span class="tag">&gt;</span>   <span class="comment">/* background COLOR gray-100 */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"border border-blue-300"</span><span class="tag">&gt;</span> <span class="comment">/* border WIDTH + border COLOR */</span><span class="tag">&lt;/div&gt;</span>
+
+<span class="comment">&lt;!-- transparency: slash + percentage --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"bg-blue-500/50"</span><span class="tag">&gt;</span>   <span class="comment">/* blue-500 at 50% opacity */</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-white/70"</span><span class="tag">&gt;</span>    <span class="comment">/* white at 70% — soft text on photos */</span><span class="tag">&lt;/p&gt;</span></code></pre>
+  <table>
+    <tr><th>Utility</th><th>Sets</th><th>Example</th></tr>
+    <tr><td><code>text-*</code></td><td>text color</td><td><code>text-gray-600</code> (body), <code>text-blue-600</code> (accent)</td></tr>
+    <tr><td><code>bg-*</code></td><td>background color</td><td><code>bg-gray-50</code> (page), <code>bg-blue-600</code> (button)</td></tr>
+    <tr><td><code>border-*</code></td><td>border color</td><td><code>border-gray-200</code> (card edge)</td></tr>
+    <tr><td><code>ring-*</code></td><td>focus ring color (not a border)</td><td><code>ring-2 ring-blue-500</code></td></tr>
+    <tr><td><code>fill-*</code> / <code>stroke-*</code></td><td>SVG fill / stroke</td><td><code>fill-blue-500</code></td></tr>
+    <tr><td><code>divide-*</code></td><td>color of borders between list children</td><td><code>divide-y divide-gray-200</code></td></tr>
+  </table>
+  <p>
+    <strong>Border utilities</strong> have three axes: <em>width</em> (<code>border</code> = 1px, <code>border-2</code>, <code>border-4</code>, <code>border-0</code>), <em>side</em> (<code>border-t</code>, <code>border-b</code>, <code>border-l</code>, <code>border-r</code>), and <em>color</em> (<code>border-blue-300</code>). Combine freely: <code>border-2 border-b-0 border-gray-300</code>.
+  </p>
+  <p>
+    <strong>Grays come in five flavors</strong> — <code>gray</code>, <code>slate</code> (cool), <code>zinc</code>, <code>neutral</code>, <code>stone</code> (warm) — all with the same 50→950 steps. Pick one for a project and stick to it; mixing <code>slate</code> and <code>stone</code> on one page is a classic consistency slip.
+  </p>
+
+  <h3>Typography — the four type scales</h3>
+  <table>
+    <tr><th>Size</th><th>rem</th><th>Size</th><th>rem</th></tr>
+    <tr><td><code>text-xs</code></td><td>0.75rem</td><td><code>text-3xl</code></td><td>1.875rem</td></tr>
+    <tr><td><code>text-sm</code></td><td>0.875rem</td><td><code>text-4xl</code></td><td>2.25rem</td></tr>
+    <tr><td><code>text-base</code></td><td>1rem (default)</td><td><code>text-5xl</code></td><td>3rem</td></tr>
+    <tr><td><code>text-lg</code></td><td>1.125rem</td><td><code>text-6xl</code></td><td>3.75rem</td></tr>
+    <tr><td><code>text-xl</code></td><td>1.25rem</td><td><code>text-7xl</code></td><td>4.5rem</td></tr>
+    <tr><td><code>text-2xl</code></td><td>1.5rem</td><td><code>text-8xl</code> / <code>text-9xl</code></td><td>6rem / 8rem</td></tr>
+  </table>
+  <table>
+    <tr><th>Weight</th><th>Value</th><th>Weight</th><th>Value</th></tr>
+    <tr><td><code>font-thin</code></td><td>100</td><td><code>font-medium</code></td><td>500</td></tr>
+    <tr><td><code>font-extralight</code></td><td>200</td><td><code>font-semibold</code></td><td>600</td></tr>
+    <tr><td><code>font-light</code></td><td>300</td><td><code>font-bold</code></td><td>700</td></tr>
+    <tr><td><code>font-normal</code></td><td>400 (default)</td><td><code>font-extrabold</code> / <code>font-black</code></td><td>800 / 900</td></tr>
+  </table>
+  <table>
+    <tr><th>Line-height (<code>leading-</code>)</th><th>Value</th><th>Letter-spacing (<code>tracking-</code>)</th><th>Value</th></tr>
+    <tr><td><code>leading-none</code></td><td>1</td><td><code>tracking-tighter</code></td><td>−0.05em</td></tr>
+    <tr><td><code>leading-tight</code></td><td>1.25</td><td><code>tracking-tight</code></td><td>−0.025em</td></tr>
+    <tr><td><code>leading-snug</code></td><td>1.375</td><td><code>tracking-normal</code></td><td>0</td></tr>
+    <tr><td><code>leading-normal</code></td><td>1.5 (comfortable default)</td><td><code>tracking-wide</code> / <code>tracking-wider</code></td><td>0.025em / 0.05em</td></tr>
+    <tr><td><code>leading-relaxed</code> / <code>leading-loose</code></td><td>1.625 / 2</td><td><code>tracking-widest</code></td><td>0.1em</td></tr>
+  </table>
+  <p>Numeric forms exist too (<code>leading-6</code> = 1.5rem, <code>tracking-[0.2em]</code> arbitrary value). Two more helpers: <code>font-sans</code>/<code>font-serif</code>/<code>font-mono</code> switch families, and <code>text-left</code>/<code>text-center</code>/<code>text-right</code> set alignment.</p>
+
+  <div class="note">
+    <strong>Key rule:</strong> use <em>steps, not hex codes</em> — and pair steps by contrast: light background steps (50–100) with dark text steps (700–900) of the <em>same</em> hue (<code>bg-blue-100</code> + <code>text-blue-700</code>). That pairing is readable, accessible, and instantly "on-brand".
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>The standard "UI vocabulary" — what to use where</h3>
+    <table>
+      <tr><th>Element</th><th>Typical utilities</th></tr>
+      <tr><td>Page background</td><td><code>bg-gray-50</code> or <code>bg-white</code></td></tr>
+      <tr><td>Main heading</td><td><code>text-gray-900 font-bold</code> (or <code>font-extrabold tracking-tight</code>)</td></tr>
+      <tr><td>Body text</td><td><code>text-gray-600</code> (+ <code>leading-relaxed</code> for long copy)</td></tr>
+      <tr><td>Muted text / metadata</td><td><code>text-gray-500</code> or <code>text-gray-400</code>, often <code>text-sm</code></td></tr>
+      <tr><td>Accent / links</td><td><code>text-blue-600 hover:text-blue-700</code></td></tr>
+      <tr><td>Card</td><td><code>bg-white border border-gray-200 rounded-xl shadow-sm</code></td></tr>
+      <tr><td>Primary button</td><td><code>bg-blue-600 hover:bg-blue-700 text-white font-semibold</code></td></tr>
+      <tr><td>Badge / pill</td><td><code>bg-blue-100 text-blue-700 text-xs font-semibold</code></td></tr>
+      <tr><td>Overline / eyebrow</td><td><code>text-xs font-semibold tracking-widest uppercase text-blue-600</code></td></tr>
+    </table>
+    <p>Memorize this table and you can style <em>anything</em> — it's the pattern behind most real Tailwind UIs.</p>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — one palette, eleven steps (needs internet)</h3>
+    <p style="font-size:0.88rem;color:var(--muted)">All swatches are the <code>blue</code> family; only the step number changes.</p>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <div class="grid grid-cols-4 sm:grid-cols-11 gap-2 mt-4 text-center">
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-50"></div><div class="text-[10px] font-mono py-1 bg-white">50</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-100"></div><div class="text-[10px] font-mono py-1 bg-white">100</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-200"></div><div class="text-[10px] font-mono py-1 bg-white">200</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-300"></div><div class="text-[10px] font-mono py-1 bg-white">300</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-400"></div><div class="text-[10px] font-mono py-1 bg-white">400</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-500"></div><div class="text-[10px] font-mono py-1 bg-white">500</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-600"></div><div class="text-[10px] font-mono py-1 bg-white">600</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-700"></div><div class="text-[10px] font-mono py-1 bg-white">700</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-800"></div><div class="text-[10px] font-mono py-1 bg-white">800</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-900"></div><div class="text-[10px] font-mono py-1 bg-white">900</div></div>
+      <div class="rounded-md overflow-hidden border border-gray-200"><div class="h-12 bg-blue-950"></div><div class="text-[10px] font-mono py-1 bg-white">950</div></div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center gap-4 mt-6">
+      <p class="text-base text-gray-600 m-0">Body: <code>text-gray-600</code> · Accent: <code class="text-blue-600">text-blue-600</code> · Muted: <code class="text-gray-400">text-gray-400</code></p>
+      <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition">bg-blue-600 → hover:700</button>
+    </div>
+  </div>
+
+  <div class="demo">
+    <h3>Live demo — a type hierarchy in six lines (needs internet)</h3>
+    <div class="mt-4 bg-white border border-gray-200 rounded-xl p-6">
+      <p class="text-xs font-semibold tracking-widest uppercase text-blue-600 m-0">text-xs · tracking-widest · uppercase — the eyebrow</p>
+      <h3 class="mt-3 text-4xl font-bold tracking-tight text-gray-900 m-0">
+        text-4xl font-bold tracking-tight
+      </h3>
+      <p class="mt-3 text-base leading-relaxed text-gray-600 m-0">
+        text-base with leading-relaxed — comfortable reading rhythm for body copy,
+        and a two-step gray (900 headings / 600 body) for contrast.
+      </p>
+      <p class="mt-3 text-sm font-mono bg-gray-100 rounded-lg p-3 text-gray-700 m-0">font-mono text-sm — code and numbers</p>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> Every Tailwind color step is defined as an <strong>OKLCH</strong> color in v4 (perceptually uniform — steps look evenly spaced to human eyes, unlike raw HSL). And you can extend the scale with your own brand colors: in v4 that's one line in CSS — <code>@theme { --color-brand: #2563eb; }</code> — after which <code>bg-brand</code>, <code>text-brand</code> etc. just work.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Color palette explorer</h3>
+  <p>A live page that displays steps of the 50→950 scale as swatches and ends with a card styled entirely from the scale. Save as <code>index.html</code> (needs internet for the CDN).</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Tailwind Color Palette Explorer<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-gray-50 p-8 text-gray-900"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"text-2xl font-bold"</span><span class="tag">&gt;</span>The color scale: 50 → 950<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>
+    Every color has the same 11 steps — 50 lightest, 500 base, 950 near black.
+  <span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- six steps of blue as swatches --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-8 grid grid-cols-3 sm:grid-cols-6 gap-2"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-50"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>50<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-100"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>100<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-300"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>300<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-500"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>500<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-700"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>700<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"rounded-lg overflow-hidden border border-gray-200"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"h-14 bg-blue-950"</span><span class="tag">&gt;&lt;/div&gt;</span><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"text-xs font-mono text-center py-1 bg-white"</span><span class="tag">&gt;</span>950<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- a card built from the scale --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"mt-8 max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-6"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"text-lg font-bold text-gray-900"</span><span class="tag">&gt;</span>A card from the scale<span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-2 text-sm text-gray-600"</span><span class="tag">&gt;</span>
+      Heading gray-900 · body gray-600 · accent <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"text-blue-600"</span><span class="tag">&gt;</span>blue-600<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="val">"inline-block mt-3 bg-blue-100 text-blue-700 text-xs
+            font-semibold px-3 py-1 rounded-full"</span><span class="tag">&gt;</span>bg-blue-100 + text-blue-700<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="val">"mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm
+            font-semibold px-5 py-2 rounded-lg transition"</span><span class="tag">&gt;</span>bg-blue-600<span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>The swatch row renders six steps of blue (<code>50, 100, 300, 500, 700, 950</code>). Swap <code>blue</code> for <code>emerald</code>, <code>amber</code>, or <code>rose</code> — every family has the same 11 steps.</li>
+      <li>The card at the bottom is the "standard UI vocabulary" in practice: white card, gray-200 border, gray-900 heading, gray-600 body, blue-100/blue-700 badge, blue-600 button with a 700 hover.</li>
+      <li>Notice the badge pairs a <em>light step</em> background with a <em>dark step</em> text of the same hue — the contrast pairing rule.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Experiment: change the page's <code>bg-gray-50</code> to <code>bg-slate-50</code> (a different gray family), try <code>bg-blue-500/50</code> on the card (transparency), and swap the button for <code>bg-blue-700 hover:bg-blue-800</code> to feel the "one step darker on hover" convention.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Typography specimen</h3>
+  <p>A page that documents its own typography — every line shows the exact classes that produce it: the size hierarchy, weights, line-heights, letter-spacing, and font families.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>Tailwind Typography Specimen<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"https://cdn.tailwindcss.com"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">class</span>=<span class="val">"bg-white p-8 text-gray-900"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"max-w-2xl mx-auto"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- eyebrow + display headline --&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-xs font-semibold tracking-widest uppercase text-blue-600"</span><span class="tag">&gt;</span>
+    text-xs · tracking-widest · uppercase
+  <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="val">"mt-3 text-4xl font-bold tracking-tight text-gray-900"</span><span class="tag">&gt;</span>
+    The quick brown fox jumps over the lazy dog
+  <span class="tag">&lt;/h1&gt;</span>
+
+  <span class="comment">&lt;!-- body copy: the everyday recipe --&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-4 text-base leading-relaxed text-gray-600"</span><span class="tag">&gt;</span>
+    Body text usually sits at <span class="tag">&lt;strong&gt;</span>text-base<span class="tag">&lt;/strong&gt;</span> with
+    <span class="tag">&lt;strong&gt;</span>leading-relaxed<span class="tag">&lt;/strong&gt;</span> in a mid-gray like
+    <span class="tag">&lt;strong&gt;</span>text-gray-600<span class="tag">&lt;/strong&gt;</span>.
+  <span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- size hierarchy --&gt;</span>
+  <span class="tag">&lt;h2</span> <span class="attr">class</span>=<span class="val">"mt-10 text-2xl font-bold"</span><span class="tag">&gt;</span>text-2xl font-bold<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-lg font-medium"</span><span class="tag">&gt;</span>text-lg font-medium<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"text-sm text-gray-500"</span><span class="tag">&gt;</span>text-sm text-gray-500 — captions<span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- tracking + leading --&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-8 tracking-tight"</span><span class="tag">&gt;</span>tracking-tight — headlines<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"tracking-widest"</span><span class="tag">&gt;</span>tracking-widest — eyebrows<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"leading-none"</span><span class="tag">&gt;</span>leading-none — 1, display text<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"leading-loose"</span><span class="tag">&gt;</span>leading-loose — 2, spacious copy<span class="tag">&lt;/p&gt;</span>
+
+  <span class="comment">&lt;!-- families --&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-8 font-mono text-sm bg-gray-100 rounded-lg p-4 text-gray-700"</span><span class="tag">&gt;</span>
+    font-mono — code and numbers
+  <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="val">"mt-4 font-serif text-lg"</span><span class="tag">&gt;</span>font-serif — quotes and accents<span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>Each line is its own documentation — the visible text names the classes that produce it, so the page doubles as a reference.</li>
+      <li>The headline (<code>text-4xl font-bold tracking-tight</code>) shows the display pattern: big, bold, and slightly negative tracking to tighten large type.</li>
+      <li>The body block is the default recipe: <code>text-base leading-relaxed text-gray-600</code> — size, rhythm, and color in three classes.</li>
+      <li>The size steps and one-line tracking/leading samples make each scale tangible.</li>
+      <li><code>font-mono</code> and <code>font-serif</code> switch the whole family for one element — useful for code, prices, and pull quotes.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>index.html</code> and open in a browser with internet. Try bumping the headline to <code>text-5xl</code>, switching the body to <code>leading-snug</code> (tighter), and changing the eyebrow to <code>tracking-normal</code> to see exactly what each utility controls.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>No hex-code guessing:</strong> you pick from a curated, tested palette — 11 steps per color — instead of hunting for "#3B82F6-ish" values that may not match the rest of the site.</li>
+    <li><strong>Consistent contrast for free:</strong> the scale is built for pairing (light tints with dark text steps of the same hue), so common combinations are readable and accessible by default.</li>
+    <li><strong>Instant theming:</strong> a brand change is a word change — <code>blue</code> → <code>emerald</code> across the file — or, in v4, one <code>@theme</code> line that gives you a <code>brand</code> color usable everywhere.</li>
+    <li><strong>Transparent tints without new colors:</strong> the <code>/NN</code> modifier (<code>bg-blue-500/50</code>) adds any opacity on the fly — no extra palette entries for glassy or hover overlays.</li>
+    <li><strong>A complete type system in four scales:</strong> size, weight, line-height, and letter-spacing cover every typographic decision a page needs, with names (not numbers) that read like intent.</li>
+    <li><strong>Recognizable hierarchy:</strong> because everyone uses the same steps, your <code>text-4xl font-bold tracking-tight</code> headline and <code>text-sm text-gray-500</code> caption look professional even before you've designed anything.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Tailwind's color utilities (<code>text-</code>, <code>bg-</code>, <code>border-</code>, plus <code>ring-</code>, <code>divide-</code> and the <code>/opacity</code> modifier) and its typography utilities (<code>text-</code> sizes, <code>font-</code> weights, <code>leading-</code>, <code>tracking-</code>) are two more applications of the same philosophy: <strong>fixed, well-chosen scales instead of free-form values</strong>. Colors come in 50→950 steps — tints for backgrounds, 500–700 for actions, 900–950 for depth — and type comes in ladders for size, weight, line-height, and spacing.
+  </p>
+  <p>
+    The habits that matter: <em>pick one gray family and stick to it, pair light steps with dark steps of the same hue, and let the four type scales — not your pixel instincts — decide the hierarchy.</em> Do that, and every page you build will look intentionally designed.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Tailwind CSS: Color &amp; Typography Utilities</footer>
+</div>
+</body>
+</html>

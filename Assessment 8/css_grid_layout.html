@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A detailed, beginner-friendly guide to CSS Grid — grid-template-columns/rows, the fr unit, repeat(), gap, line placement — and how it differs from Flexbox.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="CSS Grid, grid-template-columns, grid-template-rows, fr unit, repeat, gap, line placement, grid vs flexbox">
+  <title>CSS Grid Layout</title>
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#7c3aed; --accent-soft:#f1e9fd; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:#5b21b6; border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:#5b21b6; padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:#5b21b6; }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+    /* Live grid demos */
+    .grid-demo { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0; }
+    .grid-demo > div { background:#7c3aed; color:#fff; padding:18px; border-radius:4px; text-align:center; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>CSS Grid Layout</h1>
+    <p>grid-template-columns/rows, the fr unit, repeat(), gap, and line placement — plus Grid vs. Flexbox.</p>
+    <span class="badge">CSS · Layout · Grid</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>CSS Grid</strong> is a two-dimensional layout system. Unlike Flexbox (which handles one axis at a time), Grid lets you lay out items into <em>rows and columns at the same time</em> — like a table, but far more flexible. This makes it ideal for page-level layouts: a header spanning the top, a sidebar, a main content area, and a footer.
+  </p>
+  <p>
+    To use Grid, an element becomes a <strong>grid container</strong> with <code>display: grid</code>. Its direct children automatically become <strong>grid items</strong>. You then define the grid's structure using its tracks (rows and columns), and items are placed into them — either automatically or explicitly by line number.
+  </p>
+  <p>
+    The key ideas are:
+  </p>
+  <ul>
+    <li><strong>grid-template-columns / grid-template-rows</strong> — define the size of each column and row.</li>
+    <li><strong>fr unit</strong> — a fractional unit that shares available space in proportion to the number.</li>
+    <li><strong>repeat()</strong> — a shortcut to repeat a track pattern many times.</li>
+    <li><strong>gap</strong> — spacing between rows and columns.</li>
+    <li><strong>Line placement</strong> — placing items into specific grid lines (e.g., <code>grid-column: 1 / 3</code>).</li>
+  </ul>
+  <p>
+    A common rule of thumb: <em>Flexbox for one-dimensional layout (a row or a column), Grid for two-dimensional layout (rows AND columns together).</em>
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Making a grid container</h3>
+  <pre><code><span class="kw">.container</span> {
+  <span class="kw">display</span>: <span class="kw">grid</span>;
+  <span class="kw">grid-template-columns</span>: <span class="num">200px</span> <span class="num">1fr</span> <span class="num">1fr</span>;
+  <span class="kw">grid-template-rows</span>: <span class="kw">auto</span> <span class="num">200px</span>;
+  <span class="kw">gap</span>: <span class="num">16px</span>;
+}</code></pre>
+
+  <h3>The main grid properties</h3>
+  <table>
+    <tr><th>Property</th><th>What it does</th><th>Example</th></tr>
+    <tr><td><code>grid-template-columns</code></td><td>Defines the width of each column track.</td><td><code>grid-template-columns: 1fr 1fr</code></td></tr>
+    <tr><td><code>grid-template-rows</code></td><td>Defines the height of each row track.</td><td><code>grid-template-rows: auto 200px</code></td></tr>
+    <tr><td><code>fr</code> unit</td><td>A fraction of the available space (e.g. <code>1fr</code> shares equally).</td><td><code>1fr 2fr 1fr</code></td></tr>
+    <tr><td><code>repeat(n, value)</code></td><td>Repeats a track pattern <code>n</code> times.</td><td><code>repeat(3, 1fr)</code></td></tr>
+    <tr><td><code>gap</code></td><td>Space between rows and columns.</td><td><code>gap: 16px</code></td></tr>
+    <tr><td><code>grid-column</code> / <code>grid-row</code></td><td>Places an item between specific grid lines.</td><td><code>grid-column: 1 / 3</code></td></tr>
+  </table>
+
+  <h3>The fr unit and repeat()</h3>
+  <pre><code><span class="comment">/* 3 equal columns */</span>
+<span class="kw">grid-template-columns</span>: <span class="kw">repeat</span>(<span class="num">3</span>, <span class="num">1fr</span>);
+
+<span class="comment">/* 1 fixed column + 2 flexible columns */</span>
+<span class="kw">grid-template-columns</span>: <span class="num">200px</span> <span class="num">1fr</span> <span class="num">1fr</span>;
+
+<span class="comment">/* columns sized as 1fr, 2fr, 1fr (middle is twice as wide) */</span>
+<span class="kw">grid-template-columns</span>: <span class="num">1fr</span> <span class="num">2fr</span> <span class="num">1fr</span>;</code></pre>
+
+  <div class="note">
+    <strong>Key rule:</strong> The <code>fr</code> unit divides the <em>free</em> space among the tracks proportionally. <code>repeat(4, 1fr)</code> is equal to writing <code>1fr 1fr 1fr 1fr</code> — ideal for responsive columns that always fill the container.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>1. grid-template-columns — define columns</h3>
+    <p>Sets the width of each column. You can mix fixed sizes and flexible <code>fr</code> units.</p>
+    <pre><code><span class="kw">.grid</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">grid-template-columns</span>: <span class="num">200px</span> <span class="num">1fr</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>2. grid-template-rows — define rows</h3>
+    <p>Sets the height of each row. Useful for fixed-height header/footer areas.</p>
+    <pre><code><span class="kw">.layout</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">grid-template-rows</span>: <span class="num">60px</span> <span class="num">1fr</span> <span class="num">80px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>3. fr unit — share available space</h3>
+    <p>A flexible fraction. <code>1fr 2fr 1fr</code> splits the leftover width so the middle column is twice as wide as the outer ones.</p>
+    <div class="grid-demo" style="grid-template-columns:1fr 2fr 1fr;">
+      <div>1fr</div><div>2fr</div><div>1fr</div>
+    </div>
+    <pre><code><span class="kw">grid-template-columns</span>: <span class="num">1fr</span> <span class="num">2fr</span> <span class="num">1fr</span>;</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>4. repeat() — repeat a pattern</h3>
+    <p>Creates many identical tracks in a compact way. Perfect for equal-width column layouts.</p>
+    <pre><code><span class="kw">grid-template-columns</span>: <span class="kw">repeat</span>(<span class="num">4</span>, <span class="num">1fr</span>);  <span class="comment">// 4 equal columns</span></code></pre>
+  </div>
+
+  <div class="card">
+    <h3>5. gap — spacing between cells</h3>
+    <p>Adds spacing between all rows and columns. You can use <code>row-gap</code> and <code>column-gap</code> separately.</p>
+    <pre><code><span class="kw">.grid</span> { <span class="kw">display</span>: <span class="kw">grid</span>; <span class="kw">gap</span>: <span class="num">16px</span>; }</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>6. Line placement — position items by grid line</h3>
+    <p>Grid lines are numbered (starting at 1 before the first track). You can place an item between two lines using <code>grid-column</code> / <code>grid-row</code>, or use the shorthand <code>grid-area</code>.</p>
+    <pre><code><span class="kw">.header</span> { <span class="kw">grid-column</span>: <span class="num">1</span> / <span class="num">3</span>; }  <span class="comment">// spans from line 1 to line 3</span>
+<span class="kw">.sidebar</span> { <span class="kw">grid-row</span>: <span class="num">1</span> / <span class="num">3</span>; }    <span class="comment">// spans rows 1 to 3</span></code></pre>
+  </div>
+
+  <div class="tip">
+    <strong>Did you know?</strong> You can also update the grid to a well-known 12-column layout with just one line: <code>grid-template-columns: repeat(12, 1fr)</code> — then place sections across it, e.g. <code>grid-column: span 6</code>.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — A 3-column layout with repeat(), fr, and gap</h3>
+  <p>This example creates a responsive 3-column grid. It uses <code>repeat(3, 1fr)</code> for equal columns and <code>gap</code> to space them. On a narrow screen the columns naturally stay equal width and can wrap.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* The grid container — 3 equal columns with gap */</span>
+    <span class="kw">.grid</span> {
+      <span class="kw">display</span>: <span class="kw">grid</span>;
+      <span class="kw">grid-template-columns</span>: <span class="kw">repeat</span>(<span class="num">3</span>, <span class="num">1fr</span>);
+      <span class="kw">gap</span>: <span class="num">16px</span>;
+      <span class="kw">padding</span>: <span class="num">20px</span>;
+    }
+
+    <span class="kw">.grid &gt; div</span> {
+      <span class="kw">background</span>: <span class="str">#f1e9fd</span>; <span class="kw">padding</span>: <span class="num">20px</span>;
+      <span class="kw">border-radius</span>: <span class="num">8px</span>; <span class="kw">text-align</span>: <span class="kw">center</span>;
+    }
+
+    <span class="comment">/* The middle column is wider (2fr) — a nice emphasis */</span>
+    <span class="kw">.grid &gt; div:nth-child(2)</span> { <span class="kw">background</span>: <span class="str">#7c3aed</span>; <span class="kw">color</span>: <span class="str">white</span>; }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"grid"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 1<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 2<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 3<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 4<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 5<span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Col 6<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li><code>display: grid</code> makes the container a grid.</li>
+      <li><code>grid-template-columns: repeat(3, 1fr)</code> creates <strong>3 equal columns</strong>.</li>
+      <li>Six items are placed automatically into those columns, forming <strong>2 rows</strong>.</li>
+      <li><code>gap: 16px</code> adds space between cells.</li>
+      <li>Because the columns use <code>fr</code>, they always fill the container's width evenly.</li>
+    </ul>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A page layout with line placement</h3>
+  <p>This is a full page layout using Grid line placement. A header spans the top, a sidebar runs down the left, the main content fills the middle, and a footer spans the bottom — all arranged with <code>grid-column</code> / <code>grid-row</code>.</p>
+
+  <pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="val">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* The page grid: 2 columns, 3 rows */</span>
+    <span class="kw">.layout</span> {
+      <span class="kw">display</span>: <span class="kw">grid</span>;
+      <span class="kw">grid-template-columns</span>: <span class="num">200px</span> <span class="num">1fr</span>;  <span class="comment">// sidebar + main</span>
+      <span class="kw">grid-template-rows</span>: <span class="num">60px</span> <span class="num">1fr</span> <span class="num">80px</span>; <span class="comment">// header + content + footer</span>
+      <span class="kw">gap</span>: <span class="num">12px</span>;
+      <span class="kw">min-height</span>: <span class="num">80vh</span>;
+    }
+
+    <span class="comment">/* Header spans BOTH columns (line 1 to 3) */</span>
+    <span class="kw">header</span> {
+      <span class="kw">grid-column</span>: <span class="num">1</span> / <span class="num">3</span>;
+      <span class="kw">background</span>: <span class="str">#7c3aed</span>; <span class="kw">color</span>: <span class="str">white</span>; <span class="kw">padding</span>: <span class="num">16px</span>;
+    }
+
+    <span class="comment">/* Sidebar spans the middle only (row 2) */</span>
+    <span class="kw">aside</span> { <span class="kw">background</span>: <span class="str">#f1e9fd</span>; <span class="kw">padding</span>: <span class="num">16px</span>; }
+
+    <span class="comment">/* Main content fills the rest of the middle */</span>
+    <span class="kw">main</span>  { <span class="kw">background</span>: <span class="str">#fff</span>; <span class="kw">padding</span>: <span class="num">16px</span>; }
+
+    <span class="comment">/* Footer spans both columns on the bottom row */</span>
+    <span class="kw">footer</span> {
+      <span class="kw">grid-column</span>: <span class="num">1</span> / <span class="num">3</span>;
+      <span class="kw">background</span>: <span class="str">#5b21b6</span>; <span class="kw">color</span>: <span class="str">white</span>; <span class="kw">padding</span>: <span class="num">16px</span>;
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"layout"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;header&gt;</span>Header<span class="tag">&lt;/header&gt;</span>
+    <span class="tag">&lt;aside&gt;</span>Sidebar<span class="tag">&lt;/aside&gt;</span>
+    <span class="tag">&lt;main&gt;</span>Main Content<span class="tag">&lt;/main&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>Footer<span class="tag">&lt;/footer&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>The grid has <strong>2 columns</strong> (200px sidebar + flexible main) and <strong>3 rows</strong> (header, content, footer).</li>
+      <li><code>header</code> uses <code>grid-column: 1 / 3</code> to span across both columns.</li>
+      <li><code>aside</code> automatically sits in column 1; <code>main</code> in column 2 (both on the middle row).</li>
+      <li><code>footer</code> uses <code>grid-column: 1 / 3</code> to span the full width on the bottom row.</li>
+      <li>This creates a classic header/sidebar/main/footer layout with very little CSS.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to try it</div>
+      Copy either example into a file named <code>index.html</code> and open it in a browser. In Example 2, resize to see how the grid holds its structure. Try changing <code>grid-template-columns</code> to <code>1fr 3fr</code> to make the sidebar narrower, or add <code>grid-row: 1 / 3</code> to the sidebar to make it span the full height.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Two-dimensional layout:</strong> Control rows and columns together for real page structures.</li>
+    <li><strong>Responsive by design:</strong> The <code>fr</code> unit and <code>repeat()</code> make columns adapt to container size.</li>
+    <li><strong>Accurate placement:</strong> Line placement lets you position items precisely into the grid.</li>
+    <li><strong>Powerful page layouts:</strong> Perfect for headers, sidebars, footers, galleries, and card grids.</li>
+    <li><strong>Less markup:</strong> No wrappers or floats; just define the grid and place items.</li>
+    <li><strong>Clean &amp; maintainable:</strong> Grid makes layout intent clear and easy to reason about.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    CSS Grid is a two-dimensional layout system that handles rows and columns together. Use <strong>grid-template-columns/rows</strong> to shape the tracks, the <strong>fr</strong> unit to share space flexibly, <strong>repeat()</strong> to create many equal tracks, <strong>gap</strong> for spacing, and <strong>line placement</strong> to position items precisely.
+  </p>
+  <p>
+    In summary: <strong>Flexbox is best for one dimension (a row or a column), while Grid excels at two dimensions (rows and columns together).</strong> For a full-page structure, Grid is the natural choice; for aligning items along a single line, Flexbox is ideal. As the saying goes: <em>"Grid for the page, Flexbox for the parts."</em>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · CSS Grid Layout</footer>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38353389bfd7373',t:'MTc4ODkyNjgzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

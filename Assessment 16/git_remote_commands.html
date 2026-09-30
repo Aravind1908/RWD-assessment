@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Remote Commands — clone, remote, push, pull, fetch (and pull vs fetch)</title>
+  <meta name="description" content="Git's remote repository commands — clone, remote, push, pull, fetch — explained with the remote-tracking branch model, and a clear pull vs fetch differentiation.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="git clone, git remote, git push, git pull, git fetch, pull vs fetch, origin, remote tracking branch, upstream">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Git: Remote Repository Commands</h1>
+    <p><code>clone</code>, <code>remote</code>, <code>push</code>, <code>pull</code>, <code>fetch</code> — how local work meets shared work — plus the one distinction that matters most: <strong>pull vs fetch</strong>.</p>
+    <span class="badge">Version Control · Git · Collaboration</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    Everything so far has been on one machine. Collaboration needs a second copy of the repository that others can reach — a <strong>remote repository</strong>. A remote is just <em>another clone</em> (usually on GitHub/GitLab, but it could be a USB stick): your machine and the remote exchange commits with <code>push</code> (send) and <code>fetch</code>/<code>pull</code> (receive).
+  </p>
+  <p>
+    The five verbs, in one line each:
+  </p>
+  <table>
+    <tr><th>Command</th><th>In one line</th></tr>
+    <tr><td><code>git clone &lt;url&gt;</code></td><td>download a complete copy of a remote repo (history included) and set up <code>origin</code></td></tr>
+    <tr><td><code>git remote</code></td><td>list and manage your named remotes</td></tr>
+    <tr><td><code>git push</code></td><td>upload your local commits to a remote branch</td></tr>
+    <tr><td><code>git fetch</code></td><td>download the remote's new commits — <strong>without touching your work</strong></td></tr>
+    <tr><td><code>git pull</code></td><td>fetch <em>and immediately merge</em> into your current branch</td></tr>
+  </table>
+  <pre><code>your machine                          remote ("origin")
+main ────────●──●──●─── push ──────&gt;  main ──────●──●
+   ▲                                    │
+   └────────── fetch / pull ◀───────────┘</code></pre>
+  <p>
+    One key piece of machinery makes the rest click: for every branch on a remote, Git keeps a <strong>remote-tracking branch</strong> — <code>origin/main</code> — a local mirror of where the remote's branch currently is. <code>fetch</code> updates that mirror; it never updates <em>your</em> branch.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>git clone — the door in</h3>
+  <pre><code>git clone https://github.com/team/site.git   <span class="comment"># folder "site" appears</span>
+git clone https://github.com/team/site.git my-folder  <span class="comment"># choose the name</span></code></pre>
+  <p>
+    One command that does three things: downloads the <strong>entire repository</strong> (full history, all branches), creates the working folder, and registers the source URL as the remote <strong><code>origin</code></strong>. Because it's a full copy (distributed model), you can work offline immediately and the clone doubles as a backup.
+  </p>
+
+  <h3>git remote — named pointers to other repos</h3>
+  <pre><code>git remote               <span class="comment"># list names: origin, …</span>
+git remote -v            <span class="comment"># names + their URLs (fetch and push)</span>
+git remote add fork https://github.com/me/site.git
+git remote remove fork</code></pre>
+  <p>
+    A remote is just a <em>name</em> bound to a URL. Projects often have more than one — <code>origin</code> plus a personal <code>fork</code>, a backup mirror, a second server. Your remote-tracking branches are named after them: <code>origin/main</code>, <code>fork/main</code>.
+  </p>
+
+  <h3>git push — upload your commits</h3>
+  <pre><code>git push origin main       <span class="comment"># upload local main to origin/main</span>
+git push -u origin main    <span class="comment"># -u sets "upstream": bare push/pull work from now on</span>
+git push origin main:fixes <span class="comment"># push to a differently-named remote branch</span></code></pre>
+  <p>
+    Push is one-directional and honest: it uploads the commits on your local branch to the named remote branch, and <strong>refuses</strong> if someone else's new commits would be overwritten (a "non-fast-forward") — you must integrate first. <code>-u</code> (set upstream) is a one-time convenience; after it, <code>git push</code> alone knows where to go.
+  </p>
+
+  <h3>git fetch — download, don't integrate</h3>
+  <pre><code>git fetch                <span class="comment"># update origin/* mirrors for the current remote</span>
+git fetch origin main    <span class="comment"># just one branch</span>
+git fetch --all          <span class="comment"># every remote</span>
+git fetch --prune        <span class="comment"># also drop remote branches that were deleted</span></code></pre>
+  <p>
+    Fetch is the <strong>read-only</strong> command. It downloads new commits and refs and moves the remote-tracking branches (<code>origin/main</code> advances). Your local branch, your index and your working directory are <em>completely untouched</em> — which is exactly why it's safe to run at any time, on any branch, even mid-work.
+  </p>
+
+  <h3>git pull — fetch + merge in one step</h3>
+  <pre><code>git pull                 <span class="comment"># = git fetch + git merge origin/&lt;current branch&gt;</span>
+git pull --rebase        <span class="comment"># fetch + rebase your commits on top (linear history)</span></code></pre>
+  <p>
+    Pull is <strong>fetch followed immediately by a merge</strong> of the downloaded commits into your current branch. Same information as fetch — plus it changes your branch, can create a merge commit, and can create merge conflicts. It's the fast path; fetch is the careful path.
+  </p>
+
+  <div class="card">
+    <h3>pull vs fetch — the difference that matters</h3>
+    <table>
+      <tr><th></th><th><code>git fetch</code></th><th><code>git pull</code></th></tr>
+      <tr><td>Downloads the remote's new commits</td><td>yes</td><td>yes</td></tr>
+      <tr><td>Updates <code>origin/main</code> (the remote-tracking branch)</td><td>yes</td><td>yes</td></tr>
+      <tr><td>Updates <em>your</em> branch / working directory</td><td><strong>no</strong></td><td><strong>yes</strong> (merge or rebase)</td></tr>
+      <tr><td>Can create merge conflicts</td><td>no</td><td>yes</td></tr>
+      <tr><td>Safe to run anytime</td><td>yes — it's read-only</td><td>only when you're ready to integrate</td></tr>
+      <tr><td>Afterwards you can…</td><td>inspect <code>main..origin/main</code>, then merge/rebase <em>when you choose</em></td><td>it's already merged (or you're resolving conflicts)</td></tr>
+    </table>
+    <p style="margin-bottom:0"><strong>One sentence:</strong> <code>fetch</code> is "show me what changed on the remote"; <code>pull</code> is "fetch, and bring it into my branch right now".</p>
+  </div>
+
+  <div class="note">
+    <strong>The safe loop, as a habit:</strong> <code>git fetch</code> → look (<code>git log --oneline main..origin/main</code> and <code>git diff main origin/main</code>) → integrate when ready (<code>git merge origin/main</code> or <code>git rebase</code>). Teams that fetch before they merge have far fewer surprise conflicts at the end of the day.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Which command for which situation</h3>
+    <table>
+      <tr><th>Situation</th><th>Command</th></tr>
+      <tr><td>Joining a project for the first time</td><td><code>git clone &lt;url&gt;</code></td></tr>
+      <tr><td>Connecting a second server/fork/backup</td><td><code>git remote add name &lt;url&gt;</code></td></tr>
+      <tr><td>Sharing finished work</td><td><code>git push</code> (first time: <code>-u</code>)</td></tr>
+      <tr><td>"What's happened on the remote?"</td><td><code>git fetch</code>, then <code>git log main..origin/main</code></td></tr>
+      <tr><td>"Bring the remote's work into my branch"</td><td><code>git pull</code> (or fetch + merge/rebase)</td></tr>
+      <tr><td>A teammate deleted a branch on the remote</td><td><code>git fetch --prune</code></td></tr>
+    </table>
+  </div>
+
+  <div class="demo">
+    <h3>The remote-tracking branch, visually</h3>
+    <pre style="margin-top:0"><span class="comment"># before the teammate pushes anything new</span>
+main          ●──●──●
+origin/main   ●──●──●        <span class="comment">(a mirror of the remote, updated by fetch)</span>
+
+<span class="comment"># teammate pushes two commits; you run `git fetch`</span>
+main          ●──●──●
+origin/main   ●──●──●──●──●  <span class="comment">(mirror moved — your branch didn't)</span>
+
+<span class="comment"># `git log main..origin/main` → "what I'm missing"</span>
+<span class="comment"># `git merge origin/main`  → your catch-up decision, on your schedule</span></pre>
+  </div>
+
+  <div class="tip">
+    <strong>If you remember one thing:</strong> <code>pull = fetch + merge</code>. Fetch is the harmless half of pull — so reaching for fetch first costs nothing and removes most "why did my pull just change everything?" moments.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+  <p>Both scripts simulate a team on one machine: a bare Git repository plays the shared "origin", and two clones are two people's laptops. Everything is built in a temp folder and cleaned up afterwards.</p>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — clone, remote and push: getting started and sharing</h3>
+  <p>One bare repo, two clones. Machine A pushes; machine B — which only existed a moment ago — already has the full history.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+root=$(mktemp -d) &amp;&amp; cd <span class="str">"$root"</span>
+
+<span class="comment"># a bare repository plays the shared remote "origin"</span>
+git init -q --bare --initial-branch=main origin.git
+
+<span class="comment"># clone it — one command: full repo + folder + 'origin' configured</span>
+git clone -q origin.git site
+cd site
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="abd2c4deebced3cac6dbc7ce85c8c4c6">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+
+git remote               <span class="comment"># origin — created automatically by clone</span>
+git remote -v            <span class="comment"># the URL it points to</span>
+
+<span class="kw">echo</span> <span class="str">"hello"</span> &gt; index.html
+git add index.html
+git commit -qm <span class="str">"first page"</span>
+git push -u origin main  <span class="comment"># -u: origin/main becomes my upstream</span>
+
+<span class="comment"># a second machine clones the same remote…</span>
+cd <span class="str">"$root"</span>
+git clone -q origin.git backup
+cd backup
+git log --oneline        <span class="comment"># …and already has machine A's commit</span>
+git ls-files             <span class="comment"># …and its files too</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li><code>clone</code> did three jobs in one step: downloaded the complete repository, created the <code>site</code> folder, and registered <code>origin</code> — which is why <code>git remote</code> already lists it.</li>
+      <li><code>git remote -v</code> shows what a remote <em>is</em>: a name bound to a URL, used for both fetch and push.</li>
+      <li><code>push -u</code> uploaded the commit <em>and</em> recorded "upstream": from now on, bare <code>git push</code>/<code>git pull</code> know which remote branch to talk to.</li>
+      <li>The <code>backup</code> clone appeared seconds later and contains the commit — because cloning a remote copies the whole history, not a working snapshot.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_git_remote_clone_push.sh</code> and run <code>bash example1_git_remote_clone_push.sh</code>. Only Git is needed; a temp folder is created and used.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — pull vs fetch, shown on the same branch</h3>
+  <p>Machine A starts the project; machine B joins and works in parallel — its clone already contains A's base commit. While B pushes, you run the safe loop: <code>fetch</code>, inspect, integrate on your own schedule, and see exactly what <code>pull</code> would have done in one step.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+root=$(mktemp -d) &amp;&amp; cd <span class="str">"$root"</span>
+
+<span class="comment"># a bare repository plays the shared remote "origin"</span>
+git init -q --bare --initial-branch=main origin.git
+
+<span class="comment"># machine A joins first: clone, first commit, push</span>
+git clone -q origin.git me
+cd me
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5f26302a1f3a273e322f333a713c3032">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+<span class="kw">echo</span> <span class="str">"shared base"</span> &gt; notes.txt
+git add notes.txt
+git commit -qm <span class="str">"base"</span>
+git push -q origin main
+
+<span class="comment"># machine B joins next — its clone already contains "base"</span>
+cd <span class="str">"$root"</span>
+git clone -q origin.git teammate
+cd teammate
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d0a9bfa590b5a8b1bda0bcb5feb3bfbd">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+
+<span class="comment"># the teammate pushes a new commit while I'm working</span>
+<span class="kw">echo</span> <span class="str">"teammate's line"</span> &gt;&gt; notes.txt
+git commit -qam <span class="str">"teammate: update notes"</span>
+git push -q origin main
+
+<span class="comment"># me: the safe loop — fetch, inspect, integrate when ready</span>
+cd <span class="str">"$root"</span>/me
+<span class="kw">echo</span> <span class="str">"my line"</span> &gt; my-file.txt
+git add my-file.txt
+git commit -qm <span class="str">"me: add my file"</span>
+
+git fetch                          <span class="comment"># 1) download — my branch is untouched</span>
+git log --oneline main..origin/main <span class="comment"># 2) what I'm missing</span>
+git diff main origin/main --stat    <span class="comment">#    …and what it changes</span>
+git merge origin/main              <span class="comment"># 3) integrate — `git pull` is 1+3 in one go</span>
+git log --oneline --graph
+git push                           <span class="comment"># now my branch is ahead — upload it</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>After <code>git fetch</code>, run <code>git log --oneline</code> yourself: your branch still has only "base" + "me" — fetch moved <code>origin/main</code>, not <code>main</code>.</li>
+      <li><code>git log main..origin/main</code> lists exactly the commits you're missing; <code>git diff main origin/main</code> shows the changes they'd bring in. This is the "peek before you merge" that raw <code>pull</code> skips.</li>
+      <li><code>git merge origin/main</code> integrates on your schedule — <code>git pull</code> would have performed steps 1 and 3 together, immediately, no inspection in between.</li>
+      <li>The final <code>git push</code> uploads your branch (now containing everyone's work). Notice push never had to guess anything: your branch was ahead, so it was a clean fast-forward.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example2_git_fetch_vs_pull.sh</code> and run <code>bash example2_git_fetch_vs_pull.sh</code>. Watch the <code>--graph</code> log at the end: two lines of work woven into one.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong><code>clone</code> is a complete onboarding:</strong> full history, working files and configured remote in one command — and every clone is a backup by construction.</li>
+    <li><strong>Remotes are cheap named pointers:</strong> origin, forks, mirrors and backups can all coexist; switching or adding one is a one-line change, not a re-setup.</li>
+    <li><strong>Push is honest and safe:</strong> it uploads your commits and refuses to overwrite others' — conflicts are caught at the boundary, not hidden in someone else's day.</li>
+    <li><strong>Fetch is a zero-risk peek:</strong> read-only, anytime, any branch — the habit that turns "surprise merge conflict" into "planned integration".</li>
+    <li><strong>Pull keeps the fast path simple:</strong> one word when you know the remote is safe to integrate.</li>
+    <li><strong>Remote-tracking branches are always-current mirrors:</strong> <code>origin/main</code> tells you what the remote thinks, independently of what your branch does.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Collaboration in Git is five verbs around a model: <code>clone</code> brings you a complete copy with <code>origin</code> already wired up; <code>remote</code> manages the named connections; <code>push</code> uploads your commits; <code>fetch</code> downloads the world's new commits into <code>origin/*</code> mirrors <em>without touching you</em>; and <code>pull</code> is simply <strong>fetch + merge</strong> — the same information, but applied to your branch immediately.
+  </p>
+  <p>
+    The daily loop that follows from that model: <em>fetch (or pull) in the morning, commit and push in the evening.</em> Remotes are mirrors, not masters — and the fetch-first habit is the difference between a smooth day and a merge-conflict afternoon.
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Git: Remote Repository Commands</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e6ced40d5c2447',t:'MTc4OTk2OTk4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

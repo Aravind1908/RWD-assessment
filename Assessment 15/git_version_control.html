@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is Version Control? — Why Git, and Distributed vs Centralized</title>
+  <meta name="description" content="What version control is, why Git is used, and how a distributed VCS differs from a centralized VCS — with two demos that run on a single machine.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="version control, VCS, git, distributed version control, centralized version control, SVN, why git">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>What is Version Control?</h1>
+    <p>Why every project needs a record of its changes, why Git became the default, and what "distributed" actually means — with two demos that run on one machine.</p>
+    <span class="badge">Version Control · Git · DVCS vs CVCS</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>Version control</strong> is a system that records changes to files over time so you can retrieve any earlier state. Every save point — called a <em>commit</em> — is a snapshot of the project, tagged with who made it, when, and why (a message). Without version control, "the last version" is a folder named <code>final_FINAL_v3_really</code>.
+  </p>
+  <p>
+    <strong>Git</strong> (2005, created by Linus Torvalds for the Linux kernel) became the industry standard for four practical reasons:
+  </p>
+  <ul>
+    <li><strong>Speed</strong> — commit, log, branch and diff run entirely on your machine in milliseconds.</li>
+    <li><strong>Offline work</strong> — a Git clone is a complete repository; the network is optional.</li>
+    <li><strong>Every clone is a backup</strong> — the project's full history exists in as many places as there are developers.</li>
+    <li><strong>Cheap branching</strong> — trying an idea is a one-command, near-zero-cost operation, so teams branch constantly instead of fearing it.</li>
+  </ul>
+  <pre><code><span class="comment"># what a version-controlled project "remembers"</span>
+c3f9a12  <span class="str">"fix login timeout"</span>        Priya   2026-09-18 14:02
+a1b2c3d  <span class="str">"add retry to payments"</span>    Dev   2026-09-17 11:40
+7e2f0b1  <span class="str">"first version"</span>            Dev   2026-09-15 09:12
+<span class="comment"># any one of these snapshots can be restored at any time</span></code></pre>
+  <p>
+    VCS tools split into two families — <strong>centralized</strong> (SVN, Perforce, TFVC) and <strong>distributed</strong> (Git, Mercurial) — and the difference is a single architectural decision: <em>where the full history lives</em>.
+  </p>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>The core idea: commits are snapshots</h3>
+  <p>
+    A commit is a <strong>snapshot of the whole project</strong> (Git records what each file contained, not a list of edits), identified by a content-based hash — <code>a1b2c3d</code> is a commit, and it doubles as a bookmark, an address and a fingerprint. Because the hash is computed from the content, you cannot silently alter history: any change produces a different hash.
+  </p>
+
+  <h3>Centralized VCS (CVCS) — one server is the truth</h3>
+  <p>
+    In a centralized model, a single server holds <em>the</em> repository. Clients check out working copies, and nearly every operation — committing, reading old logs, comparing versions — <strong>requires a connection to that server</strong>.
+  </p>
+  <pre><code>client A ─┐
+client B ─┼──&gt;  CENTRAL SERVER  <span class="comment">(the only copy of the full history)</span>
+client C ─┘</code></pre>
+  <p>
+    Examples: <strong>Subversion (SVN)</strong>, Perforce, Team Foundation Version Control. Consequences: fastest possible setup and one canonical location, but a <strong>single point of failure</strong> — server down, and nobody can commit, read history, or diff old versions.
+  </p>
+
+  <h3>Distributed VCS (DVCS) — every clone is the truth</h3>
+  <p>
+    In a distributed model, <code>clone</code> copies the <strong>entire repository — full history, all branches</strong> — to your machine. Commits, logs, branches and diffs are local operations that never touch the network. Remotes exist purely to <em>sync</em> clones with each other.
+  </p>
+  <pre><code>your clone (full copy)  <span class="comment">──push/pull──&gt;</span>  "origin" (just another clone,
+   + your local commits,        <span class="comment">    typically on GitHub/GitLab — a</span>
+     branches, history              <span class="comment">    convenience, not a dependency)</span></code></pre>
+  <p>
+    Examples: <strong>Git</strong>, Mercurial. Consequences: offline capability, many independent copies (a clone is a backup), and arbitrary topologies — any clone can serve as the "server", and teams push/pull peer-to-peer, not just to a hub.
+  </p>
+
+  <h3>The practical differences</h3>
+  <table>
+    <tr><th></th><th>Centralized (SVN…)</th><th>Distributed (Git…)</th></tr>
+    <tr><td>Full history lives in</td><td>one central server</td><td>every clone</td></tr>
+    <tr><td>Commit while offline</td><td>no</td><td>yes — commit locally, push later</td></tr>
+    <tr><td>Server outage means</td><td>the whole team is blocked</td><td>nothing locally; sync is delayed</td></tr>
+    <tr><td>Reading old logs / diffs</td><td>usually needs the server</td><td>always local, always fast</td></tr>
+    <tr><td>Who merges what</td><td>often a designated admin/lead</td><td>anyone, anywhere, peer-to-peer</td></tr>
+    <tr><td>Clone =</td><td>working copy (partial)</td><td>complete repository + backup</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>GitHub is not the point.</strong> Git doesn't need GitHub. "origin" is the name of a sync partner — a bare repository on a server, a USB stick, or a teammate's laptop. The centralized habit of treating the server as the project is exactly what the distributed model removes.
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>What teams actually use it for</h3>
+    <ul>
+      <li><strong>Undoing mistakes</strong> — restore any file from any commit; the "oops" is a command, not a catastrophe.</li>
+      <li><strong>Answering "who changed what, when, why"</strong> — <code>git log</code>, <code>git blame</code> turn arguments into lookups.</li>
+      <li><strong>Parallel work</strong> — each developer (or feature) works on its own branch; merge when ready.</li>
+      <li><strong>Experiments without risk</strong> — a branch you abandon costs nothing.</li>
+      <li><strong>History as documentation</strong> — commit messages + reviews form a narrative of how the code evolved.</li>
+      <li><strong>Releases and rollbacks</strong> — tag a commit as v2.1, and you can always go back to it exactly.</li>
+    </ul>
+  </div>
+
+  <div class="demo">
+    <h3>Same incident, two worlds</h3>
+    <table>
+      <tr><th>6 pm: you need to commit; the network/server is down</th><th>What happens</th></tr>
+      <tr><td><strong>CVCS</strong></td><td>You're blocked. The only copy of the history is unreachable; even reading yesterday's log may fail.</td></tr>
+      <tr><td><strong>DVCS (Git)</strong></td><td>You commit, branch and diff normally — everything is local. You push tomorrow; nobody notices.</td></tr>
+    </table>
+  </div>
+
+  <div class="tip">
+    <strong>Why version control, in one line:</strong> it is the safety net that makes collaboration possible — it turns "whose copy is the right one?" into a question with a definite, provable answer.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+  <p>Both examples are terminal scripts — they build a throwaway repository in a temp folder, print what's happening, and clean up after themselves. They need Git installed and nothing else.</p>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — Why VCS exists: undo a mistake, read the history</h3>
+  <p>A file gets broken. Version control gives it back and remembers every state in between.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+demo=$(mktemp -d)/undo-demo &amp;&amp; mkdir -p <span class="str">"$demo"</span> &amp;&amp; cd <span class="str">"$demo"</span>
+
+git init -q                          <span class="comment"># start tracking this folder</span>
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0970667c496c71686479656c276a6664">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+<span class="kw">echo</span> <span class="str">"v1 of the app"</span> &gt; app.txt
+git add app.txt
+git commit -qm <span class="str">"first version"</span>       <span class="comment"># snapshot 1 saved</span>
+
+<span class="kw">echo</span> <span class="str">"oops, broke it"</span> &gt; app.txt      <span class="comment"># simulate a bad edit</span>
+git status --short                   <span class="comment"># M  app.txt — git knows it changed</span>
+git restore app.txt                  <span class="comment"># undo: file is back to the committed state</span>
+<span class="kw">cat</span> app.txt                          <span class="comment"># "v1 of the app" — the damage is gone</span>
+
+git log --oneline                    <span class="comment"># the history, newest first</span>
+git log --stat --oneline             <span class="comment"># …with what each commit touched</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li><code>git init</code> turns an ordinary folder into a version-controlled one — from then on, Git watches what you save.</li>
+      <li><code>git commit</code> is the save point: a named snapshot that survives any later damage.</li>
+      <li><code>git status</code> is the "what changed?" check — here it reports <code>M app.txt</code> (modified, not yet saved into a commit).</li>
+      <li><code>git restore</code> throws away the bad edit and brings the file back to the last committed state — the everyday "undo" that no folder named <code>backup</code> can give you.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example1_vcs_undo_history.sh</code> and run <code>bash example1_vcs_undo_history.sh</code> — or paste the lines into a terminal in any empty folder. You'll see the broken file heal itself and the history print out.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — Distributed vs centralized, on one machine</h3>
+  <p>A bare Git repository plays the role of "the central server". Watch what happens when it goes away — the difference between the two models in one experiment.</p>
+
+  <pre><code><span class="comment">#!/usr/bin/env bash</span>
+<span class="kw">set</span> -euo pipefail
+root=$(mktemp -d) &amp;&amp; cd <span class="str">"$root"</span>
+
+<span class="comment"># 1) a bare repo plays "the central server"</span>
+git init -q --bare server.git
+git clone -q server.git work         <span class="comment"># your clone: a FULL copy</span>
+cd work
+git config user.email <span class="str">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d8a1b7ad98bda0b9b5a8b4bdf6bbb7b5">[email&#160;protected]</a>"</span>
+git config user.name  <span class="str">"You"</span>
+<span class="kw">echo</span> <span class="str">"line one"</span> &gt; notes.txt
+git add notes.txt
+git commit -qm <span class="str">"first commit"</span>
+
+<span class="comment"># 2) "the server goes down" — rename the bare repo away</span>
+cd <span class="str">"$root"</span> &amp;&amp; mv server.git server.git-down
+cd work
+<span class="kw">echo</span> <span class="str">"line two"</span> &gt;&gt; notes.txt
+git add notes.txt
+git commit -qm <span class="str">"commits still work — the full history is local"</span>
+git log --oneline                     <span class="comment"># both commits, read entirely offline</span>
+
+<span class="comment"># 3) "the server is back" — push the two commits</span>
+cd <span class="str">"$root"</span> &amp;&amp; mv server.git-down server.git
+cd work
+git push -q origin main 2&gt;/dev/null || git push -q origin master
+<span class="kw">echo</span> <span class="str">"done — the clone kept working without the 'server'"</span></code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>The <code>clone</code> in step 1 copied a complete repository — history, branches, everything — not just current files.</li>
+      <li>In step 2 the "server" no longer exists, yet committing and reading the log work perfectly. In a centralized VCS this is the step where the team stops.</li>
+      <li>In step 3 <code>push</code> simply <em>synchronizes</em> the two copies — the "server" received two commits it never saw happen. In a DVCS, origin is a peer, not a gatekeeper.</li>
+      <li>Run it twice and compare: the second run's push says <code>Everything up-to-date</code> — sync is idempotent and cheap.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Save as <code>example2_distributed_vs_centralized.sh</code> and run <code>bash example2_distributed_vs_centralized.sh</code>. Needs Git; uses only a temp folder.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Local-first speed:</strong> the operations you use a hundred times a day (commit, log, diff, branch) never touch the network.</li>
+    <li><strong>Offline capability:</strong> planes, trains, flaky offices — work and commit continue; sync is a separate, later step.</li>
+    <li><strong>Every clone is a backup:</strong> the full history exists in N places; losing one machine (or even the "main" server) loses nothing.</li>
+    <li><strong>Integrity by design:</strong> content-addressed commits mean history can't be quietly corrupted or altered — a different hash is proof of a different state.</li>
+    <li><strong>Branching is a non-event:</strong> near-zero cost makes feature branches, experiments and hotfixes the normal way of working instead of a risky escalation.</li>
+    <li><strong>Arbitrary topologies:</strong> hub-and-spoke, peer-to-peer, or both — the model doesn't care who pushes to whom.</li>
+    <li><strong>Industry gravity:</strong> GitHub/GitLab/Bitbucket, CI/CD pipelines and code-review flows are built around Git, so the skill compounds.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Version control is the record of a project's changes — snapshots tagged with who, when and why. Git won because it made that record <strong>local, fast and everywhere</strong>: every clone carries the full history, so the network becomes optional and every machine becomes a backup.
+  </p>
+  <p>
+    The architectural difference in one sentence: <em>in a centralized system the server is the project; in a distributed system every clone is the project.</em> Centralized VCS (SVN-style) is a hub that the whole team depends on; distributed VCS (Git) is a mesh of complete copies that sync when convenient. <strong>Origin is a convenience, not a dependency.</strong>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · What is Version Control?</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

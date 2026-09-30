@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Syntax — Headings, Emphasis, Lists, Code, Tables, Links &amp; Images</title>
+  <meta name="description" content="Markdown syntax explained with examples — headings, emphasis, ordered and unordered lists, inline and fenced code blocks, tables, links and images — each shown as source and rendered result.">
+  <meta name="author" content="Arena.ai Agent">
+  <meta name="keywords" content="markdown, markdown syntax, headings, emphasis, lists, code block, table, link, image, README">
+  <style>
+    :root { --ink:#1f2430; --muted:#5b6270; --accent:#2563eb; --accent-dark:#1d4ed8; --accent-soft:#dbeafe; --code-bg:#0f172a; --code-ink:#e2e8f0; --border:#e3e7ee; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f6f8fb; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:32px 20px 80px; }
+    header.hero { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border-radius:16px; padding:36px 28px; margin-bottom:28px; }
+    header.hero h1 { margin:0 0 8px; font-size:1.9rem; }
+    header.hero p { margin:0; opacity:0.92; }
+    .badge { display:inline-block; background:rgba(255,255,255,0.18); border-radius:999px; padding:3px 12px; font-size:0.8rem; margin-top:14px; letter-spacing:0.4px; }
+    h2 { font-size:1.4rem; color:var(--accent-dark); border-bottom:2px solid var(--accent-soft); padding-bottom:6px; margin-top:42px; }
+    h2 .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--accent); color:#fff; border-radius:50%; font-size:0.9rem; margin-right:10px; }
+    h3 { color:var(--ink); margin-top:26px; font-size:1.08rem; }
+    p { margin:12px 0; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; box-shadow:0 1px 2px rgba(15,23,42,0.03); }
+    pre { background:var(--code-bg); color:var(--code-ink); border-radius:10px; padding:16px 18px; overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0; border-left:4px solid var(--accent); }
+    code { font-family:"SF Mono","Cascadia Code",Consolas,Menlo,monospace; }
+    p code, li code, td code { background:var(--accent-soft); color:var(--accent-dark); padding:2px 6px; border-radius:5px; font-size:0.88em; }
+    .comment { color:#7c8aa0; font-style:italic; }
+    .kw { color:#c084fc; }
+    .str { color:#a5f3c4; }
+    .num { color:#fca5a5; }
+    .tag { color:#7dd3fc; }
+    .attr { color:#f0abfc; }
+    .val { color:#fde68a; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { background:var(--accent-soft); color:var(--accent-dark); }
+    tr:last-child td { border-bottom:none; }
+    ul,ol { padding-left:22px; }
+    li { margin:6px 0; }
+    .tip { background:#fff7e6; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:8px; margin:16px 0; color:#7a4c00; }
+    .note { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:16px 0; }
+    .run-box { border:1px dashed var(--border); border-radius:10px; padding:12px 16px; margin-top:10px; background:#fbfcfe; }
+    .run-box .label { font-size:0.78rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+    .demo { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin:18px 0; }
+    .rendered { background:#fff; border:1px solid var(--border); border-left:4px solid #22c55e; border-radius:10px; padding:14px 18px; margin:10px 0 18px; font-size:0.92rem; }
+    .rendered h1 { font-size:1.35rem; margin:4px 0; }
+    .rendered h2 { font-size:1.1rem; margin:4px 0; color:var(--ink); border:none; padding:0; }
+    .rendered h2 .num, .rendered h3 { display:none; }
+    .rendered table { font-size:0.85rem; }
+    footer { margin-top:48px; text-align:center; color:var(--muted); font-size:0.85rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Markdown Syntax</h1>
+    <p>The complete everyday set — headings, emphasis, lists, inline and fenced code, tables, links and images — each shown as <strong>source</strong> and as the <strong>rendered result</strong>.</p>
+    <span class="badge">Documentation · Markdown</span>
+  </header>
+
+  <!-- 1. INTRODUCTION -->
+  <h2><span class="num">1</span>Introduction</h2>
+  <p>
+    <strong>Markdown</strong> is a lightweight markup language: you write plain text with a small set of symbols, and a renderer turns it into a formatted document (HTML). Created in 2004 by John Gruber, it's now the default format for <code>README</code> files, issue trackers, technical docs, notes apps and chat tools — because it's readable <em>unrendered</em>: a raw <code>.md</code> file makes sense even before anything converts it.
+  </p>
+  <p>
+    The philosophy in one line: <strong>formatting should be a side effect of plain text, not a battle with a word processor.</strong> A paragraph is just lines separated by a blank line; a heading is a line that starts with <code>#</code>. No tags, no escaping, no cursor-hunting for a menu.
+  </p>
+  <pre><code><span class="comment"># the whole "document" model of Markdown</span>
+plain text lines        →  paragraphs
+# symbol + text         →  heading
+- symbol + text         →  list item
+`backticks`             →  inline code
+[text](url)             →  link
+![alt](url)             →  image
+| a | b |               →  table cell</code></pre>
+
+  <!-- 2. SYNTAX -->
+  <h2><span class="num">2</span>Syntax and its Explanation</h2>
+
+  <h3>Headings — <code>#</code> through <code>######</code></h3>
+  <p>One to six <code>#</code> at the start of a line, then a space, then the text. The number of hashes sets the level.</p>
+  <pre><code># Chapter title            <span class="comment">&lt;h1&gt;</span>
+## Section                 <span class="comment">&lt;h2&gt;</span>
+### Subsection             <span class="comment">&lt;h3&gt;</span>
+#### Down to ###### h6</code></pre>
+  <div class="rendered"><h1>Chapter title</h1><h2>Section</h2><h3>Subsection</h3></div>
+  <p>Habit: a document has one <code>#</code>, and levels shouldn't skip (<code>##</code> → <code>###</code>, not <code>##</code> → <code>####</code>). Renderers and TOC generators both rely on the structure.</p>
+
+  <h3>Emphasis — italic, bold, both, strikethrough</h3>
+  <pre><code>*italic*      or   _italic_
+**bold**      or   __bold__
+***bold italic***
+~~strikethrough~~   <span class="comment">(GitHub/Flavored Markdown)</span></code></pre>
+  <div class="rendered"><p><em>italic</em> · <strong>bold</strong> · <em><strong>bold italic</strong></em> · <s>strikethrough</s></p></div>
+
+  <h3>Lists — unordered, ordered, nested</h3>
+  <pre><code><span class="comment">&lt;!-- unordered: - (or * or +), nested with 2-space indents --&gt;</span>
+- Apples
+- Oranges
+  - Navel
+  - Blood
+
+<span class="comment">&lt;!-- ordered: numbers + dot (the numbers you type don't matter) --&gt;</span>
+1. Boil water
+1. Steep for 3 minutes
+1. Strain
+
+<span class="comment">&lt;!-- task lists (GitHub/Flavored Markdown) --&gt;</span>
+- [x] Write the docs
+- [ ] Ship it</code></pre>
+  <div class="rendered">
+    <ul><li>Apples</li><li>Oranges<ul><li>Navel</li><li>Blood</li></ul></li></ul>
+    <ol><li>Boil water</li><li>Steep for 3 minutes</li><li>Strain</li></ol>
+    <ul style="list-style:none"><li><input type="checkbox" checked disabled> Write the docs</li><li><input type="checkbox" disabled> Ship it</li></ul>
+  </div>
+
+  <h3>Code — inline and fenced blocks</h3>
+  <p>Inline code goes in single backticks — great for file names, commands, class names. Multi-line code goes in a <strong>fenced block</strong>: three backticks on a line by themselves, optionally followed by a language name for syntax highlighting.</p>
+  <pre><code>Run `npm install` and then `npm run dev`.
+
+```js
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+```</code></pre>
+  <div class="rendered"><p>Run <code>npm install</code> and then <code>npm run dev</code>.</p><pre style="margin:8px 0">function greet(name) {
+  return `Hello, ${name}!`;
+}</pre></div>
+  <p>The closing fence goes on its own line, left-aligned. (If your code itself contains backticks, use double backticks.)</p>
+
+  <h3>Tables</h3>
+  <pre><code>| Command   | Purpose          |
+| --------- | ---------------- |
+| `git add` | stage changes    |
+| `git log` | show history     |</code></pre>
+  <div class="rendered">
+    <table><tr><th>Command</th><th>Purpose</th></tr>
+    <tr><td><code>git add</code></td><td>stage changes</td></tr>
+    <tr><td><code>git log</code></td><td>show history</td></tr></table>
+  </div>
+  <p>The second row of dashes is required — it also sets alignment: <code>:---</code> left, <code>:---:</code> center, <code>---:</code> right. Cells can contain emphasis and inline code.</p>
+
+  <h3>Links</h3>
+  <pre><code><span class="comment">&lt;!-- inline: visible text, then URL in parens --&gt;</span>
+[GitHub](https://github.com)
+
+<span class="comment">&lt;!-- autolink: bare URLs just work (Flavored Markdown) --&gt;</span>
+https://example.com
+
+<span class="comment">&lt;!-- reference style: short in text, URL defined once below --&gt;</span>
+See the [spec][md].
+
+[md]: https://daringfireball.net/projects/markdown/</code></pre>
+  <div class="rendered"><p><a href="https://github.com">GitHub</a> · <a href="https://example.com">https://example.com</a> · See the <a href="https://daringfireball.net/projects/markdown/">spec</a>.</p></div>
+  <p>Reference style is handy for repeated links — the URL lives in one place you can fix once. A space before the URL inside the parentheses is allowed in Flavored Markdown.</p>
+
+  <h3>Images</h3>
+  <pre><code>![A friendly cat](images/cat.jpg)
+
+<span class="comment">&lt;!-- link an image: wrap it in a link --&gt;</span>
+[![A friendly cat](images/cat.jpg)](https://example.com/cats)</code></pre>
+  <div class="rendered"><p><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="A friendly logo (demo image, needs internet)" style="height:44px;display:inline-block;vertical-align:middle"> — same shape as a link, with an <code>!</code> in front and <em>alt text</em> that describes it.</p></div>
+  <p>Two rules that matter: <strong>always write meaningful alt text</strong> (screen readers, and the fallback when the image fails to load), and keep image files in a predictable folder (or use a stable URL).</p>
+
+  <div class="note">
+    <strong>Beyond the basics:</strong> blockquotes (<code>&gt; quoted text</code>), horizontal rules (<code>---</code> on its own line), and reference-style links are part of the core spec. Task lists, strikethrough, autolinks and tables are <strong>GitHub Flavored Markdown (GFM)</strong> extensions — the dialect you'll meet most often (GitHub, GitLab, VS Code preview, Obsidian).
+  </div>
+
+  <!-- 3. FEATURES & USES -->
+  <h2><span class="num">3</span>Features &amp; Uses</h2>
+
+  <div class="card">
+    <h3>Where you'll meet Markdown</h3>
+    <table>
+      <tr><th>Place</th><th>What it's for</th></tr>
+      <tr><td>GitHub / GitLab / Bitbucket</td><td><code>README.md</code>, issues, PR descriptions, wikis</td></tr>
+      <tr><td>VS Code, Obsidian, Notion, Typora</td><td>notes and docs with live preview</td></tr>
+      <tr><td>Slack / Discord (subsets)</td><td>formatted chat: <code>**bold**</code>, <code>`code`</code>, <code>&gt; quotes</code></td></tr>
+      <tr><td>npm / PyPI packages</td><td>the <code>README.md</code> is the package's landing page</td></tr>
+      <tr><td>Academic &amp; internal docs</td><td>CHANGELOGs, RFCs, meeting notes — version-controllable text</td></tr>
+    </table>
+  </div>
+
+  <div class="tip">
+    <strong>Why plain text wins:</strong> a Markdown file renders in a browser, reads fine in an email, diffs cleanly in Git, survives a copy-paste, and won't be orphaned by a software upgrade. That's why the whole ecosystem standardized on it instead of Word docs.
+  </div>
+
+  <!-- 4. EXAMPLE PROGRAMS -->
+  <h2><span class="num">4</span>Example Programs with Explanation</h2>
+  <p>Both examples are <code>.md</code> files — the "run" step is opening them in any Markdown preview (VS Code: <code>Ctrl+Shift+V</code>, GitHub: push and browse, or any renderer). Both are also saved as standalone files in this workspace.</p>
+
+  <!-- Example 1 -->
+  <h3>Example 1 — The core elements in a notes file</h3>
+  <p>Headings, emphasis, both list kinds and inline code — the set that covers 90% of daily writing.</p>
+
+  <pre><code><span class="comment"># Weekly Notes — Sprint 14</span>
+
+## What got done
+- Shipped the **billing fix** (the *urgent* one)
+- Wrote the on-call handover
+  - Included the `~/.env` checklist
+  - Added the rollback steps
+
+## Next week
+1. Review PRs from the frontend team
+1. Pair on the search performance work
+1. ~~Rewrite the dashboard~~ Just profile it first
+
+> Rule for this sprint: **no feature without a rollback plan.**
+
+The deploy command is `deploy --env prod` — ask Priya for access.</code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 1:</strong>
+    <ul>
+      <li>One <code>#</code> for the document title, <code>##</code> for sections — a structure any TOC generator can read.</li>
+      <li>The nested unordered list uses 2-space indents; the ordered list reuses <code>1.</code> for every line (renderers number them automatically).</li>
+      <li><code>~~Rewrite the dashboard~~</code> shows a cancelled plan — the classic strikethrough use in planning docs.</li>
+      <li><code>&gt;</code> blockquote sets the rule apart; backticks mark the exact command so it's copy-paste-safe.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Open <code>example1_markdown_basics.md</code> (in this workspace) in VS Code and press <code>Ctrl+Shift+V</code>, or paste it into any Markdown editor's preview.
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <h3>Example 2 — A complete project README</h3>
+  <p>Every element together, in the shape you'll actually ship: title, image, quick start with a fenced code block, a usage table, links and a task list.</p>
+
+  <pre><code><span class="comment"># tasklight</span>
+
+![Tasklight logo](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)
+
+A *small* task tracker that lives in **one file**. No server,
+no database — your tasks are a JSON file you own.
+
+## Quick start
+```bash
+npm install tasklight
+tasklight add "write the docs"
+tasklight list
+```
+
+## Commands
+| Command         | What it does                  |
+| --------------- | ----------------------------- |
+| `tasklight add` | add a task                    |
+| `tasklight done`| mark a task complete          |
+| `tasklight list`| print everything, `--all` for history |
+
+## Roadmap
+- [x] JSON file storage
+- [x] Terminal themes
+- [ ] Sync between machines
+
+## Links
+- [Issue tracker](https://github.com/example/tasklight/issues)
+- [Changelog](CHANGELOG.md)
+- Questions? [Open an issue](https://github.com/example/tasklight/issues/new) —
+  or read the [FAQ](https://example.com/faq) first.</code></pre>
+
+  <div class="card">
+    <strong>Explanation of Example 2:</strong>
+    <ul>
+      <li>The <code>!</[…]</code> line is the image — hosted on a stable URL (needs internet to display); its alt text describes it for when it doesn't load.</li>
+      <li>The fenced <code>```bash</code> block gets shell syntax highlighting in any GFM renderer — the language tag is what enables that.</li>
+      <li>The table mixes plain text and inline code in one cell (<code>`--all`</code>) — cells accept all inline syntax.</li>
+      <li>Reference-free inline links everywhere; a real README would often use reference style for the repeated repo URL.</li>
+      <li>Everything on this page — including the rendered previews above — is what your <code>.md</code> file will look like on GitHub.</li>
+    </ul>
+    <div class="run-box">
+      <div class="label">How to run</div>
+      Open <code>example2_markdown_readme.md</code> in a Markdown preview, or push the file to a GitHub repo and watch the rendered page appear automatically.
+    </div>
+  </div>
+
+  <!-- 5. ADVANTAGES -->
+  <h2><span class="num">5</span>Advantages</h2>
+  <ul>
+    <li><strong>Readable unrendered:</strong> the source <em>is</em> the document — in a diff, in an email, in a terminal. No format is more portable than plain text.</li>
+    <li><strong>Minimal to learn:</strong> the core set above is learnable in an afternoon; the rest (GFM extensions) is picked up as needed.</li>
+    <li><strong>Version-control friendly:</strong> text diffs cleanly in Git, so docs change through the same pull-request flow as code.</li>
+    <li><strong>Renderer-agnostic:</strong> the same file renders on GitHub, VS Code, Obsidian, Slack — write once, no export step.</li>
+    <li><strong>Structure without ceremony:</strong> headings give documents a table of contents; lists and tables give them scannability — with zero formatting tooling.</li>
+    <li><strong>Extensible where needed:</strong> fenced blocks carry real code with highlighting; front-matter (YAML) and plugins add metadata, math and diagrams on top of the same core.</li>
+  </ul>
+
+  <!-- 6. CONCLUSION -->
+  <h2><span class="num">6</span>Conclusion</h2>
+  <p>
+    Markdown is a deliberately small language: <code>#</code> for headings, <code>*</code>/<code>**</code> for emphasis, <code>-</code> and <code>1.</code> for lists, backticks for code (inline and fenced), pipes for tables, <code>[text](url)</code> for links, and <code>![alt](url)</code> for images. Add GFM's task lists, strikethrough and autolinks, and that's the dialect the entire software industry actually uses.
+  </p>
+  <p>
+    Its power isn't the formatting — it's that <em>plain text survives everything</em>: Git, email, terminals, and twenty years of software. If you remember one thing, make it the pairing: <strong>writable by hand, readable by humans, renderable by machines.</strong>
+  </p>
+
+  <footer>Created with the Arena.ai Agent · Markdown Syntax</footer>
+</div>
+</body>
+</html>
